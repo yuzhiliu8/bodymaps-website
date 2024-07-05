@@ -34,7 +34,7 @@ export default function App() {
   return (
     <div className="App">
       <div className="head">
-        My App
+        My Apppp
       </div>
 
       <button onClick={() => test()}>
