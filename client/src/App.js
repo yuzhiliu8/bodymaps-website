@@ -1,49 +1,43 @@
 import React from 'react'
 import { useState } from 'react'
 import "./App.css"
+import image from './assets/BodyMaps.png';
 
 export default function App() {
+  const [files, setFiles] = useState(' ');
 
-  const [data, setData] = useState();
-
-
-  function test(){
-    console.log('test');
-    setData('test');
-    const url = "https://jsonplaceholder.typicode.com/todos/1";
-    fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      console.log(data);
-      setData(JSON.stringify(data));
-    })
+  const handleUpload = (event) => {
+    const file = event.target.files[0]
+    if (file){
+      setFiles(file);
+      console.log(files);
+    }
+    
   }
 
 
-  // useEffect(() => {
-  //   const url = "https://www.reddit.com/r/javascript/top/.json?limit=5";
-  //   fetch(url)
-  //   .then(response => response.json())
-  //   .then(data => {
-  //     console.log(data);
-  //     setData(data);
-  //   })
-
-  // })
 
   return (
     <div className="App">
-      <div className="head">
-        My Apppp
+      
+      <div className="container">
+        <div className="header">
+          BodyMaps
+        </div>
+        <img src={image} alt="BodyMaps" />
+        <div className="input-container">
+          <div className="input-label">
+            Upload NIFTI.nii.gz Here
+          </div>
+          <form>
+            <input type="file" multiple onChange={handleUpload}/>
+          </form>
+        </div>
+        <div>
+        {files.name}
       </div>
-
-      <button onClick={() => test()}>
-        Get
-      </button>
-
-      <div className="data-output">
-        {data}
       </div>
+      
     </div>    
   )
 }
