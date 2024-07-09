@@ -1,14 +1,15 @@
 {
   "files": {
-    "main.css": "/bodymaps-website/static/css/main.8cbaee13.css",
-    "main.js": "/bodymaps-website/static/js/main.dde42425.js",
-    "static/media/BodyMaps.png": "/bodymaps-website/static/media/BodyMaps.1af404ef82ccf17b9b13.png",
+    "main.css": "/bodymaps-website/static/css/main.77fc5312.css",
+    "main.js": "/bodymaps-website/static/js/main.3f9d8a7b.js",
+    "static/media/Aptos-Display.ttf": "/bodymaps-website/static/media/Aptos-Display.069b7a87a0ee6677d284.ttf",
+    "static/media/BodyMapsIcon.png": "/bodymaps-website/static/media/BodyMapsIcon.ad216ba6f36f7d304db7.png",
     "index.html": "/bodymaps-website/index.html",
-    "main.8cbaee13.css.map": "/bodymaps-website/static/css/main.8cbaee13.css.map",
-    "main.dde42425.js.map": "/bodymaps-website/static/js/main.dde42425.js.map"
+    "main.77fc5312.css.map": "/bodymaps-website/static/css/main.77fc5312.css.map",
+    "main.3f9d8a7b.js.map": "/bodymaps-website/static/js/main.3f9d8a7b.js.map"
   },
   "entrypoints": [
-    "static/css/main.8cbaee13.css",
-    "static/js/main.dde42425.js"
+    "static/css/main.77fc5312.css",
+    "static/js/main.3f9d8a7b.js"
   ]
 }
