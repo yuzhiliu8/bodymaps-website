@@ -4,10 +4,12 @@
   "homepage": "https://yuzhiliu8.github.io/bodymaps-website",
   "private": true,
   "dependencies": {
+    "@cornerstonejs/core": "^1.82.0",
+    "@cornerstonejs/streaming-image-volume-loader": "^1.82.0",
+    "@cornerstonejs/tools": "^1.82.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
@@ -39,6 +41,9 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^6.1.1"
+    "gh-pages": "^6.1.1",
+    "i": "^0.3.7",
+    "react": "^18.3.1",
+    "react-router-dom": "^6.24.1"
   }
 }
