@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 
 import "./Home.css"
-import image from '../assets/BodyMaps.png';
+import image from '../assets/images/BodyMapsIcon.png';
 
 export default function Home() {
   const [file, setFile] = useState(' ');
@@ -30,20 +30,26 @@ export default function Home() {
         <div className="header">
           BodyMaps
         </div>
-        <img src={image} alt="BodyMaps" />
+        <img className="image" src={image} alt="BodyMaps" />
         <div className="input-container">
-          <div className="input-label">
-            Drop <b>NIFTI.nii.gz</b> here or Click to Upload
+          <div className="label-container">
+            <div className="input-label">
+              Drop <b>NIFTI.nii.gz</b> here 
+            </div>
+            <div className="input-label">
+              or Click to Upload
+            </div>
           </div>
+          
           
           <form>
             <input type="file" multiple onChange={handleUpload}/>
           </form>
         </div>
-        <div>
-        {file.name}
+      <div className="note">
+        By using this online service ​<br/> you agree that the data can be used to improve the model.​
       </div>
-      <button onClick={handleInference}>Inference</button>
+      {/* <button onClick={handleInference}>Inference</button> */}
       </div>
     </div>    
   )
