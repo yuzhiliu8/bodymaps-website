@@ -1,15 +1,21 @@
 {
   "files": {
-    "main.css": "/bodymaps-website/static/css/main.50f981d6.css",
-    "main.js": "/bodymaps-website/static/js/main.4334e42d.js",
+    "main.css": "/bodymaps-website/static/css/main.9e98e69d.css",
+    "main.js": "/bodymaps-website/static/js/main.891ca1f5.js",
+    "static/media/Aptos-Bold.ttf": "/bodymaps-website/static/media/Aptos-Bold.44d52cede70509c8f5b7.ttf",
     "static/media/Aptos-Display.ttf": "/bodymaps-website/static/media/Aptos-Display.069b7a87a0ee6677d284.ttf",
+    "static/media/Aptos.ttf": "/bodymaps-website/static/media/Aptos.28b557123cf03c7db634.ttf",
+    "static/media/Demo_img_BR.png": "/bodymaps-website/static/media/Demo_img_BR.8a274da824fb10285bc4.png",
+    "static/media/Demo_img_TR.png": "/bodymaps-website/static/media/Demo_img_TR.f7fdf60cb954c97fd8dc.png",
+    "static/media/Demo_img_TL.png": "/bodymaps-website/static/media/Demo_img_TL.5ea4f400a20a03d92aff.png",
+    "static/media/Demo_img_BL.png": "/bodymaps-website/static/media/Demo_img_BL.fb3f30776574ff97581b.png",
     "static/media/BodyMapsIcon.png": "/bodymaps-website/static/media/BodyMapsIcon.ad216ba6f36f7d304db7.png",
     "index.html": "/bodymaps-website/index.html",
-    "main.50f981d6.css.map": "/bodymaps-website/static/css/main.50f981d6.css.map",
-    "main.4334e42d.js.map": "/bodymaps-website/static/js/main.4334e42d.js.map"
+    "main.9e98e69d.css.map": "/bodymaps-website/static/css/main.9e98e69d.css.map",
+    "main.891ca1f5.js.map": "/bodymaps-website/static/js/main.891ca1f5.js.map"
   },
   "entrypoints": [
-    "static/css/main.50f981d6.css",
-    "static/js/main.4334e42d.js"
+    "static/css/main.9e98e69d.css",
+    "static/js/main.891ca1f5.js"
   ]
 }
