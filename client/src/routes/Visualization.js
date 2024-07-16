@@ -1,12 +1,22 @@
 import React from 'react'
-// import { useRef, useState } from 'react';
+import { useRef } from 'react';
 // import { Enums, RenderingEngine, init } from '@cornerstonejs/core';
-
 // import { useLocation, useNavigate } from 'react-router-dom';
+
+import TaskMenu from '../components/TaskMenu';
+import ReportScreen from '../components/ReportScreen';
+import Demo_img_TL from '../assets/images/Demo_img_TL.png';
+import Demo_img_TR from '../assets/images/Demo_img_TR.png';
+import Demo_img_BL from '../assets/images/Demo_img_BL.png';
+import Demo_img_BR from '../assets/images/Demo_img_BR.png';
 import './Visualization.css';
 
 
 export default function Visualization() {
+  const TaskMenu_ref = useRef(null);
+  const ReportScreen_ref = useRef(null);
+  const VisualizationContainer_ref = useRef(null);
+
   
   // const location = useLocation();
   // const [nii_file, setFile] = useState();
@@ -96,51 +106,70 @@ export default function Visualization() {
   // //   RenderVolume()
   // // }, []);
 
+  const showTaskMenu = () => {
+    if (TaskMenu_ref.current.style.display === "none"){
+      TaskMenu_ref.current.style.display = "block";
+    }
+    else{
+      TaskMenu_ref.current.style.display = "none";
+    }
+  }
+
+  const showReportScreen = () => {
+    if (ReportScreen_ref.current.style.display === "none"){
+      ReportScreen_ref.current.style.display = "block";
+      VisualizationContainer_ref.current.style.opacity = "30%";
+    }
+    else{
+      ReportScreen_ref.current.style.display = "none";
+      VisualizationContainer_ref.current.style.opacity = "100%";
+    }
+
+  }
 
   
   
   return (
-    
     <div className="Visualization">
-    <div className="sidebar">
-      <div className="dropdown">
-        Selected Task
-        <select multiple>
-          <option>All (default)</option>
-        </select>
+
+      <div className="sidebar">
+        <div className="tasks-container">
+          <div className="dropdown">
+            <div className="dropdown-header" onClick={showTaskMenu}>Selected Task</div>
+            <TaskMenu 
+            innerRef={TaskMenu_ref}/>
+          </div>
+        </div>
+        
+        <div className="report-container">
+          <div className="dropdown">
+            <div className="dropdown-header" onClick={showReportScreen}>Report</div>
+          </div>
+        </div>
       </div>
-      <div className="dropdown">
-        Report
+      
+      <div className="visualization-container" ref={VisualizationContainer_ref}>
+        <div className="visual1">
+          <img src={Demo_img_TL} alt="top left"/>
+        </div>
+        <div className="visual2">
+          <img src={Demo_img_TR} alt="top right" />
+        </div>
+        <div className="visual3">
+          <img src={Demo_img_BL} alt="bottom left"/>
+        </div>
+        <div className="visual4">
+          <img src={Demo_img_BR} alt="bottom right"/>
+        </div>
       </div>
-    </div>
 
-    <div className="visual1">
-        visual1
-      <label>
-      <input type="checkbox" />
-      My Value
-    </label>
-    </div>
-    <div className="visual2">
-      visual2
-    </div>
-    <div className="visual3">
-      visual3
-    </div>
-    <div className="visual4">
-      visual4
-    </div>
-
-    {/* <div className="content" ref={content}>
+        
+      
+      
+      <div className="report" ref={ReportScreen_ref} style={{display: "none"}}>
+        <ReportScreen />
+      </div>
 
     </div>
-
-    <button onClick={() => {
-      navigate("/");
-    }}> Back </button>
-    
-    <button onClick={RenderVolume}> Render </button> */}
-    </div>
-
   )
 }

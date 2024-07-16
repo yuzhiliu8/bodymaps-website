@@ -1,15 +1,20 @@
 import React from 'react'
-import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import {HashRouter as Router, Route, Routes} from 'react-router-dom';
+
+
 import Home from './routes/Home'
 import Visualization from './routes/Visualization';
+import Test from './routes/Test';
+import './App.css';
 
 function App() {
     return (
     <>
-    <Router basename="/bodymaps-website">
+    <Router>
         <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/visualization" element={<Visualization/>} />
+        <Route path="/visualization" element={<Visualization />} />
+        <Route path="/test" element={<Test />} />
         </Routes>
     </Router>
     </>

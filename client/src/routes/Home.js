@@ -14,12 +14,9 @@ export default function Home() {
     if (f){
       setFile(f);
       console.log(file);
+      navigate("/visualization", {"state": {"file": file}});
     }
     
-  }
-
-  const handleInference = (event) => {
-    navigate("/visualization", {"state": {"file": file}})
   }
 
 
@@ -43,13 +40,12 @@ export default function Home() {
           
           
           <form>
-            <input type="file" multiple onChange={handleUpload}/>
+            <input className="fileInput" type="file" multiple onChange={handleUpload}/>
           </form>
         </div>
-      <div className="note">
-        By using this online service ​<br/> you agree that the data can be used to improve the model.​
-      </div>
-      {/* <button onClick={handleInference}>Inference</button> */}
+        <div className="note">
+          By using this online service ​<br/> you agree that the data can be used to improve the model.​
+        </div>
       </div>
     </div>    
   )
