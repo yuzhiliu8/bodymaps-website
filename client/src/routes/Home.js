@@ -1,23 +1,36 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 
 import "./Home.css"
 import image from '../assets/images/BodyMapsIcon.png';
 
 export default function Home() {
-  const [file, setFile] = useState(' ');
+  const [file, setFile] = useState();
+  const [masks, setMasks] = useState();
   const navigate = useNavigate();
+
 
   const handleUpload = (event) => {
     const f = event.target.files[0]
     if (f){
       setFile(f);
-      console.log(file);
-      navigate("/visualization", {"state": {"file": file}});
     }
-    
   }
+
+  const handleMaskUpload = (event) => {
+    const m = event.target.files;
+    setMasks(m);
+  }
+
+  useEffect(() => {
+    console.log(file);
+    console.log(masks);
+    if (file && masks){
+      navigate('/visualization', {"state": {"niftiMain": file, "masks": masks}});
+    }
+  })
+
 
 
 
@@ -39,13 +52,16 @@ export default function Home() {
           </div>
           
           
-          <form>
-            <input className="fileInput" type="file" multiple onChange={handleUpload}/>
-          </form>
+          
+          <input className="fileInput" type="file" onChange={handleUpload}/>
+          
         </div>
         <div className="note">
           By using this online service ​<br/> you agree that the data can be used to improve the model.​
         </div>
+        <br/>
+        <div>Upload CT Masks Here: (Development Phase only)</div> <br/>
+        <input type="file" multiple onChange={handleMaskUpload}/>
       </div>
     </div>    
   )

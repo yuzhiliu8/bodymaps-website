@@ -1,13 +1,17 @@
 import React from 'react';
-import ReportScreen from '../components/ReportScreen';
+
+import TestComp from '../components/TestComp';
 
 import './Test.css';
 
-
 function Test() {
+  
+
   return (
     <div className="test">
-      <ReportScreen />
+      test
+      <TestComp/>
+      <TestComp/>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import React from 'react'
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 // import { Enums, RenderingEngine, init } from '@cornerstonejs/core';
-// import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import TaskMenu from '../components/TaskMenu';
 import ReportScreen from '../components/ReportScreen';
@@ -13,15 +13,19 @@ import './Visualization.css';
 
 
 export default function Visualization() {
+  const state = useLocation();
+  if (state){
+    const {niftiMain, masks} = state;
+  }
+  const navigate = useNavigate();
+
   const TaskMenu_ref = useRef(null);
   const ReportScreen_ref = useRef(null);
   const VisualizationContainer_ref = useRef(null);
 
   
-  // const location = useLocation();
-  // const [nii_file, setFile] = useState();
-  // const content = useRef();
-  // const navigate = useNavigate();
+
+  
   // const { ViewportType } = Enums;
   
 
@@ -127,6 +131,21 @@ export default function Visualization() {
 
   }
 
+  const handleChecked = (event) => {
+    const selectedInputElement = event.target; //<input> element
+    const selectedTaskMenuItemComponent = event.target.parentElement.parentElement; //TaskMenuItem component
+    const TaskMenuItemArray = TaskMenu_ref.current.children;
+
+    if (selectedInputElement.checked === true){
+      for (let i = 0; i < TaskMenuItemArray.length; i++){
+        const currentInputElement = TaskMenuItemArray[i].children[0].children[0];
+        if (TaskMenuItemArray[i] !== selectedTaskMenuItemComponent && currentInputElement.checked === true){
+          currentInputElement.checked = false;
+        }
+      }
+    }
+  }
+
   
   
   return (
@@ -137,7 +156,8 @@ export default function Visualization() {
           <div className="dropdown">
             <div className="dropdown-header" onClick={showTaskMenu}>Selected Task</div>
             <TaskMenu 
-            innerRef={TaskMenu_ref}/>
+            innerRef={TaskMenu_ref}
+            handleChecked={handleChecked}/>
           </div>
         </div>
         
@@ -146,6 +166,7 @@ export default function Visualization() {
             <div className="dropdown-header" onClick={showReportScreen}>Report</div>
           </div>
         </div>
+        <button onClick={() => navigate("/")}>Back</button>
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref}>

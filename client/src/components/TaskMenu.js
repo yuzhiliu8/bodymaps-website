@@ -3,39 +3,39 @@ import TaskMenuItem from './TaskMenuItem'
 
 import './TaskMenu.css'
 
-function TaskMenu({ handleChanged, innerRef, innerStyle }) {
+function TaskMenu({ handleChecked, innerRef }) {
   return (
     <div className="TaskMenu" style={{display:"none"}} ref={innerRef}>
        <TaskMenuItem
         name="All (default)"
-        handleChanged={handleChanged}/>
+        handleChecked={handleChecked}/>
        <TaskMenuItem
         name="Aorta"
-        handleChanged={handleChanged}/>
+        handleChecked={handleChecked}/>
        <TaskMenuItem
         name="Gallbladder"
-        handleChanged={handleChanged}/>
+        handleChecked={handleChecked}/>
        <TaskMenuItem
         name="Kidney (L)"
-        handleChanged={handleChanged}/>
+        handleChecked={handleChecked}/>
        <TaskMenuItem
         name="Kidney (R)"
-        handleChanged={handleChanged}/>
+        handleChecked={handleChecked}/>
        <TaskMenuItem
         name="Liver"
-        handleChanged={handleChanged}/>
+        handleChecked={handleChecked}/>
        <TaskMenuItem
         name="Pancreas"
-        handleChanged={handleChanged}/>
+        handleChecked={handleChecked}/>
        <TaskMenuItem
         name="Postcava"
-        handleChanged={handleChanged}/>
+        handleChecked={handleChecked}/>
        <TaskMenuItem
         name="Spleen"
-        handleChanged={handleChanged}/>
+        handleChecked={handleChecked}/>
        <TaskMenuItem
         name="Stomach"
-        handleChanged={handleChanged}/>
+        handleChecked={handleChecked}/>
     </div>
   )
 }

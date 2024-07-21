@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "@cornerstonejs/core": "^1.82.0",
+    "@cornerstonejs/nifti-volume-loader": "^1.82.4",
     "@cornerstonejs/streaming-image-volume-loader": "^1.82.0",
     "@cornerstonejs/tools": "^1.82.0",
     "@testing-library/jest-dom": "^5.17.0",
