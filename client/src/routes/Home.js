@@ -27,7 +27,7 @@ export default function Home() {
     console.log(file);
     console.log(masks);
     if (file && masks){
-      navigate('/visualization', {"state": {"niftiMain": file, "masks": masks}});
+      navigate('/visualization', {"state": {"nifti": file, "masks": masks}});
     }
   })
 
