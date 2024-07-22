@@ -2,7 +2,7 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 
-import "./Home.css"
+import "./HomePage.css"
 import image from '../assets/images/BodyMapsIcon.png';
 
 export default function Home() {
@@ -35,7 +35,7 @@ export default function Home() {
 
 
   return (
-    <div className="App">
+    <div className="HomePage">
       <div className="container">
         <div className="header">
           BodyMaps

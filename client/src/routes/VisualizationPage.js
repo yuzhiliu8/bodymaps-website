@@ -12,13 +12,14 @@ import { initializeCornerstone } from '../cornerstonejs/helper/init';
 
 import TaskMenu from '../components/TaskMenu';
 import ReportScreen from '../components/ReportScreen';
-import './Visualization.css';
+import './VisualizationPage.css';
 
 export default function Visualization() {
 
   const [csInitializationState, setInitializationState] = useState(false);
   const [niftiFile, setNiftiFile] = useState();
   const [niftiMasks, setMasks] = useState();
+  const [showVisuals, setShowVisuals] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -41,9 +42,10 @@ export default function Visualization() {
   useEffect(() => {
     if (!csInitializationState || !niftiFile || !niftiMasks) {
       console.log('initialization not completed'); 
-    } else {
-      console.log("everything initialized");
+      return
     }
+    console.log("initialization complete");
+    setShowVisuals(true);
   }, [niftiFile, niftiMasks, csInitializationState])
 
   const showTaskMenu = () => {
@@ -99,7 +101,7 @@ export default function Visualization() {
   
   
   return (
-    <div className="Visualization">
+    <div className="VisualizationPage">
 
       <div className="sidebar">
         <div className="tasks-container">
@@ -120,18 +122,7 @@ export default function Visualization() {
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref}>
-        <div className="visual1">
-          Top Left
-        </div>
-        <div className="visual2">
-          Top Right
-        </div>
-        <div className="visual3">
-          Bottom Left
-        </div>
-        <div className="visual4">
-          Bottom Right
-        </div>
+        visualization-container
       </div>
 
         

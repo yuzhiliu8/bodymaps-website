@@ -2,8 +2,8 @@ import React from 'react'
 import {HashRouter as Router, Route, Routes} from 'react-router-dom';
 
 
-import Home from './routes/Home'
-import Visualization from './routes/Visualization';
+import HomePage from './routes/HomePage'
+import VisualizationPage from './routes/VisualizationPage'
 import Test from './routes/Test';
 import './App.css';
 
@@ -12,8 +12,8 @@ function App() {
     <>
     <Router>
         <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/visualization" element={<Visualization />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/visualization" element={<VisualizationPage />} />
         <Route path="/test" element={<Test />} />
         </Routes>
     </Router>
