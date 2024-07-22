@@ -82,6 +82,20 @@ export default function Visualization() {
     }
   }
 
+  const dev_download = () => {
+    console.log(niftiFile);
+    const link = URL.createObjectURL(niftiFile);
+    
+    // console.log(link);
+    const element = document.createElement('a')
+    element.href = link;
+    element.download = "download.nii.gz";
+    console.log(element.href);
+    VisualizationContainer_ref.current.appendChild(element);
+    element.click();
+    VisualizationContainer_ref.current.removeChild(element);
+  }
+
   
   
   return (
@@ -102,6 +116,7 @@ export default function Visualization() {
           </div>
         </div>
         <button onClick={() => navigate("/")}>Back</button>
+        <button onClick={dev_download}> Download files </button>
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref}>
