@@ -4,22 +4,32 @@ import {
   useEffect,
   useState,
 } from 'react';
-
 import { useLocation, useNavigate } from 'react-router-dom';
 
 // import { Enums, RenderingEngine, init } from '@cornerstonejs/core';
 import { initializeCornerstone } from '../cornerstonejs/helper/init';
+import  * as fflate  from 'fflate';
+
 
 import TaskMenu from '../components/TaskMenu';
 import ReportScreen from '../components/ReportScreen';
+import Visual from '../components/Visual';
 import './VisualizationPage.css';
 
 export default function Visualization() {
+  const data = new TextEncoder().encode("Hello, fflate!");
+  const compressedData = fflate.compressSync(data);
+  const decompressedData = fflate.decompressSync(compressedData);
+  const decompressedString = new TextDecoder().decode(decompressedData);
+  console.log("Original Data:", new TextDecoder().decode(data));
+  console.log("Compressed Data:", compressedData);
+  console.log("Decompressed Data:", decompressedString);
 
   const [csInitializationState, setInitializationState] = useState(false);
   const [niftiFile, setNiftiFile] = useState();
   const [niftiMasks, setMasks] = useState();
-  const [showVisuals, setShowVisuals] = useState(false);
+  const [visualizationContent, setVisualizationContent] = useState(null);
+  
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -28,8 +38,8 @@ export default function Visualization() {
   const ReportScreen_ref = useRef(null);
   const VisualizationContainer_ref = useRef(null);
 
-  useEffect(() => {
-    console.log("init after  location");
+
+  useEffect(() => {            //set niftiFile, niftiMasks, and initialize cornerstone libraries
     const {nifti, masks} = location.state;
     setNiftiFile(nifti);
     setMasks(masks); 
@@ -39,13 +49,15 @@ export default function Visualization() {
       })();
     }, [location])
 
-  useEffect(() => {
+  useEffect(() => {           //If nifti files are set && cornerstone is initialized, load visualizations
     if (!csInitializationState || !niftiFile || !niftiMasks) {
       console.log('initialization not completed'); 
       return
     }
     console.log("initialization complete");
-    setShowVisuals(true);
+    const niftiURL = URL.createObjectURL(niftiFile);
+    console.log("nifti url: ", niftiURL);
+    setVisualizationContent(<Visual selectedTask={"All (default)"} niftiURL={niftiURL}/>);
   }, [niftiFile, niftiMasks, csInitializationState])
 
   const showTaskMenu = () => {
@@ -84,19 +96,6 @@ export default function Visualization() {
     }
   }
 
-  const dev_download = () => {
-    console.log(niftiFile);
-    const link = URL.createObjectURL(niftiFile);
-    
-    // console.log(link);
-    const element = document.createElement('a')
-    element.href = link;
-    element.download = "download.nii.gz";
-    console.log(element.href);
-    VisualizationContainer_ref.current.appendChild(element);
-    element.click();
-    VisualizationContainer_ref.current.removeChild(element);
-  }
 
   
   
@@ -118,16 +117,12 @@ export default function Visualization() {
           </div>
         </div>
         <button onClick={() => navigate("/")}>Back</button>
-        <button onClick={dev_download}> Download files </button>
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref}>
-        visualization-container
+        {visualizationContent}
       </div>
 
-        
-      
-      
       <div className="report" ref={ReportScreen_ref} style={{display: "none"}}>
         <ReportScreen />
       </div>
