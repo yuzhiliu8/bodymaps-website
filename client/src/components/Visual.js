@@ -14,7 +14,8 @@ function Visual({ selectedTask, niftiURL}) {
 
     useEffect(() => {
         volumeLoader.registerVolumeLoader('nifti', cornerstoneNiftiImageVolumeLoader);
-        const volumeId = "nifti:" + 'https://ohif-assets.s3.us-east-2.amazonaws.com/nifti/MRHead.nii.gz';
+        console.log(volumeLoader.getVolumeLoaderSchemes())
+        const volumeId = "nifti:" + niftiURL;
         console.log(volumeId);
         
         const AXIAL_VIEWPORT_ID = "AXIAL";

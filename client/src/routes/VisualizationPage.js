@@ -18,6 +18,7 @@ import './VisualizationPage.css';
 
 export default function Visualization() {
   const data = new TextEncoder().encode("Hello, fflate!");
+  console.log(fflate);
   const compressedData = fflate.compressSync(data);
   const decompressedData = fflate.decompressSync(compressedData);
   const decompressedString = new TextDecoder().decode(decompressedData);
@@ -55,9 +56,8 @@ export default function Visualization() {
       return
     }
     console.log("initialization complete");
-    const niftiURL = URL.createObjectURL(niftiFile);
-    console.log("nifti url: ", niftiURL);
-    setVisualizationContent(<Visual selectedTask={"All (default)"} niftiURL={niftiURL}/>);
+    const url = 'http://localhost:5000/api/download/ct.nii.gz';
+    setVisualizationContent(<Visual selectedTask={"All (default)"} niftiURL={url}/>);
   }, [niftiFile, niftiMasks, csInitializationState])
 
   const showTaskMenu = () => {
