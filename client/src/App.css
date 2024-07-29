@@ -3,3 +3,18 @@
   min-width:100vw;
 }
 
+@font-face{
+  font-family: AptosDisplay;
+  src: url("./assets/fonts/Aptos-Display.ttf")
+}
+
+@font-face{
+  font-family: Aptos;
+  src: url("./assets/fonts/Aptos.ttf")
+}
+
+@font-face{
+  font-family: AptosBold;
+  src: url("./assets/fonts/Aptos-Bold.ttf")
+}
+

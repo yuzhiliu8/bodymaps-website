@@ -1,0 +1,60 @@
+.VisualizationPage{
+    text-align: center;
+    height:100vh;
+    display:grid;
+    grid-template-columns: 20vw 79vw;
+    grid-template-rows: 100vh;
+    column-gap:1px;
+    background-color: black;
+}
+
+
+.content{
+    display:flex;
+    justify-content: center;
+}
+
+.sidebar{
+    font-family:AptosDisplay;
+    background-color: black;
+    color:white;
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.dropdown{
+    color:black;
+    background-color:#eaeef8;
+    margin:2vh;
+    border-radius: 15px;
+    position:relative;
+}
+
+.dropdown-header{
+    text-align: left;
+    color: #a5a5a5;
+    font-size:20px;
+    padding:10px;
+    border-radius: 15px 15px 15px 15px;
+}
+
+.report-container .dropdown-header:hover{
+    background-color:grey;
+}
+
+.dropdown TaskMenu{
+    display:none;
+}
+
+.visualization-container{
+    grid-column: 2;
+}
+
+
+.report{
+    grid-column: 2;
+    grid-row: 1;
+    color:white;
+    z-index: 0;
+    display: none;
+}

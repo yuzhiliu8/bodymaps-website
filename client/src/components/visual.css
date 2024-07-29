@@ -1,7 +1,7 @@
 .viewport{
     display:grid;
     grid-template-rows: 50vh 50vh;
-    grid-template-columns: 40vw 40vw;
+    grid-template-columns: 39.5vw 39.5vw;
 }
 
 .axial{
@@ -17,4 +17,10 @@
 .coronal{
     grid-row: 2;
     grid-column: 1;
+}
+
+.tools{
+    grid-row: 2;
+    grid-column: 2;
+    color:white;
 }

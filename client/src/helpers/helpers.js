@@ -19,13 +19,13 @@ export async function setup(ref1, ref2, ref3, niftiURL){
 
     const volume = await volumeLoader.createAndCacheVolume(volumeId);
 
-    const renderingEngineId = 'myRenderingEngine';
+    const renderingEngineId = 'myRenderingEngine1';
     const renderingEngine = new RenderingEngine(renderingEngineId);
     
     
     const viewportInputArray = [
         {
-          viewportId: viewportId1,
+          viewportId: viewportId1, 
           type: Enums.ViewportType.ORTHOGRAPHIC,
           element: ref1.current,
           defaultOptions: {
@@ -57,8 +57,17 @@ export async function setup(ref1, ref2, ref3, niftiURL){
         [{ volumeId }],
         viewportInputArray.map((v) => v.viewportId)
     );
+    renderingEngine.getViewports().map((v) => {
+      v.canvas.style.position = "relative";
+    })
 
     renderingEngine.render();
+    
+    
+    
+    // vp1.resize()
+
+    return renderingEngine;
 }
 
 export async function initializeCornerstone(){
