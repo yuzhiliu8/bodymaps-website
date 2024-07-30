@@ -6,7 +6,7 @@ import './Visual.css';
 
 
 
-function Visual({ niftiURL }) {
+function Visual({ niftiURL, filename }) {
   const axial_ref = useRef(null);
   const sagittal_ref = useRef(null);
   const coronal_ref = useRef(null);
@@ -25,7 +25,8 @@ function Visual({ niftiURL }) {
           <div className="sagittal" ref={sagittal_ref}></div>
           <div className="coronal" ref={coronal_ref}></div>
           <div className="tools">
-            Tools
+            <div>Tools</div>
+            <div>Showing: {filename} </div>
           </div>
         </div>
     </div>

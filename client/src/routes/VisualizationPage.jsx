@@ -11,7 +11,9 @@ import './VisualizationPage.css';
 function VisualizationPage() {
   const [csInitializationState, setInitializationState] = useState(false);
   const [visualizationContent, setVisualizationContent] = useState(null);
-  const [niftiFile, setNiftiFile] = useState(null);
+  const [serverPath, setServerPath] = useState('');
+  const [filename, setFilename] = useState();
+
   const TaskMenu_ref = useRef(null);
   const ReportScreen_ref = useRef(null);
   const VisualizationContainer_ref = useRef(null);
@@ -19,17 +21,22 @@ function VisualizationPage() {
   const location = useLocation();
 
   useEffect(() => {
+    const state = location.state
+    const path = state.path
+    console.log("PATH: ", path)
+    setServerPath(path)
+    setFilename(state.filename)
+    console.log(state.filename)
     const initState = initializeCornerstone();
     setInitializationState(initState);
   }, [])
 
-  useEffect(() => {
-    const niftiURL = 'https://ohif-assets.s3.us-east-2.amazonaws.com/nifti/MRHead.nii.gz';
-    // const niftiURL = 'http://localhost:5000/api/download/MRHead.nii.gz';
-    if (csInitializationState) {
-      setVisualizationContent(<Visual niftiURL={niftiURL} />)
+  useEffect(() => {    
+    if (csInitializationState && serverPath) {
+      const niftiURL = `/api/download/${serverPath}`;
+      setVisualizationContent(<Visual niftiURL={niftiURL} filename={filename}/>)
     }
-  }, [csInitializationState, niftiFile])
+  }, [csInitializationState, serverPath])
 
   const showTaskMenu = () => {
     if (TaskMenu_ref.current.style.display === "none"){
@@ -57,12 +64,10 @@ function VisualizationPage() {
     const selectedTaskMenuItemComponent = event.target.parentElement.parentElement; //TaskMenuItem component
     const TaskMenuItemArray = TaskMenu_ref.current.children;
 
-    if (selectedInputElement.checked === true){
+    if (selectedTaskMenuItemComponent === TaskMenuItemArray[0] && selectedInputElement.checked === true){
       for (let i = 0; i < TaskMenuItemArray.length; i++){
-        const currentInputElement = TaskMenuItemArray[i].children[0].children[0];
-        if (TaskMenuItemArray[i] !== selectedTaskMenuItemComponent && currentInputElement.checked === true){
-          currentInputElement.checked = false;
-        }
+        let currentElement = TaskMenuItemArray[i].children[0].children[0];
+        currentElement.checked = true;
       }
     }
   }
