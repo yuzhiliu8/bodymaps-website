@@ -50,7 +50,7 @@ function VisualizationPage() {
   const showReportScreen = () => {
     if (ReportScreen_ref.current.style.display === "none"){
       ReportScreen_ref.current.style.display = "block";
-      VisualizationContainer_ref.current.style.opacity = "30%";
+      VisualizationContainer_ref.current.style.opacity = "25%";
     }
     else{
       ReportScreen_ref.current.style.display = "none";
