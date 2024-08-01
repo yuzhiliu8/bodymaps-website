@@ -90,6 +90,8 @@ function VisualizationPage() {
           </div>
         </div>
         <button onClick={() => navigate("/")}>Back</button>
+        <div><br/></div>
+        <button>Check Volume</button>
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref}>

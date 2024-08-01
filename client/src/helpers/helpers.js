@@ -4,6 +4,7 @@ import {
     init as csInit,
     volumeLoader,
     setVolumesForViewports,
+    getEnabledElements,
   } from '@cornerstonejs/core';
 import {
   init as csTools3dInit,
@@ -34,6 +35,7 @@ export async function setup(ref1, ref2, ref3, ref4, niftiURL){
   
   const volumeId = 'nifti:' + niftiURL;
   const volume = await volumeLoader.createAndCacheVolume(volumeId);
+  // volume.origin = [400, 400, 100];
 
   const renderingEngineId = 'myRenderingEngine';
   const renderingEngine = new RenderingEngine(renderingEngineId);
@@ -117,17 +119,36 @@ export async function setup(ref1, ref2, ref3, ref4, niftiURL){
     v.canvas.style.position = "relative";
   })
 
-  renderingEngine.render();
+  renderingEngine.render()
   
   
   
   // vp1.resize()
 
-  return renderingEngine;
+  return [renderingEngine, volume];
 }
 
 export async function initializeCornerstone(){
   const initState = await csInit();
   await csTools3dInit()
   return initState;
+}
+
+export const debug = () => {
+  const axial_viewport = getEnabledElements()[0].viewport;
+  const axial_camera = axial_viewport.getCamera();
+  const axial_imageData = axial_viewport.getImageData();
+  // console.log(getEnabledElements())
+  
+  const sagittal_viewport = getEnabledElements()[1].viewport;
+  const sagittal_camera = sagittal_viewport.getCamera();
+  const sagittal_imageData = sagittal_viewport.getImageData();
+
+  const coronal_viewport = getEnabledElements()[2].viewport;
+  const coronal_camera = coronal_viewport.getCamera();
+  const coronal_imageData = coronal_viewport.getImageData();
+
+  console.log("AXIAL: ", axial_camera.position)
+  console.log("SAGITTAL: ", sagittal_camera.position)
+  console.log("CORONAL: ", coronal_camera.position)
 }
