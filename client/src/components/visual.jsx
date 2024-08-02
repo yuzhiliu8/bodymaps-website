@@ -10,6 +10,7 @@ function Visual({ niftiURL, filename }) {
   const [renderingEngine, setRenderingEngine] = useState(null);
   const [niftiVolume, setNiftiVolume] = useState(null);
   console.log(niftiVolume);
+  // console.log(niftiVolume.hasPixelSpacing)
 
   const axial_ref = useRef(null);
   const sagittal_ref = useRef(null);

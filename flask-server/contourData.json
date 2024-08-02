@@ -1,0 +1,23 @@
+{
+    "axial":{
+        "aorta":{
+            "data":[
+            {
+                "points":[
+                    [4, 4, 0],
+                    [3, 4, 0]
+                ],
+                "type": "CLOSED_PLANAR"
+            }
+            ],
+            "id": "axial_aorta",
+            "color": [255, 0, 0]  
+        }
+    },
+    "sagittal": {
+
+    },
+    "coronal": {
+
+    }
+}

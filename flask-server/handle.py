@@ -4,6 +4,7 @@ from decimal import Decimal
 
 
 path = 'nifti/aorta.nii.gz'
+# path = 'files/As_fYUgNzHAl/MRHead.nii.gz'
 img = nib.load(path)
-data = img.get_fdata()
-print(data[:, :, 0].shape)
+print(img.affine)
+

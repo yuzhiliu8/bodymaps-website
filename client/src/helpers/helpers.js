@@ -148,7 +148,10 @@ export const debug = () => {
   const coronal_camera = coronal_viewport.getCamera();
   const coronal_imageData = coronal_viewport.getImageData();
 
-  console.log("AXIAL: ", axial_camera.position)
-  console.log("SAGITTAL: ", sagittal_camera.position)
-  console.log("CORONAL: ", coronal_camera.position)
+  console.log("AXIAL: ", axial_camera);
+  console.log("SAGITTAL: ", sagittal_camera);
+  console.log("CORONAL: ", coronal_camera);
+  // console.log("AXIAL: ", axial_imageData);
+  // console.log("SAGITTAL: ", sagittal_imageData);
+  // console.log("CORONAL: ", coronal_imageData);
 }
