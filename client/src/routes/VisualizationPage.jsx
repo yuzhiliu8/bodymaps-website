@@ -1,7 +1,7 @@
 import React from 'react'
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
-import { initializeCornerstone } from '../helpers/helpers';
+import { debug, initializeCornerstone } from '../helpers/helpers';
 
 import Visual from '../components/Visual';
 import ReportScreen from '../components/ReportScreen';
@@ -21,14 +21,18 @@ function VisualizationPage() {
   const location = useLocation();
 
   useEffect(() => {
-    const state = location.state
-    const path = state.path
-    console.log("PATH: ", path)
-    setServerPath(path)
-    setFilename(state.filename)
-    console.log(state.filename)
-    const initState = initializeCornerstone();
-    setInitializationState(initState);
+    (async () => {
+      const state = location.state
+      if (!state){
+        navigate('/')
+      }
+      const path = state.path
+      console.log("PATH: ", path)
+      setServerPath(path)
+      setFilename(state.filename)
+      const initState = await initializeCornerstone();
+      setInitializationState(initState);
+    }) ();
   }, [])
 
   useEffect(() => {    
@@ -91,7 +95,7 @@ function VisualizationPage() {
         </div>
         <button onClick={() => navigate("/")}>Back</button>
         <div><br/></div>
-        <button>Check Volume</button>
+        <button onClick={debug}>Check Volume</button>
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref}>
