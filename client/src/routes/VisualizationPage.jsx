@@ -9,7 +9,6 @@ import TaskMenu from '../components/TaskMenu';
 import './VisualizationPage.css';
 
 function VisualizationPage() {
-  const [csInitializationState, setInitializationState] = useState(false);
   const [visualizationContent, setVisualizationContent] = useState(null);
   const [serverPath, setServerPath] = useState('');
   const [filename, setFilename] = useState();
@@ -30,17 +29,15 @@ function VisualizationPage() {
       console.log("PATH: ", path)
       setServerPath(path)
       setFilename(state.filename)
-      const initState = await initializeCornerstone();
-      setInitializationState(initState);
     }) ();
   }, [])
 
   useEffect(() => {    
-    if (csInitializationState && serverPath) {
+    if (serverPath) {
       const niftiURL = `/api/download/${serverPath}`;
       setVisualizationContent(<Visual niftiURL={niftiURL} filename={filename}/>)
     }
-  }, [csInitializationState, serverPath])
+  }, [serverPath])
 
   const showTaskMenu = () => {
     if (TaskMenu_ref.current.style.display === "none"){

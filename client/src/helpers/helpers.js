@@ -5,7 +5,9 @@ import {
     volumeLoader,
     setVolumesForViewports,
     getEnabledElements,
-    getRenderingEngine
+    getRenderingEngine,
+    geometryLoader,
+    getRenderingEngines,
   } from '@cornerstonejs/core';
 import {
   init as csTools3dInit,
@@ -14,12 +16,15 @@ import {
   StackScrollMouseWheelTool,
   ToolGroupManager,
   addTool,
-  Enums as csToolsEnums
+  Enums as csToolsEnums,  
+  segmentation,
+  state as csToolState
 }from '@cornerstonejs/tools';
 
 import { cornerstoneNiftiImageVolumeLoader } from '@cornerstonejs/nifti-volume-loader';
 
 export async function render(ref1, ref2, ref3, niftiURL, renderingEngineId, toolGroupId){
+  
   ref1.current.oncontextmenu = (e) => e.preventDefault();
   ref2.current.oncontextmenu = (e) => e.preventDefault();
   ref3.current.oncontextmenu = (e) => e.preventDefault();
@@ -32,12 +37,8 @@ export async function render(ref1, ref2, ref3, niftiURL, renderingEngineId, tool
   const volume = await volumeLoader.createAndCacheVolume(volumeId);
 
   const renderingEngine = getRenderingEngine(renderingEngineId);
-  const toolGroup = ToolGroupManager.getToolGroup('myToolGroup');
+  const toolGroup = ToolGroupManager.getToolGroup(toolGroupId);
 
-  toolGroup.addViewport(viewportId1, renderingEngineId)
-  toolGroup.addViewport(viewportId2, renderingEngineId)
-  toolGroup.addViewport(viewportId3, renderingEngineId)
-  
   const viewportInputArray = [
       {
         viewportId: viewportId1, 
@@ -67,6 +68,10 @@ export async function render(ref1, ref2, ref3, niftiURL, renderingEngineId, tool
 
   renderingEngine.setViewports(viewportInputArray);
 
+  toolGroup.addViewport(viewportId1, renderingEngineId)
+  toolGroup.addViewport(viewportId2, renderingEngineId)
+  toolGroup.addViewport(viewportId3, renderingEngineId)
+
   setVolumesForViewports(
       renderingEngine,
       [{ volumeId }],
@@ -91,25 +96,24 @@ export function createRenderingEngineAndRegisterVolumeLoader(){
   if (!getRenderingEngine(renderingEngineId)){
     const renderingEngine = new RenderingEngine(renderingEngineId);
   }
-  
-  
-  
   return renderingEngineId;
 }
 
 export function createToolGroupAndAddTools(){
-  const toolGroupId = "myToolGroup" ;
-  if (!ToolGroupManager.getToolGroup(toolGroupId)){
-    const toolGroup = ToolGroupManager.createToolGroup(toolGroupId);
+  const toolGroupId = "myToolGroup";
+  ToolGroupManager.destroyToolGroup(toolGroupId);
+
+  const toolGroup = ToolGroupManager.createToolGroup(toolGroupId);
+  if (!csToolState.tools.Zoom){
     addTool(ZoomTool);
     addTool(WindowLevelTool);
-    addTool(StackScrollMouseWheelTool)
+    addTool(StackScrollMouseWheelTool);
+  }
+  toolGroup.addTool(ZoomTool.toolName);
+  toolGroup.addTool(WindowLevelTool.toolName);
+  toolGroup.addTool(StackScrollMouseWheelTool.toolName);
   
-    toolGroup.addTool(ZoomTool.toolName)
-    toolGroup.addTool(WindowLevelTool.toolName)
-    toolGroup.addTool(StackScrollMouseWheelTool.toolName)
-    
-    toolGroup.setToolActive(StackScrollMouseWheelTool.toolName);
+  toolGroup.setToolActive(StackScrollMouseWheelTool.toolName);
     toolGroup.setToolActive(WindowLevelTool.toolName, {
       bindings: [
         {
@@ -125,11 +129,11 @@ export function createToolGroupAndAddTools(){
         },
       ],
     });
-  }
   return toolGroupId
 }
 
 export const debug = () => {
+  console.log(getRenderingEngines())
   const axial_viewport = getEnabledElements()[0].viewport;
   const axial_camera = axial_viewport.getCamera();
   const axial_imageData = axial_viewport.getImageData();
@@ -144,9 +148,13 @@ export const debug = () => {
   const coronal_imageData = coronal_viewport.getImageData();
 
   console.log("AXIAL: ", axial_camera);
-  console.log("SAGITTAL: ", sagittal_camera);
-  console.log("CORONAL: ", coronal_camera);
+  // console.log("SAGITTAL: ", sagittal_camera);
+  // console.log("CORONAL: ", coronal_camera);
   // console.log("AXIAL: ", axial_imageData);
   // console.log("SAGITTAL: ", sagittal_imageData);
   // console.log("CORONAL: ", coronal_imageData);
+  const segmentationData = fetch('/api/segmentations')
+  .then((response) => response.json())
+  .then((data) => console.log(data))
+
 }

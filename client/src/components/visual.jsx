@@ -1,10 +1,11 @@
 import React from 'react'
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect} from 'react'
 import { 
   render,
   debug, 
   createRenderingEngineAndRegisterVolumeLoader,
-  createToolGroupAndAddTools
+  createToolGroupAndAddTools,
+  initializeCornerstone
 } from '../helpers/helpers';
 import './Visual.css';
 
@@ -15,6 +16,7 @@ function Visual({ niftiURL, filename }) {
   
   useEffect(() => {              //TODO: Need to not make a new renderingEngine on every render. 
     (async () => {
+      await initializeCornerstone();
       if (axial_ref && sagittal_ref && coronal_ref){
         console.log("setup");  
         const renderingEngineId = createRenderingEngineAndRegisterVolumeLoader();
