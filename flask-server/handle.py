@@ -1,6 +1,5 @@
 import nibabel as nib
 import matplotlib.pyplot as plt
-from decimal import Decimal
 
 
 path = 'nifti/aorta.nii.gz'
