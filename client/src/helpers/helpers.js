@@ -6,38 +6,82 @@ import {
     setVolumesForViewports,
     getEnabledElements,
     getRenderingEngine,
-    geometryLoader,
-    getRenderingEngines,
+    geometryLoader
   } from '@cornerstonejs/core';
 import {
   init as csTools3dInit,
-  ZoomTool,
-  WindowLevelTool,
   StackScrollMouseWheelTool,
   ToolGroupManager,
   addTool,
-  Enums as csToolsEnums,  
-  segmentation,
-  state as csToolState
+  Enums as csToolsEnums, 
+  SegmentationDisplayTool,
+  segmentation
 }from '@cornerstonejs/tools';
 
 import { cornerstoneNiftiImageVolumeLoader } from '@cornerstonejs/nifti-volume-loader';
 
-export async function render(ref1, ref2, ref3, niftiURL, renderingEngineId, toolGroupId){
-  
+
+
+export async function renderVisualization(ref1, ref2, ref3, niftiURL){
+  csTools3dInit();
+  await csInit();
+
+  const segmentationId = "mySegmentation";
+  const toolGroupId = "myToolGroup";
+  const renderingEngineId = "myRenderingEngine";
+
   ref1.current.oncontextmenu = (e) => e.preventDefault();
   ref2.current.oncontextmenu = (e) => e.preventDefault();
   ref3.current.oncontextmenu = (e) => e.preventDefault();
 
-  const viewportId1 = 'CT_NIFTI_AXIAL';
-  const viewportId2 = 'CT_NIFTI_SAGITTAL';
-  const viewportId3 = 'CT_NIFTI_CORONAL';
+  addTool(StackScrollMouseWheelTool);
+  addTool(SegmentationDisplayTool);
+
+  const toolGroup = ToolGroupManager.createToolGroup(toolGroupId);
+
+  toolGroup.addTool(StackScrollMouseWheelTool.toolName);
+  toolGroup.addTool(SegmentationDisplayTool.toolName);
+
+  toolGroup.setToolActive(StackScrollMouseWheelTool.toolName);
+  toolGroup.setToolEnabled(SegmentationDisplayTool.toolName);
+
+  volumeLoader.registerVolumeLoader('nifti', cornerstoneNiftiImageVolumeLoader);
   
   const volumeId = 'nifti:' + niftiURL;
   const volume = await volumeLoader.createAndCacheVolume(volumeId);
 
-  const renderingEngine = getRenderingEngine(renderingEngineId);
-  const toolGroup = ToolGroupManager.getToolGroup(toolGroupId);
+  const segmentationData = await fetch('/api/segmentations').then((resp) => resp.json());
+
+  const geometryIds = []
+  const promises = segmentationData.contourSets.axial.map((contourSet) => {
+    const geometryId = contourSet.id;
+    geometryIds.push(geometryId);
+    return geometryLoader.createAndCacheGeometry(geometryId, {
+      type: Enums.GeometryType.CONTOUR,
+      geometryData: contourSet,
+    });
+  });
+
+  await Promise.all(promises);
+
+  segmentation.addSegmentations([
+    {
+      segmentationId,
+      representation: {
+        type: csToolsEnums.SegmentationRepresentations.Contour,
+        data:{
+          geometryIds: geometryIds,
+        },
+      },
+    },
+  ]);
+
+  const renderingEngine = new RenderingEngine(renderingEngineId);
+
+  const viewportId1 = 'CT_NIFTI_AXIAL';
+  const viewportId2 = 'CT_NIFTI_SAGITTAL';
+  const viewportId3 = 'CT_NIFTI_CORONAL';
+  const viewportIds = [viewportId1, viewportId2, viewportId3];
 
   const viewportInputArray = [
       {
@@ -72,68 +116,27 @@ export async function render(ref1, ref2, ref3, niftiURL, renderingEngineId, tool
   toolGroup.addViewport(viewportId2, renderingEngineId)
   toolGroup.addViewport(viewportId3, renderingEngineId)
 
+
   setVolumesForViewports(
       renderingEngine,
       [{ volumeId }],
-      viewportInputArray.map((v) => v.viewportId)
+      viewportIds
   );
-  renderingEngine.getViewports().map((v) => {
-    v.canvas.style.position = "relative";
-  }) 
-  
-  renderingEngine.render()
+
+  await segmentation.addSegmentationRepresentations(toolGroupId, [
+    {
+      segmentationId,
+      type: csToolsEnums.SegmentationRepresentations.Contour,
+    },
+  ]);
+
+  renderingEngine.render();
 }
 
-export async function initializeCornerstone(){
-  const initState = await csInit();
-  await csTools3dInit()
-  return initState;
-}
 
-export function createRenderingEngineAndRegisterVolumeLoader(){
-  volumeLoader.registerVolumeLoader('nifti', cornerstoneNiftiImageVolumeLoader);
-  const renderingEngineId = "myRenderingEngine";
-  if (!getRenderingEngine(renderingEngineId)){
-    const renderingEngine = new RenderingEngine(renderingEngineId);
-  }
-  return renderingEngineId;
-}
 
-export function createToolGroupAndAddTools(){
-  const toolGroupId = "myToolGroup";
-  ToolGroupManager.destroyToolGroup(toolGroupId);
 
-  const toolGroup = ToolGroupManager.createToolGroup(toolGroupId);
-  if (!csToolState.tools.Zoom){
-    addTool(ZoomTool);
-    addTool(WindowLevelTool);
-    addTool(StackScrollMouseWheelTool);
-  }
-  toolGroup.addTool(ZoomTool.toolName);
-  toolGroup.addTool(WindowLevelTool.toolName);
-  toolGroup.addTool(StackScrollMouseWheelTool.toolName);
-  
-  toolGroup.setToolActive(StackScrollMouseWheelTool.toolName);
-    toolGroup.setToolActive(WindowLevelTool.toolName, {
-      bindings: [
-        {
-          mouseButton: csToolsEnums.MouseBindings.Primary, // Left Click
-        },
-      ],
-    });
-  
-    toolGroup.setToolActive(ZoomTool.toolName, {
-      bindings: [
-        {
-          mouseButton: csToolsEnums.MouseBindings.Secondary, // Right Click
-        },
-      ],
-    });
-  return toolGroupId
-}
-
-export const debug = () => {
-  console.log(getRenderingEngines())
+export const debug = async () => {
   const axial_viewport = getEnabledElements()[0].viewport;
   const axial_camera = axial_viewport.getCamera();
   const axial_imageData = axial_viewport.getImageData();
@@ -147,14 +150,16 @@ export const debug = () => {
   const coronal_camera = coronal_viewport.getCamera();
   const coronal_imageData = coronal_viewport.getImageData();
 
-  console.log("AXIAL: ", axial_camera);
+  // axial_camera.focalPoint[2] = -144.3599964477612;
+  // console.log("AXIAL: ", axial_camera);
+  console.log(segmentation.state.getSegmentations());
+  console.log(segmentation.state.getAllSegmentationRepresentations());
+  
+
   // console.log("SAGITTAL: ", sagittal_camera);
   // console.log("CORONAL: ", coronal_camera);
   // console.log("AXIAL: ", axial_imageData);
   // console.log("SAGITTAL: ", sagittal_imageData);
   // console.log("CORONAL: ", coronal_imageData);
-  const segmentationData = fetch('/api/segmentations')
-  .then((response) => response.json())
-  .then((data) => console.log(data))
-
 }
+

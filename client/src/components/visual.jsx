@@ -1,12 +1,7 @@
 import React from 'react'
 import { useRef, useEffect} from 'react'
-import { 
-  render,
-  debug, 
-  createRenderingEngineAndRegisterVolumeLoader,
-  createToolGroupAndAddTools,
-  initializeCornerstone
-} from '../helpers/helpers';
+import { renderVisualization } from '../helpers/helpers';
+import { run } from '../helpers/run';
 import './Visual.css';
 
 function Visual({ niftiURL, filename }) {
@@ -16,12 +11,10 @@ function Visual({ niftiURL, filename }) {
   
   useEffect(() => {              //TODO: Need to not make a new renderingEngine on every render. 
     (async () => {
-      await initializeCornerstone();
       if (axial_ref && sagittal_ref && coronal_ref){
         console.log("setup");  
-        const renderingEngineId = createRenderingEngineAndRegisterVolumeLoader();
-        const toolGroupId = createToolGroupAndAddTools()
-        await render(axial_ref, sagittal_ref, coronal_ref, niftiURL, renderingEngineId, toolGroupId);
+        // renderVisualization(axial_ref, sagittal_ref, coronal_ref, niftiURL);
+        await renderVisualization(axial_ref, sagittal_ref, coronal_ref, niftiURL);
       }  
     }) ();
     }, [])
@@ -29,7 +22,7 @@ function Visual({ niftiURL, filename }) {
   return ( 
     <div className="Visual">
         <div className="viewport">
-          <div className="axial" ref={axial_ref} style={{height: "50vh", width: "39.5vw"}}></div>
+          <div className="axial" ref={axial_ref}></div>
           <div className="sagittal" ref={sagittal_ref}></div>
           <div className="coronal" ref={coronal_ref}></div>
           <div className="tools"></div>

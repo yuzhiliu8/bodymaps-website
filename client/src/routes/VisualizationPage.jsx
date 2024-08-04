@@ -1,7 +1,7 @@
 import React from 'react'
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
-import { debug, initializeCornerstone } from '../helpers/helpers';
+import { debug } from '../helpers/helpers';
 
 import Visual from '../components/Visual';
 import ReportScreen from '../components/ReportScreen';
@@ -73,6 +73,7 @@ function VisualizationPage() {
     }
   }
 
+
   return (
     <div className="VisualizationPage">
 
@@ -95,13 +96,13 @@ function VisualizationPage() {
         <button onClick={debug}>Check Volume</button>
       </div>
       
-      <div className="visualization-container" ref={VisualizationContainer_ref}>
+      <div className="visualization-container" ref={VisualizationContainer_ref} >
         {visualizationContent}
       </div>
 
-      <div className="report" ref={ReportScreen_ref} style={{display: "none"}}>
+      {/* <div className="report" ref={ReportScreen_ref} style={{display: "none"}}>
         <ReportScreen />
-      </div>
+      </div> */}
 
     </div>
   )

@@ -8,10 +8,10 @@ def process_masks(file_path):
     aff = aorta.affine #aff should be the same for all masks
     aorta_data = aorta.get_fdata()    #aorta_data[x, y, z]
 
-    contourSets = {"contourSets": []}
+    contourSets = {"contourSets": {"axial": [], "sagittal": [], "coronal": []}}
 
 
-    axial_aorta = initContourSet(id="axial_aorta", rgb=[255, 0, 0])
+    axial_aorta = initContourSet(id="axial_aorta", rgb=[0, 255, 0])
     #AXIAL ORIENTATION (Z axis)
     Z_INDEX_RANGE = aorta_data.shape[2]
     for Z in range(Z_INDEX_RANGE):  #AORTA ONLY FOR NOW
@@ -23,13 +23,13 @@ def process_masks(file_path):
             points = []
             for point in contour:
                 X, Y = map(int, point[0])
-                point = convertIndexesToCornerstonePoints([X, Y, Z], aff)    #swap x, y bc cv reads shape in as (height, width)
+                point = convertIndexesToCornerstonePoints([Y, X, Z], aff)    #swap x, y bc cv reads shape in as (height, width)
                 points.append(point)
             slice_data['points'] = points
             slice_data['type'] = 'CLOSED_PLANAR'
             axial_aorta["data"].append(slice_data)
     
-    contourSets["contourSets"].append(axial_aorta)
+    contourSets["contourSets"]['axial'].append(axial_aorta)
     return contourSets
 
 ## use go from discrete values to less discrete cornerstone camera coords
