@@ -50,7 +50,7 @@ def download(path):
 
 @app.route('/api/segmentations', methods=['GET'])
 def get_segmentations():
-    file_path = 'nifti/aorta.nii.gz'
+    file_path = 'nifti'
     data = process_masks(file_path)
     return jsonify(data)
 

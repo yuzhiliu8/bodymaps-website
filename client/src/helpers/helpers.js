@@ -46,14 +46,17 @@ export async function renderVisualization(ref1, ref2, ref3, niftiURL){
   toolGroup.setToolEnabled(SegmentationDisplayTool.toolName);
 
   volumeLoader.registerVolumeLoader('nifti', cornerstoneNiftiImageVolumeLoader);
+
+  const renderingEngine = new RenderingEngine(renderingEngineId);
   
   const volumeId = 'nifti:' + niftiURL;
+
   const volume = await volumeLoader.createAndCacheVolume(volumeId);
 
   const segmentationData = await fetch('/api/segmentations').then((resp) => resp.json());
 
   const geometryIds = []
-  const promises = segmentationData.contourSets.axial.map((contourSet) => {
+  const promises = segmentationData.axial.map((contourSet) => {
     const geometryId = contourSet.id;
     geometryIds.push(geometryId);
     return geometryLoader.createAndCacheGeometry(geometryId, {
@@ -76,7 +79,21 @@ export async function renderVisualization(ref1, ref2, ref3, niftiURL){
     },
   ]);
 
-  const renderingEngine = new RenderingEngine(renderingEngineId);
+  let [segmentationRepUID] = 
+  await segmentation.addSegmentationRepresentations(toolGroupId, [
+    {
+      segmentationId,
+      type: csToolsEnums.SegmentationRepresentations.Contour,
+      options:{
+        colorLUTOrIndex: [
+          [255, 0, 0, 100],
+          [0, 255, 0, 100],
+        ],
+      }
+    },
+  ]);
+
+  
 
   const viewportId1 = 'CT_NIFTI_AXIAL';
   const viewportId2 = 'CT_NIFTI_SAGITTAL';
@@ -123,14 +140,11 @@ export async function renderVisualization(ref1, ref2, ref3, niftiURL){
       viewportIds
   );
 
-  await segmentation.addSegmentationRepresentations(toolGroupId, [
-    {
-      segmentationId,
-      type: csToolsEnums.SegmentationRepresentations.Contour,
-    },
-  ]);
+  
 
   renderingEngine.render();
+
+  // segmentation.config.color.setColorForSegmentIndex(toolGroupId, segmentationRepUID, 1, [0, 255, 0, 255]);
 }
 
 
@@ -161,5 +175,9 @@ export const debug = async () => {
   // console.log("AXIAL: ", axial_imageData);
   // console.log("SAGITTAL: ", sagittal_imageData);
   // console.log("CORONAL: ", coronal_imageData);
+}
+
+async function createAndRenderVolume(){
+  
 }
 

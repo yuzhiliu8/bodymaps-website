@@ -1,7 +1,6 @@
 import React from 'react'
 import { useRef, useEffect} from 'react'
 import { renderVisualization } from '../helpers/helpers';
-import { run } from '../helpers/run';
 import './Visual.css';
 
 function Visual({ niftiURL, filename }) {
@@ -14,7 +13,7 @@ function Visual({ niftiURL, filename }) {
       if (axial_ref && sagittal_ref && coronal_ref){
         console.log("setup");  
         // renderVisualization(axial_ref, sagittal_ref, coronal_ref, niftiURL);
-        await renderVisualization(axial_ref, sagittal_ref, coronal_ref, niftiURL);
+        renderVisualization(axial_ref, sagittal_ref, coronal_ref, niftiURL);
       }  
     }) ();
     }, [])
