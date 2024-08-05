@@ -17,6 +17,7 @@
     color:white;
     grid-column: 1;
     grid-row: 1;
+    text-align: center;
 }
 
 .dropdown{

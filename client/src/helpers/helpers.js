@@ -20,15 +20,14 @@ import {
 
 import { cornerstoneNiftiImageVolumeLoader } from '@cornerstonejs/nifti-volume-loader';
 
+const segmentationId = "mySegmentation";
+const toolGroupId = "myToolGroup";
+const renderingEngineId = "myRenderingEngine";
 
 
 export async function renderVisualization(ref1, ref2, ref3, niftiURL){
   csTools3dInit();
   await csInit();
-
-  const segmentationId = "mySegmentation";
-  const toolGroupId = "myToolGroup";
-  const renderingEngineId = "myRenderingEngine";
 
   ref1.current.oncontextmenu = (e) => e.preventDefault();
   ref2.current.oncontextmenu = (e) => e.preventDefault();
@@ -51,50 +50,43 @@ export async function renderVisualization(ref1, ref2, ref3, niftiURL){
   
   const volumeId = 'nifti:' + niftiURL;
 
-  const volume = await volumeLoader.createAndCacheVolume(volumeId);
+  createAndRenderVolume(volumeId, renderingEngine, toolGroup, ref1, ref2, ref3); //async
+  createAndRenderMaskSegmentations();                                            //async
+  // segmentation.config.color.setColorForSegmentIndex(toolGroupId, segmentationRepUID, 1, [0, 255, 0, 255]);
+}
 
-  const segmentationData = await fetch('/api/segmentations').then((resp) => resp.json());
 
-  const geometryIds = []
-  const promises = segmentationData.axial.map((contourSet) => {
-    const geometryId = contourSet.id;
-    geometryIds.push(geometryId);
-    return geometryLoader.createAndCacheGeometry(geometryId, {
-      type: Enums.GeometryType.CONTOUR,
-      geometryData: contourSet,
-    });
-  });
 
-  await Promise.all(promises);
 
-  segmentation.addSegmentations([
-    {
-      segmentationId,
-      representation: {
-        type: csToolsEnums.SegmentationRepresentations.Contour,
-        data:{
-          geometryIds: geometryIds,
-        },
-      },
-    },
-  ]);
+export const debug = async () => {
+  const axial_viewport = getEnabledElements()[0].viewport;
+  const axial_camera = axial_viewport.getCamera();
+  const axial_imageData = axial_viewport.getImageData();
+  // console.log(getEnabledElements())
+  
+  const sagittal_viewport = getEnabledElements()[1].viewport;
+  const sagittal_camera = sagittal_viewport.getCamera();
+  const sagittal_imageData = sagittal_viewport.getImageData();
 
-  let [segmentationRepUID] = 
-  await segmentation.addSegmentationRepresentations(toolGroupId, [
-    {
-      segmentationId,
-      type: csToolsEnums.SegmentationRepresentations.Contour,
-      options:{
-        colorLUTOrIndex: [
-          [255, 0, 0, 100],
-          [0, 255, 0, 100],
-        ],
-      }
-    },
-  ]);
+  const coronal_viewport = getEnabledElements()[2].viewport;
+  const coronal_camera = coronal_viewport.getCamera();
+  const coronal_imageData = coronal_viewport.getImageData();
 
+  // axial_camera.focalPoint[2] = -144.3599964477612;
+  // console.log("AXIAL: ", axial_camera);
+  console.log(segmentation.state.getSegmentations());
+  console.log(segmentation.state.getAllSegmentationRepresentations());
   
 
+  // console.log("SAGITTAL: ", sagittal_camera);
+  // console.log("CORONAL: ", coronal_camera);
+  // console.log("AXIAL: ", axial_imageData);
+  // console.log("SAGITTAL: ", sagittal_imageData);
+  // console.log("CORONAL: ", coronal_imageData);
+}
+
+async function createAndRenderVolume(volumeId, renderingEngine, toolGroup, ref1, ref2, ref3){
+  const volume = await volumeLoader.createAndCacheVolume(volumeId);
   const viewportId1 = 'CT_NIFTI_AXIAL';
   const viewportId2 = 'CT_NIFTI_SAGITTAL';
   const viewportId3 = 'CT_NIFTI_CORONAL';
@@ -143,41 +135,49 @@ export async function renderVisualization(ref1, ref2, ref3, niftiURL){
   
 
   renderingEngine.render();
-
-  // segmentation.config.color.setColorForSegmentIndex(toolGroupId, segmentationRepUID, 1, [0, 255, 0, 255]);
+  console.log("volume rendered");
 }
 
+async function createAndRenderMaskSegmentations() {
+  const segmentationData = await fetch('/api/segmentations').then((resp) => resp.json());
 
+  const geometryIds = []
+  const promises = segmentationData.axial.map((contourSet) => {
+    const geometryId = contourSet.id;
+    geometryIds.push(geometryId);
+    return geometryLoader.createAndCacheGeometry(geometryId, {
+      type: Enums.GeometryType.CONTOUR,
+      geometryData: contourSet,
+    });
+  });
 
+  await Promise.all(promises);
 
-export const debug = async () => {
-  const axial_viewport = getEnabledElements()[0].viewport;
-  const axial_camera = axial_viewport.getCamera();
-  const axial_imageData = axial_viewport.getImageData();
-  // console.log(getEnabledElements())
-  
-  const sagittal_viewport = getEnabledElements()[1].viewport;
-  const sagittal_camera = sagittal_viewport.getCamera();
-  const sagittal_imageData = sagittal_viewport.getImageData();
+  segmentation.addSegmentations([
+    {
+      segmentationId,
+      representation: {
+        type: csToolsEnums.SegmentationRepresentations.Contour,
+        data:{
+          geometryIds: geometryIds,
+        },
+      },
+    },
+  ]);
 
-  const coronal_viewport = getEnabledElements()[2].viewport;
-  const coronal_camera = coronal_viewport.getCamera();
-  const coronal_imageData = coronal_viewport.getImageData();
-
-  // axial_camera.focalPoint[2] = -144.3599964477612;
-  // console.log("AXIAL: ", axial_camera);
-  console.log(segmentation.state.getSegmentations());
-  console.log(segmentation.state.getAllSegmentationRepresentations());
-  
-
-  // console.log("SAGITTAL: ", sagittal_camera);
-  // console.log("CORONAL: ", coronal_camera);
-  // console.log("AXIAL: ", axial_imageData);
-  // console.log("SAGITTAL: ", sagittal_imageData);
-  // console.log("CORONAL: ", coronal_imageData);
-}
-
-async function createAndRenderVolume(){
-  
+  let [segmentationRepUID] = 
+  await segmentation.addSegmentationRepresentations(toolGroupId, [
+    {
+      segmentationId,
+      type: csToolsEnums.SegmentationRepresentations.Contour,
+      options:{
+        colorLUTOrIndex: [
+          [255, 0, 0, 100],
+          [0, 255, 0, 100],
+        ],
+      }
+    },
+  ]);
+  console.log("Segmentations rendered");
 }
 
