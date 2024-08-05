@@ -1,0 +1,10 @@
+const RED = [230, 25, 75, 255];
+const BLUE = [0, 130, 200, 255];
+const MAROON = [128, 0, 0, 255];
+const BROWN = [170, 110, 40, 255];
+const OLIVE = [128, 128, 0, 255];
+const TEAL = [0, 128, 128, 255];
+const PURPLE = [145, 30, 180, 255];
+const MAGENTA = [240, 50, 230, 255];
+const LIME = [210, 245, 60, 255];
+export const defaultColors = [RED, BLUE, MAROON, BROWN, OLIVE, TEAL, PURPLE, MAGENTA, LIME];
