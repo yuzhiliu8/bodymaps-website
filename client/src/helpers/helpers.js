@@ -80,7 +80,6 @@ export async function renderVisualization(ref1, ref2, ref3, ref4, niftiURL, mask
   volumeLoader.registerVolumeLoader('nifti', cornerstoneNiftiImageVolumeLoader);
 
   let renderingEngine = getRenderingEngine(renderingEngineId);
-  console.log(renderingEngine);
   if (renderingEngine){
     renderingEngine.destroy();  
     renderingEngine = new RenderingEngine(renderingEngineId); 
@@ -159,7 +158,7 @@ async function createAndRenderVolume(volumeId, renderingEngine, toolGroup, toolG
 
   renderingEngine.render();
   console.log("volume rendered");
-}
+} 
 
 
 
@@ -214,7 +213,6 @@ async function createAndRenderSegmentations(maskData){
 
 function addToolsToCornerstone(){
   const addedTools = csToolState.tools;
-  console.log(addedTools.StackScrollMouseWheel);
   if (!addedTools.StackScrollMouseWheel) addTool(StackScrollMouseWheelTool);
   if (!addedTools.SegmentationDisplay) addTool(SegmentationDisplayTool);
   if (!addedTools.TrackballRotate) addTool(TrackballRotateTool);
