@@ -6,5 +6,5 @@ const OLIVE = [128, 128, 0, 255];
 const TEAL = [0, 128, 128, 255];
 const PURPLE = [145, 30, 180, 255];
 const MAGENTA = [240, 50, 230, 255];
-const LIME = [210, 245, 60, 255];
+const LIME = [240, 50, 230, 255];
 export const defaultColors = [RED, BLUE, MAROON, BROWN, OLIVE, TEAL, PURPLE, MAGENTA, LIME];
