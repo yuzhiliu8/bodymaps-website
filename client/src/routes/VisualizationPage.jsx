@@ -1,7 +1,7 @@
 import React from 'react'
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
-import { initializeCornerstone } from '../helpers/helpers';
+import { debug } from '../helpers/helpers';
 
 import Visual from '../components/Visual';
 import ReportScreen from '../components/ReportScreen';
@@ -9,10 +9,8 @@ import TaskMenu from '../components/TaskMenu';
 import './VisualizationPage.css';
 
 function VisualizationPage() {
-  const [csInitializationState, setInitializationState] = useState(false);
   const [visualizationContent, setVisualizationContent] = useState(null);
-  const [serverPath, setServerPath] = useState('');
-  const [filename, setFilename] = useState();
+  // const [serverPath, setServerPath] = useState('');
 
   const TaskMenu_ref = useRef(null);
   const ReportScreen_ref = useRef(null);
@@ -21,22 +19,20 @@ function VisualizationPage() {
   const location = useLocation();
 
   useEffect(() => {
-    const state = location.state
-    const path = state.path
-    console.log("PATH: ", path)
-    setServerPath(path)
-    setFilename(state.filename)
-    console.log(state.filename)
-    const initState = initializeCornerstone();
-    setInitializationState(initState);
-  }, [])
-
-  useEffect(() => {    
-    if (csInitializationState && serverPath) {
-      const niftiURL = `/api/download/${serverPath}`;
-      setVisualizationContent(<Visual niftiURL={niftiURL} filename={filename}/>)
+    const state = location.state;
+    if (!state){
+      navigate('/');
     }
-  }, [csInitializationState, serverPath])
+    const niftiURL = URL.createObjectURL(state.file);
+    const maskData = []
+    Array.from(state.masks).forEach((file) => {
+      maskData.push({
+        id: file.name,
+        url: URL.createObjectURL(file),
+      });
+    });
+    setVisualizationContent(<Visual niftiURL={niftiURL} maskData={maskData}/>)
+  }, [])
 
   const showTaskMenu = () => {
     if (TaskMenu_ref.current.style.display === "none"){
@@ -72,6 +68,7 @@ function VisualizationPage() {
     }
   }
 
+
   return (
     <div className="VisualizationPage">
 
@@ -91,16 +88,16 @@ function VisualizationPage() {
         </div>
         <button onClick={() => navigate("/")}>Back</button>
         <div><br/></div>
-        <button>Check Volume</button>
+        <button onClick={debug}>Debug</button>
       </div>
       
-      <div className="visualization-container" ref={VisualizationContainer_ref}>
+      <div className="visualization-container" ref={VisualizationContainer_ref} >
         {visualizationContent}
       </div>
 
-      <div className="report" ref={ReportScreen_ref} style={{display: "none"}}>
+      {/* <div className="report" ref={ReportScreen_ref} style={{display: "none"}}>
         <ReportScreen />
-      </div>
+      </div> */}
 
     </div>
   )
