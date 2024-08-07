@@ -16,4 +16,9 @@ export default defineConfig({
       "Cross-Origin-Embedder-Policy": "require-corp"
     },
   },
+  resolve: {
+    alias: {
+      "@cornerstonejs/tools": "@cornerstonejs/tools/dist/umd/index.js"
+    },
+  },
 });
