@@ -91,8 +91,8 @@ export async function renderVisualization(ref1, ref2, ref3, ref4, niftiURL, mask
   const volumeId = 'nifti:' + niftiURL;
 
   await createAndRenderVolume(volumeId, renderingEngine, toolGroup, toolGroup3D, ref1, ref2, ref3, ref4); //async                                          //async
-  await createAndRenderSegmentations(maskData);
-  
+  const segmentationRepresentationUIDs = await createAndRenderSegmentations(maskData);
+  return segmentationRepresentationUIDs; 
 }
 
 
@@ -198,7 +198,7 @@ async function createAndRenderSegmentations(maskData){
   await Promise.all(segmentationVols)
 
   segmentation.addSegmentations(segmentationInputArray);
-  // let segmentIndex = 1;
+  let segmentIndex = 1;
   // segmentationInputArray.forEach((seg) => {
   //   segmentation.segmentIndex.setActiveSegmentIndex(seg.segmentationId, segmentIndex);
   //   segmentIndex++;
@@ -209,6 +209,7 @@ async function createAndRenderSegmentations(maskData){
   
   
   console.log("labelmaps rendered");
+  return segRepUIDs;
 }
 
 function addToolsToCornerstone(){
@@ -241,3 +242,11 @@ export const debug = async () => {
   const coronal_imageData = coronal_viewport.getImageData();
   console.log(csToolState);
 }
+
+export function setVisibilities(segRepUIDs, checkState){
+  let i = 1;  
+  segRepUIDs.forEach((segRepUID) => {
+    segmentation.config.visibility.setSegmentVisibility(toolGroupId, segRepUID, 1, checkState[i]);
+    i++;
+  });
+};

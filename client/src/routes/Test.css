@@ -1,12 +1,5 @@
 .test-container{
     display:grid;
     grid-template-columns: 20vw 80vw;
-}
-
-.side{
-    background-color:grey;
-}
-
-.vis-container{
-    grid-column: 2;
+    color: black;
 }

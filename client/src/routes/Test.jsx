@@ -3,23 +3,11 @@ import { useRef, useEffect } from 'react';
 import Visual from '../components/Visual'
 import './Test.css';
 
-
-
-
+import NestedCheckBox from '../components/NestedCheckBox';
 
 function Test() {
     return (
-        <div className="Test">
-            <div className="test-container">
-                <div className="side">
-                    sidebar
-                </div>
-                <div className="vis-container">
-                <Visual />
-                </div>
-            </div>
-            
-        </div>
+        <NestedCheckBox />
     )
 }
 

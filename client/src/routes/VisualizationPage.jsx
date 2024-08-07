@@ -6,10 +6,25 @@ import { debug } from '../helpers/helpers';
 import Visual from '../components/Visual';
 import ReportScreen from '../components/ReportScreen';
 import TaskMenu from '../components/TaskMenu';
+import NestedCheckBox from '../components/NestedCheckBox';
+import { setVisibilities } from '../helpers/helpers';
 import './VisualizationPage.css';
+import TaskMenuItem from '../components/TaskMenuItem';
+import { segmentation } from '@cornerstonejs/tools';
+
+const trueCheckState = [true, true, true, true, true, true, true, true, true, true];
+const case1 = '[false,true,true,true,true,true,true,true,true,true]'
 
 function VisualizationPage() {
   const [visualizationContent, setVisualizationContent] = useState(null);
+  const [taskMenuContent, setTaskMenuContent] = useState(null);
+  const [checkState, setCheckState] = useState(trueCheckState);
+  const [segmentationRepresentationUIDs, setSegmentationRepresentationUIDs] = useState(null);
+
+  if (segmentationRepresentationUIDs && checkState){
+    setVisibilities(segmentationRepresentationUIDs, checkState);
+  }
+  
   // const [serverPath, setServerPath] = useState('');
 
   const TaskMenu_ref = useRef(null);
@@ -22,6 +37,7 @@ function VisualizationPage() {
     const state = location.state;
     if (!state){
       navigate('/');
+      return;
     }
     const niftiURL = URL.createObjectURL(state.file);
     const maskData = []
@@ -31,12 +47,19 @@ function VisualizationPage() {
         url: URL.createObjectURL(file),
       });
     });
-    setVisualizationContent(<Visual niftiURL={niftiURL} maskData={maskData}/>)
+    setVisualizationContent(<Visual niftiURL={niftiURL} maskData={maskData} setSegRepUIDs = {setSegmentationRepresentationUIDs}/>);
+    
   }, [])
+
+  useEffect(() => {
+    if (segmentationRepresentationUIDs){
+      setTaskMenuContent(<NestedCheckBox innerRef={TaskMenu_ref} checkState={checkState} update={update} />);
+    }
+  },[segmentationRepresentationUIDs, checkState])
 
   const showTaskMenu = () => {
     if (TaskMenu_ref.current.style.display === "none"){
-      TaskMenu_ref.current.style.display = "block";
+      TaskMenu_ref.current.style.display = "block"; 
     }
     else{
       TaskMenu_ref.current.style.display = "none";
@@ -55,18 +78,18 @@ function VisualizationPage() {
 
   }
 
-  const handleChecked = (event) => {
-    const selectedInputElement = event.target; //<input> element
-    const selectedTaskMenuItemComponent = event.target.parentElement.parentElement; //TaskMenuItem component
-    const TaskMenuItemArray = TaskMenu_ref.current.children;
+  const update = (id, checked) => {
+    let newCheckState = [...checkState];
+    newCheckState[id] = checked;
+    if (JSON.stringify(newCheckState) === case1) newCheckState = trueCheckState;
+    if (id !== 0 && checked === false && newCheckState[0] === true) newCheckState[0] = false;
+    newCheckState = (id === 0) ? Array(10).fill(checked) : newCheckState;
+    // console.log(newCheckState);
+    setCheckState(newCheckState);
+}
 
-    if (selectedTaskMenuItemComponent === TaskMenuItemArray[0] && selectedInputElement.checked === true){
-      for (let i = 0; i < TaskMenuItemArray.length; i++){
-        let currentElement = TaskMenuItemArray[i].children[0].children[0];
-        currentElement.checked = true;
-      }
-    }
-  }
+
+ 
 
 
   return (
@@ -76,9 +99,7 @@ function VisualizationPage() {
         <div className="tasks-container">
           <div className="dropdown">
             <div className="dropdown-header" onClick={showTaskMenu}>Selected Task</div>
-            <TaskMenu 
-            innerRef={TaskMenu_ref}
-            handleChecked={handleChecked}/>
+            {taskMenuContent}
           </div>
         </div>
         <div className="report-container">
@@ -87,17 +108,17 @@ function VisualizationPage() {
           </div>
         </div>
         <button onClick={() => navigate("/")}>Back</button>
-        <div><br/></div>
-        <button onClick={debug}>Debug</button>
+        <div><br/></div> 
+        <button onClick={() => debug}>Debug</button>
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref} >
         {visualizationContent}
       </div>
 
-      {/* <div className="report" ref={ReportScreen_ref} style={{display: "none"}}>
+      <div className="report" ref={ReportScreen_ref} style={{display: "none"}}>
         <ReportScreen />
-      </div> */}
+      </div>
 
     </div>
   )
