@@ -10,8 +10,7 @@ import './VisualizationPage.css';
 
 function VisualizationPage() {
   const [visualizationContent, setVisualizationContent] = useState(null);
-  const [serverPath, setServerPath] = useState('');
-  const [filename, setFilename] = useState();
+  // const [serverPath, setServerPath] = useState('');
 
   const TaskMenu_ref = useRef(null);
   const ReportScreen_ref = useRef(null);
@@ -20,24 +19,20 @@ function VisualizationPage() {
   const location = useLocation();
 
   useEffect(() => {
-    (async () => {
-      const state = location.state
-      if (!state){
-        navigate('/')
-      }
-      const path = state.path
-      console.log("PATH: ", path)
-      setServerPath(path)
-      setFilename(state.filename)
-    }) ();
-  }, [])
-
-  useEffect(() => {    
-    if (serverPath) {
-      const niftiURL = `/api/download/${serverPath}`;
-      setVisualizationContent(<Visual niftiURL={niftiURL} filename={filename}/>)
+    const state = location.state;
+    if (!state){
+      navigate('/');
     }
-  }, [serverPath])
+    const niftiURL = URL.createObjectURL(state.file);
+    const maskData = []
+    Array.from(state.masks).forEach((file) => {
+      maskData.push({
+        id: file.name,
+        url: URL.createObjectURL(file),
+      });
+    });
+    setVisualizationContent(<Visual niftiURL={niftiURL} maskData={maskData}/>)
+  }, [])
 
   const showTaskMenu = () => {
     if (TaskMenu_ref.current.style.display === "none"){

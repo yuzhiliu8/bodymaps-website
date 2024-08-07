@@ -3,7 +3,7 @@ import { useRef, useEffect} from 'react'
 import { renderVisualization } from '../helpers/helpers';
 import './Visual.css';
 
-function Visual({ niftiURL, filename }) {
+function Visual({ niftiURL, maskData }) {
   const axial_ref = useRef(null);
   const sagittal_ref = useRef(null);
   const coronal_ref = useRef(null);
@@ -12,10 +12,8 @@ function Visual({ niftiURL, filename }) {
   useEffect(() => {              //TODO: Need to not make a new renderingEngine on every render. 
     (async () => {
       if (axial_ref && sagittal_ref && coronal_ref){
-        console.log("setup");  
-        // renderVisualization(axial_ref, sagittal_ref, coronal_ref, niftiURL);
-        renderVisualization(axial_ref, sagittal_ref, coronal_ref, volume3D_ref, niftiURL);
-      }  
+        await renderVisualization(axial_ref, sagittal_ref, coronal_ref, volume3D_ref, niftiURL, maskData);
+      }
     }) ();
     }, [])
  

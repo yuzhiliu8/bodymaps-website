@@ -19,7 +19,7 @@ export default function HomePage() {
   }
 
   const handleMaskUpload = (event) => {
-    const m = event.target.files;
+    const m = Array.from(event.target.files);
     setMasks(m);
   }
 
@@ -27,18 +27,19 @@ export default function HomePage() {
     console.log(file);
     console.log(masks);
     if (file && masks){
-      const formData = new FormData();
-      formData.append('file', file)
-      fetch("/api/send", {
-        method: 'POST',
-        body: formData,
-      })
-      .then((response) => response.text())
-      .then((data) => {
-        console.log(data)
-        console.log("filename: ", file.filename)
-        navigate('/visualization', {state: {path: data, filename: file.name}})
-      })
+      // const formData = new FormData();
+      // formData.append('file', file)
+      // fetch("/api/send", {
+      //   method: 'POST',
+      //   body: formData,
+      // })
+      // .then((response) => response.text())
+      // .then((data) => {
+      //   console.log(data)
+      //   console.log("filename: ", file.filename)
+      //   navigate('/visualization', {state: {path: data, file: file}})
+      // });
+      navigate('/visualization', {state: {file: file, masks: masks}});
     }
   })
 
