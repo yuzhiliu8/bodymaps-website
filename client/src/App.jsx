@@ -1,7 +1,7 @@
 import VisualizationPage from './routes/VisualizationPage'
 import HomePage from './routes/HomePage';
 import Test from './routes/Test';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 
 import './App.css'
 
