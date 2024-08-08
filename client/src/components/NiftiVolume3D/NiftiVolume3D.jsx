@@ -55,12 +55,8 @@ function NiftiVolume3D({ maskFiles }) {
         <div className="NiftiVolume3D">
             <div className="canvas">
                 <canvas ref={canvasRef}>Canvas</canvas>
-                <input type="file" multiple onChange={handleUpload}/>
             </div>
-            
-        </div>
-    )
-    
-}
-
+        </div> 
+        )}
+        
 export default NiftiVolume3D

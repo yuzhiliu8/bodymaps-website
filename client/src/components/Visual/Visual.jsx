@@ -34,7 +34,7 @@ function Visual({ niftiURL, maskFiles, setSegRepUIDs}) {
           <div className="axial" ref={axial_ref}></div>
           <div className="sagittal" ref={sagittal_ref}></div>
           <div className="coronal" ref={coronal_ref}></div>
-          <div className="3D">
+          <div className="Volume3D">
             <NiftiVolume3D maskFiles={maskFiles}/>
           </div>
         </div>
