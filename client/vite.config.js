@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: "/bodymaps-website/",
+  
   server: {
     proxy: {
       '/api': {
@@ -17,6 +18,7 @@ export default defineConfig({
       "Cross-Origin-Embedder-Policy": "require-corp"
     },
   },
+  
   resolve: {
     alias: {
       "@cornerstonejs/tools": "@cornerstonejs/tools/dist/umd/index.js"
