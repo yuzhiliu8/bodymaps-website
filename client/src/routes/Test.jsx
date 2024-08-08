@@ -1,11 +1,14 @@
 import React from 'react'
-import { useRef, useEffect } from 'react';
+import NiftiVolume3D from '../components/NiftiVolume3D/NiftiVolume3D';
 import './Test.css';
 
 
 function Test() {
     return (
-        <div>Test</div>
+        <div className="TestPage">
+            <NiftiVolume3D />
+
+        </div>
     )
 }
 

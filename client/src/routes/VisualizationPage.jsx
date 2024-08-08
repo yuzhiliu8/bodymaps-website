@@ -1,19 +1,15 @@
 import React from 'react'
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
-import { debug } from '../helpers/helpers';
+import { debug, setVisibilities } from '../helpers/helpers';
+import Visual from '../components/Visual/Visual';
+import ReportScreen from '../components/ReportScreen/ReportScreen';
+import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
 
-import Visual from '../components/Visual';
-import ReportScreen from '../components/ReportScreen';
-import TaskMenu from '../components/TaskMenu';
-import NestedCheckBox from '../components/NestedCheckBox';
-import { setVisibilities } from '../helpers/helpers';
 import './VisualizationPage.css';
-import TaskMenuItem from '../components/TaskMenuItem';
-import { segmentation } from '@cornerstonejs/tools';
 
 const trueCheckState = [true, true, true, true, true, true, true, true, true, true];
-const case1 = '[false,true,true,true,true,true,true,true,true,true]'
+const case1 = '[false,true,true,true,true,true,true,true,true,true]';
 
 function VisualizationPage() {
   const [visualizationContent, setVisualizationContent] = useState(null);
@@ -40,15 +36,8 @@ function VisualizationPage() {
       return;
     }
     const niftiURL = URL.createObjectURL(state.file);
-    const maskData = []
-    Array.from(state.masks).forEach((file) => {
-      maskData.push({
-        id: file.name,
-        url: URL.createObjectURL(file),
-      });
-    });
-    setVisualizationContent(<Visual niftiURL={niftiURL} maskData={maskData} setSegRepUIDs = {setSegmentationRepresentationUIDs}/>);
-    
+    const maskFiles = Array.from(state.masks)
+    setVisualizationContent(<Visual niftiURL={niftiURL} maskFiles={maskFiles} setSegRepUIDs = {setSegmentationRepresentationUIDs}/>);
   }, [])
 
   useEffect(() => {
@@ -109,7 +98,7 @@ function VisualizationPage() {
         </div>
         <button onClick={() => navigate("/")}>Back</button>
         <div><br/></div> 
-        <button onClick={() => debug}>Debug</button>
+        <button onClick={debug}>Debug</button>
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref} >
