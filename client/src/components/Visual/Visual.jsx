@@ -1,6 +1,6 @@
 import React from 'react'
 import { useRef, useEffect} from 'react'
-import { renderVisualization } from '../helpers/helpers';
+import { renderVisualization } from '../../helpers/helpers';
 import './Visual.css';
 
 function Visual({ niftiURL, maskData, setSegRepUIDs}) {

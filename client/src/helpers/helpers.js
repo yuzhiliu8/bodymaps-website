@@ -153,8 +153,9 @@ async function createAndRenderVolume(volumeId, renderingEngine, toolGroup, toolG
   setVolumesForViewports(
       renderingEngine,
       [{ volumeId }],
-      viewportIds
+      [viewportId1, viewportId2, viewportId3]
   );
+
 
   renderingEngine.render();
   console.log("volume rendered");
