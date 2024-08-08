@@ -6,6 +6,7 @@ import {
     setVolumesForViewports,
     getEnabledElements,
     getRenderingEngine,
+    CONSTANTS
   } from '@cornerstonejs/core';
 import {
   init as csTools3dInit,
@@ -20,6 +21,7 @@ import {
 }from '@cornerstonejs/tools';
 
 import { cornerstoneNiftiImageVolumeLoader } from '@cornerstonejs/nifti-volume-loader';
+import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps';
 import { defaultColors } from './colors';
 
 const toolGroupId = "myToolGroup";
@@ -45,14 +47,13 @@ const toolGroupSpecificRepresentationConfig = {
 
 
 
-export async function renderVisualization(ref1, ref2, ref3, ref4, niftiURL, maskData){
+export async function renderVisualization(ref1, ref2, ref3, niftiURL, maskData){
   csTools3dInit();
   await csInit();
 
   ref1.current.oncontextmenu = (e) => e.preventDefault();
   ref2.current.oncontextmenu = (e) => e.preventDefault();
   ref3.current.oncontextmenu = (e) => e.preventDefault();
-  ref4.current.oncontextmenu = (e) => e.preventDefault();
 
   
   addToolsToCornerstone();  
@@ -89,23 +90,48 @@ export async function renderVisualization(ref1, ref2, ref3, ref4, niftiURL, mask
   
   
   const volumeId = 'nifti:' + niftiURL;
-
-  await createAndRenderVolume(volumeId, renderingEngine, toolGroup, toolGroup3D, ref1, ref2, ref3, ref4); //async                                          //async
-  const segmentationRepresentationUIDs = await createAndRenderSegmentations(maskData);
-  return segmentationRepresentationUIDs; 
-}
-
-
-
-
-
-async function createAndRenderVolume(volumeId, renderingEngine, toolGroup, toolGroup3D, ref1, ref2, ref3, ref4){
-  const volume = await volumeLoader.createAndCacheVolume(volumeId);
   const viewportId1 = 'CT_NIFTI_AXIAL';
   const viewportId2 = 'CT_NIFTI_SAGITTAL';
   const viewportId3 = 'CT_NIFTI_CORONAL';
-  const viewportId4 = 'CT_NIFTI_3DVOLUME'
-  const viewportIds = [viewportId1, viewportId2, viewportId3, viewportId4];
+
+  const volume = await volumeLoader.createAndCacheVolume(volumeId);
+
+  const segmentationInputArray = []
+  const segRepInputArray = []
+  const segmentationVols = []
+  const segVolumeIds = []
+  let i = 0;
+  maskData.forEach((mask) => { 
+    segmentation.state.removeSegmentation(mask.id);
+    const segId = "nifti:" + mask.url;
+    const vol = volumeLoader.createAndCacheVolume(segId);
+    segmentationVols.push(vol);
+    segVolumeIds.push({volumeId: segId});
+    segmentationInputArray.push(
+      {
+        segmentationId: mask.id,
+        representation: {
+          type: csToolsEnums.SegmentationRepresentations.Labelmap,
+          data:{
+            volumeId: segId,
+          },
+        },
+      },
+    );
+    segRepInputArray.push({
+      segmentationId: mask.id,
+      type: csToolsEnums.SegmentationRepresentations.Labelmap,
+      options: {
+        colorLUTOrIndex: [
+          defaultColors[i],
+          defaultColors[i], 
+        ],
+      },
+    });
+    i++;
+  });
+  await Promise.all(segmentationVols); 
+
 
   const viewportInputArray = [
       {
@@ -132,15 +158,6 @@ async function createAndRenderVolume(volumeId, renderingEngine, toolGroup, toolG
           orientation: Enums.OrientationAxis.CORONAL,
         },
       },
-      {
-        viewportId: viewportId4,
-        type: Enums.ViewportType.VOLUME_3D,
-        element: ref4.current,
-        defaultOptions: {
-          orientation: Enums.OrientationAxis.SAGITTAL,
-          background: [0.2, 0, 0.2]
-        }
-      },
     ];
 
   renderingEngine.setViewports(viewportInputArray);
@@ -148,7 +165,6 @@ async function createAndRenderVolume(volumeId, renderingEngine, toolGroup, toolG
   toolGroup.addViewport(viewportId1, renderingEngineId);
   toolGroup.addViewport(viewportId2, renderingEngineId);
   toolGroup.addViewport(viewportId3, renderingEngineId);
-  toolGroup3D.addViewport(viewportId4, renderingEngineId);
 
   setVolumesForViewports(
       renderingEngine,
@@ -157,61 +173,17 @@ async function createAndRenderVolume(volumeId, renderingEngine, toolGroup, toolG
   );
 
 
+
   renderingEngine.render();
   console.log("volume rendered");
-} 
-
-
-
-async function createAndRenderSegmentations(maskData){
-  const segmentationInputArray = []
-  const segRepInputArray = []
-  const segmentationVols = []
-  let i = 0;
-  maskData.forEach((mask) => { 
-    segmentation.state.removeSegmentation(mask.id);
-    const volId = "nifti:" + mask.url;
-    const vol = volumeLoader.createAndCacheVolume(volId);
-    segmentationVols.push(vol);
-    segmentationInputArray.push(
-      {
-        segmentationId: mask.id,
-        representation: {
-          type: csToolsEnums.SegmentationRepresentations.Labelmap,
-          data:{
-            volumeId: volId,
-          },
-        },
-      },
-    );
-    segRepInputArray.push({
-      segmentationId: mask.id,
-      type: csToolsEnums.SegmentationRepresentations.Labelmap,
-      options: {
-        colorLUTOrIndex: [
-          defaultColors[i],
-          defaultColors[i],
-        ],
-      },
-    });
-    i++;
-  });
-  await Promise.all(segmentationVols)
 
   segmentation.addSegmentations(segmentationInputArray);
-  let segmentIndex = 1;
-  // segmentationInputArray.forEach((seg) => {
-  //   segmentation.segmentIndex.setActiveSegmentIndex(seg.segmentationId, segmentIndex);
-  //   segmentIndex++;
-  // })
-  const segRepUIDs = 
-  await segmentation.addSegmentationRepresentations(toolGroupId, segRepInputArray, toolGroupSpecificRepresentationConfig)
-
-  
-  
+  const segRepUIDs = await segmentation.addSegmentationRepresentations(toolGroupId, segRepInputArray, toolGroupSpecificRepresentationConfig);
   console.log("labelmaps rendered");
-  return segRepUIDs;
+  return segRepUIDs; 
 }
+
+
 
 function addToolsToCornerstone(){
   const addedTools = csToolState.tools;
@@ -228,20 +200,22 @@ function createToolGroups(){
   return [toolGroup, toolGroup3D];
 }
 
+const presetNames = CONSTANTS.VIEWPORT_PRESETS.map((preset) => preset.name);
+let i = 0;
 export const debug = async () => {
-  const axial_viewport = getEnabledElements()[0].viewport;
-  const axial_camera = axial_viewport.getCamera();
-  const axial_imageData = axial_viewport.getImageData();
-  // console.log(getEnabledElements())
+  // console.log(vtkColorMaps);
+  const RE = getRenderingEngine('myRenderingEngine'); 
+  const viewport = RE.getViewport('CT_NIFTI_3DVOLUME');
+  console.log(viewport.getActors())
   
-  const sagittal_viewport = getEnabledElements()[1].viewport;
-  const sagittal_camera = sagittal_viewport.getCamera();
-  const sagittal_imageData = sagittal_viewport.getImageData();
+  
+  viewport.setProperties({ preset: presetNames[i]}); 
+  console.log(presetNames[i])
+  // viewport.getProperties().voiRange = {lower: 0, upper: 1}
+  console.log(viewport.getProperties());
 
-  const coronal_viewport = getEnabledElements()[2].viewport;
-  const coronal_camera = coronal_viewport.getCamera();
-  const coronal_imageData = coronal_viewport.getImageData();
-  console.log(csToolState);
+  viewport.render();
+  i++
 }
 
 export function setVisibilities(segRepUIDs, checkState){

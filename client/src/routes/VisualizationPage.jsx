@@ -36,15 +36,8 @@ function VisualizationPage() {
       return;
     }
     const niftiURL = URL.createObjectURL(state.file);
-    const maskData = []
-    Array.from(state.masks).forEach((file) => {
-      maskData.push({
-        id: file.name,
-        url: URL.createObjectURL(file),
-      });
-    });
-    setVisualizationContent(<Visual niftiURL={niftiURL} maskData={maskData} setSegRepUIDs = {setSegmentationRepresentationUIDs}/>);
-    
+    const maskFiles = Array.from(state.masks)
+    setVisualizationContent(<Visual niftiURL={niftiURL} maskFiles={maskFiles} setSegRepUIDs = {setSegmentationRepresentationUIDs}/>);
   }, [])
 
   useEffect(() => {
@@ -105,7 +98,7 @@ function VisualizationPage() {
         </div>
         <button onClick={() => navigate("/")}>Back</button>
         <div><br/></div> 
-        <button onClick={() => debug}>Debug</button>
+        <button onClick={debug}>Debug</button>
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref} >

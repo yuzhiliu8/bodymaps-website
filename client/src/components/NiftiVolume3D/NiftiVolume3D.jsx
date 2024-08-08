@@ -1,23 +1,20 @@
 import React from 'react'
 import { useEffect, useRef } from 'react';
-import { Niivue, NVImage, SHOW_RENDER, SLICE_TYPE, colortables } from '@niivue/niivue';
+import { Niivue, NVImage, SLICE_TYPE,  } from '@niivue/niivue';
+import { NVcolorMaps } from '../../helpers/colors';
 
 
 import './NiftiVolume3D.css';
-
 const organs = ['aorta', 'gall_bladder', 'kidney_left', 'kidney_right', 'liver', 'pancreas', 'postcava', 'spleen', 'stomach'];
+const colorMapNames = NVcolorMaps.map((map) => map.name);
+console.log(colorMapNames);
 
 
 
-function NiftiVolume3D() {
+function NiftiVolume3D({ maskFiles }) {
     const canvasRef = useRef(null);
     const nv = useRef(null);
     
-    let cmap = {
-        R: [0, 255],
-        G: [0, 0],
-        B: [0, 255],
-    };
 
     useEffect(() => {
         nv.current = new Niivue({
@@ -25,25 +22,30 @@ function NiftiVolume3D() {
         });
         console.log(nv.current);
         nv.current.attachToCanvas(canvasRef.current);
-        nv.current.addColormap('a', cmap);
+        NVcolorMaps.forEach((map) => {
+            nv.current.addColormap(map.name, map.cmap);
+        })
 
-        // organs.forEach((organ) => {
-        //     const url = `/api/download/files||${organ}.nii.gz`;
-        //     nv.current.addVolumeFromUrl({
-        //         url: url,
-        //         rgba255: [178, 34, 34, 255],
-        //         key: "panc",
-        //     });
-        // });
+        let i = -1;
+        const NVimages = [];
+        maskFiles.forEach(async (file) => {
+            console.log(i);
+            i = i + 1;
+            const image = await NVImage.loadFromFile({
+                file: file, 
+                colormap: colorMapNames[i],
+            });
+            nv.current.addVolume(image);
+            
+        });
+
     }, []);
 
     const handleUpload = async (event) => {
-        const file = event.target.files[0];
-        const nvimage = await NVImage.loadFromFile({
-            file: file, 
-            colormap: 'a',
-        });
-        await nv.current.addVolume(nvimage);
+        console.log('upload');
+        const files = Array.from(event.target.files);
+
+        
         
     }
 
@@ -51,12 +53,11 @@ function NiftiVolume3D() {
 
     return (
         <div className="NiftiVolume3D">
-            <div>NiftiMesh</div>
             <div className="canvas">
                 <canvas ref={canvasRef}>Canvas</canvas>
+                <input type="file" multiple onChange={handleUpload}/>
             </div>
             
-            <input type="file" onChange={handleUpload}/>
         </div>
     )
     
