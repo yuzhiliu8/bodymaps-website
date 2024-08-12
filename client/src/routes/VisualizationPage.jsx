@@ -5,6 +5,7 @@ import { debug, setVisibilities, renderVisualization } from '../helpers/helpers'
 import ReportScreen from '../components/ReportScreen/ReportScreen';
 import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
 import NiftiVolume3D from '../components/NiftiVolume3D/NiftiVolume3D';
+import { create3DVolume, updateOpacities } from '../helpers/Volume3D';
 import { trueCheckState, case1 } from '../helpers/constants';
 import './VisualizationPage.css';
 
@@ -14,14 +15,13 @@ import './VisualizationPage.css';
 function VisualizationPage() {
   const [checkState, setCheckState] = useState(trueCheckState);
   const [segmentationRepresentationUIDs, setSegmentationRepresentationUIDs] = useState(null);
-  const [maskFiles, setMaskFiles] = useState();
+  const [NV, setNV] = useState();
   const axial_ref = useRef(null);
   const sagittal_ref = useRef(null);
   const coronal_ref = useRef(null);
+  const render_ref = useRef(null);
 
-  if (segmentationRepresentationUIDs && checkState){
-    setVisibilities(segmentationRepresentationUIDs, checkState);
-  }
+  
   
   // const [serverPath, setServerPath] = useState('');
 
@@ -37,19 +37,30 @@ function VisualizationPage() {
       navigate('/');
       return;
     }
-    const niftiURL = URL.createObjectURL(state.file);
-    const maskFiles = Array.from(state.masks);
-    setMaskFiles(maskFiles);
-    const maskData = [];
-        maskFiles.forEach((file) => {
-          maskData.push({
-            id: file.name,
-            url: URL.createObjectURL(file),
+    if (axial_ref, sagittal_ref, coronal_ref, render_ref){
+      const niftiURL = URL.createObjectURL(state.file);
+      const maskFiles = Array.from(state.masks);
+      const maskData = [];
+          maskFiles.forEach((file) => {
+            maskData.push({
+              id: file.name,
+              url: URL.createObjectURL(file),
+            });
           });
-        });
-    renderVisualization(axial_ref, sagittal_ref, coronal_ref, niftiURL, maskData)
-    .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
-  }, [])
+      renderVisualization(axial_ref, sagittal_ref, coronal_ref, niftiURL, maskData)
+      .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
+      const nv = create3DVolume(render_ref, maskFiles);
+      setNV(nv);
+    }
+  }, [axial_ref, sagittal_ref, coronal_ref, render_ref]);
+
+
+  useEffect(() => {
+    if (segmentationRepresentationUIDs && checkState && NV){
+      setVisibilities(segmentationRepresentationUIDs, checkState);
+      updateOpacities(NV, checkState);
+    }
+  }, [segmentationRepresentationUIDs, checkState, NV])
 
   const showTaskMenu = () => {
     if (TaskMenu_ref.current.style.display === "none"){
@@ -101,7 +112,18 @@ function VisualizationPage() {
         </div>
         <button onClick={() => navigate("/")}>Back</button>
         <div><br/></div> 
-        <button onClick={debug}>Debug</button>
+        <button onClick={() => {
+          console.log(NV.volumes[0]);
+          // NV.setOpacity(0, 0);
+          NV.setOpacity(1, false);
+          NV.setOpacity(2, false);
+          NV.setOpacity(3, false);
+          NV.setOpacity(4, 0);
+          NV.setOpacity(5, 0);
+          NV.setOpacity(6, 0);
+          NV.setOpacity(7, 0);
+          NV.setOpacity(8, 0); 
+        }}>Debug</button>
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref} >
@@ -109,7 +131,9 @@ function VisualizationPage() {
         <div className="sagittal" ref={sagittal_ref}></div>
         <div className="coronal" ref={coronal_ref}></div>
         <div className="render">
-          <NiftiVolume3D maskFiles={maskFiles}/>
+          <div className="canvas">
+            <canvas ref={render_ref}></canvas>
+          </div>
         </div>
       </div>
 
