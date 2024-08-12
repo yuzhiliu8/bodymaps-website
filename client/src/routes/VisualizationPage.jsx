@@ -1,21 +1,23 @@
 import React from 'react'
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
-import { debug, setVisibilities } from '../helpers/helpers';
-import Visual from '../components/Visual/Visual';
+import { debug, setVisibilities, renderVisualization } from '../helpers/helpers';
 import ReportScreen from '../components/ReportScreen/ReportScreen';
 import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
-
+import NiftiVolume3D from '../components/NiftiVolume3D/NiftiVolume3D';
+import { trueCheckState, case1 } from '../helpers/constants';
 import './VisualizationPage.css';
 
-const trueCheckState = [true, true, true, true, true, true, true, true, true, true];
-const case1 = '[false,true,true,true,true,true,true,true,true,true]';
+
+
 
 function VisualizationPage() {
-  const [visualizationContent, setVisualizationContent] = useState(null);
-  const [taskMenuContent, setTaskMenuContent] = useState(null);
   const [checkState, setCheckState] = useState(trueCheckState);
   const [segmentationRepresentationUIDs, setSegmentationRepresentationUIDs] = useState(null);
+  const [maskFiles, setMaskFiles] = useState();
+  const axial_ref = useRef(null);
+  const sagittal_ref = useRef(null);
+  const coronal_ref = useRef(null);
 
   if (segmentationRepresentationUIDs && checkState){
     setVisibilities(segmentationRepresentationUIDs, checkState);
@@ -36,15 +38,18 @@ function VisualizationPage() {
       return;
     }
     const niftiURL = URL.createObjectURL(state.file);
-    const maskFiles = Array.from(state.masks)
-    setVisualizationContent(<Visual niftiURL={niftiURL} maskFiles={maskFiles} setSegRepUIDs = {setSegmentationRepresentationUIDs}/>);
+    const maskFiles = Array.from(state.masks);
+    setMaskFiles(maskFiles);
+    const maskData = [];
+        maskFiles.forEach((file) => {
+          maskData.push({
+            id: file.name,
+            url: URL.createObjectURL(file),
+          });
+        });
+    renderVisualization(axial_ref, sagittal_ref, coronal_ref, niftiURL, maskData)
+    .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
   }, [])
-
-  useEffect(() => {
-    if (segmentationRepresentationUIDs){
-      setTaskMenuContent(<NestedCheckBox innerRef={TaskMenu_ref} checkState={checkState} update={update} />);
-    }
-  },[segmentationRepresentationUIDs, checkState])
 
   const showTaskMenu = () => {
     if (TaskMenu_ref.current.style.display === "none"){
@@ -73,7 +78,6 @@ function VisualizationPage() {
     if (JSON.stringify(newCheckState) === case1) newCheckState = trueCheckState;
     if (id !== 0 && checked === false && newCheckState[0] === true) newCheckState[0] = false;
     newCheckState = (id === 0) ? Array(10).fill(checked) : newCheckState;
-    // console.log(newCheckState);
     setCheckState(newCheckState);
 }
 
@@ -83,12 +87,11 @@ function VisualizationPage() {
 
   return (
     <div className="VisualizationPage">
-
       <div className="sidebar">
         <div className="tasks-container">
           <div className="dropdown">
             <div className="dropdown-header" onClick={showTaskMenu}>Selected Task</div>
-            {taskMenuContent}
+            <NestedCheckBox innerRef={TaskMenu_ref} checkState={checkState} update={update} />
           </div>
         </div>
         <div className="report-container">
@@ -102,7 +105,12 @@ function VisualizationPage() {
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref} >
-        {visualizationContent}
+        <div className="axial" ref={axial_ref}></div>
+        <div className="sagittal" ref={sagittal_ref}></div>
+        <div className="coronal" ref={coronal_ref}></div>
+        <div className="render">
+          <NiftiVolume3D maskFiles={maskFiles}/>
+        </div>
       </div>
 
       <div className="report" ref={ReportScreen_ref} style={{display: "none"}}>

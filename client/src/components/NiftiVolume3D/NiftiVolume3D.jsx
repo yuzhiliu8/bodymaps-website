@@ -1,7 +1,7 @@
 import React from 'react'
 import { useEffect, useRef } from 'react';
 import { Niivue, NVImage, SLICE_TYPE,  } from '@niivue/niivue';
-import { NVcolorMaps } from '../../helpers/colors';
+import { NVcolorMaps } from '../../helpers/constants';
 
 
 import './NiftiVolume3D.css';
@@ -17,39 +17,29 @@ function NiftiVolume3D({ maskFiles }) {
     
 
     useEffect(() => {
-        nv.current = new Niivue({
-            sliceType: SLICE_TYPE.RENDER,
-        });
-        console.log(nv.current);
-        nv.current.attachToCanvas(canvasRef.current);
-        NVcolorMaps.forEach((map) => {
-            nv.current.addColormap(map.name, map.cmap);
-        })
-
-        let i = -1;
-        const NVimages = [];
-        maskFiles.forEach(async (file) => {
-            console.log(i);
-            i = i + 1;
-            const image = await NVImage.loadFromFile({
-                file: file, 
-                colormap: colorMapNames[i],
+        if (maskFiles){
+            nv.current = new Niivue({
+                sliceType: SLICE_TYPE.RENDER,
             });
-            nv.current.addVolume(image);
-            
-        });
-
-    }, []);
-
-    const handleUpload = async (event) => {
-        console.log('upload');
-        const files = Array.from(event.target.files);
-
-        
-        
-    }
-
-
+            console.log(nv.current);
+            nv.current.attachToCanvas(canvasRef.current);
+            NVcolorMaps.forEach((map) => {
+                nv.current.addColormap(map.name, map.cmap);
+            })
+    
+            let i = -1;
+            maskFiles.forEach(async (file) => {
+                console.log(i);
+                i = i + 1;
+                const image = await NVImage.loadFromFile({
+                    file: file, 
+                    colormap: colorMapNames[i],
+                });
+                nv.current.addVolume(image);
+                
+            });
+        }
+    }, [maskFiles]);
 
     return (
         <div className="NiftiVolume3D">

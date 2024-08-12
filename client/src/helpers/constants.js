@@ -93,3 +93,6 @@ export const NVcolorMaps = [
         }
     },
 ]
+
+export const trueCheckState = [true, true, true, true, true, true, true, true, true, true];
+export const case1 = '[false,true,true,true,true,true,true,true,true,true]';

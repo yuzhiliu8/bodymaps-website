@@ -22,7 +22,7 @@ import {
 
 import { cornerstoneNiftiImageVolumeLoader } from '@cornerstonejs/nifti-volume-loader';
 import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps';
-import { defaultColors } from './colors';
+import { defaultColors } from './constants';
 
 const toolGroupId = "myToolGroup";
 const toolGroup3DId = "3DToolGroup";

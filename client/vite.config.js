@@ -1,24 +1,38 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import fs from 'fs'
+
+function customHeadersPlugin() {
+  return {
+    name: 'configure-server',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+        res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+        next();
+      });
+    },
+  }
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), customHeadersPlugin()],
   base: "/bodymaps-website/",
   
   server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-      }
+    https: {
+      key: fs.readFileSync('https/key.pem'),
+      cert: fs.readFileSync('https/cert.pem'),
     },
-    headers: {
-      "Cross-Origin-Opener-Policy": "same-origin",
-      "Cross-Origin-Embedder-Policy": "require-corp"
-    },
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://localhost:5000',
+    //     changeOrigin: true,
+    //   }
+    // },
+    host: true,
   },
-  
   resolve: {
     alias: {
       "@cornerstonejs/tools": "@cornerstonejs/tools/dist/umd/index.js"

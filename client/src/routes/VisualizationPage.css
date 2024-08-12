@@ -3,6 +3,7 @@
     grid-template-columns: 20vw 80vw;
     grid-template-rows: 100vh;
     background-color: black;
+    color:white;
 }
 
 
@@ -47,6 +48,10 @@
 .visualization-container{
     grid-column: 2;
     grid-row: 1;
+
+    display: grid;
+    grid-template-columns: 40vw 40vw;
+    grid-template-rows: 50vh 50vh;
 }
 
 
