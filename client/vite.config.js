@@ -25,12 +25,12 @@ export default defineConfig({
       key: fs.readFileSync('https/key.pem'),
       cert: fs.readFileSync('https/cert.pem'),
     },
-    // proxy: {
-    //   '/api': {
-    //     target: 'http://localhost:5000',
-    //     changeOrigin: true,
-    //   }
-    // },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      }
+    },
     host: true,
   },
   resolve: {

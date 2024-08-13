@@ -2,7 +2,6 @@ from flask import Flask, send_file, make_response, request, jsonify
 from flask_cors import CORS
 import random
 import os
-from processMasks import process_masks
 
 app = Flask(__name__)
 CORS(app)
@@ -47,12 +46,6 @@ def download(path):
     response.headers['Content-Type'] = 'application/x-gzip'
 
     return response
-
-@app.route('/api/segmentations', methods=['GET'])
-def get_segmentations():
-    file_path = 'nifti'
-    data = process_masks(file_path)
-    return jsonify(data)
 
 
 if __name__ == "__main__":
