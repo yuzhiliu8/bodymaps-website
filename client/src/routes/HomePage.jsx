@@ -1,9 +1,10 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
-
-import "./HomePage.css"
+import { organ_names } from '../helpers/constants';
 import image from '../assets/images/BodyMapsIcon.png';
+import "./HomePage.css"
+
 
 export default function HomePage() {
   const [file, setFile] = useState();
@@ -23,25 +24,37 @@ export default function HomePage() {
     setMasks(m);
   }
 
+  const getMasks = async (basePath) => {
+    const filenames = [...organ_names];
+    const promises = filenames.map(async (name) => { 
+      const blob = await fetch(`/api/download/${basePath}||${name}.nii.gz`).then((resp) => resp.blob());
+      return new File([blob], name, {type: blob.type}); 
+    });
+    await Promise.all(promises);
+    return promises;
+  }
+   
   useEffect(() => {
-    console.log(file);
-    console.log(masks);
-    if (file && masks){
-      // const formData = new FormData();
-      // formData.append('file', file)
-      // fetch("/api/send", {
-      //   method: 'POST',
-      //   body: formData,
-      // })
-      // .then((response) => response.text())
-      // .then((data) => {
-      //   console.log(data)
-      //   console.log("filename: ", file.filename)
-      //   navigate('/visualization', {state: {path: data, file: file}})
-      // });
-      navigate('/visualization', {state: {file: file, masks: masks}});
-    }
-  })
+    (async () => {
+      if (file && masks){
+        const formData = new FormData();    
+        // console.log(masks); 
+        masks.forEach((file) => {
+          formData.append(file.name, file) 
+        })   
+        // console.log(formData); 
+        const response = await fetch('/api/upload', {method: 'POST', body: formData});
+        const basePath = await response.text();
+        console.log(basePath);
+        const maskFiles = Array.from(await getMasks(basePath));
+        console.log(maskFiles); 
+        if (maskFiles){
+          navigate('/visualization', {state: {file: file, masks: maskFiles}})
+        }
+      }
+    }) 
+    ();
+  }, [file, masks]);
 
 
 
@@ -74,6 +87,15 @@ export default function HomePage() {
         <br/>
         <div>Upload CT Masks Here: (Development Phase only)</div> <br/>
         <input type="file" multiple onChange={handleMaskUpload}/>
+        <button onClick={() => {
+          fetch('/api/download/files||aorta.nii.gz')
+          .then((response) => response.blob())
+          .then((blob) => {
+            console.log(blob);
+            const link = URL.createObjectURL(blob);
+            console.log(link);
+          })
+        }}> Debug </button>
       </div>
     </div>    
   )
