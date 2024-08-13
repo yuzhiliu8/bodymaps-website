@@ -4,7 +4,7 @@ import random
 import os
 
 app = Flask(__name__)
-CORS(app)
+# CORS(app)
 
 chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_"
 length = len(chars)
@@ -22,17 +22,27 @@ def home():
 
 @app.route('/api', methods=['GET'])
 def api():
-    return jsonify("api")
+    return "api"
 
-@app.route('/api/send', methods= ['POST'])
+@app.route('/api/upload', methods= ['POST'])
 def upload():
-    file = request.files['file']
+    files = request.files
+    filenames = files.keys()
     folder_name = generate_folder_name()
-    os.makedirs(os.path.join('files', folder_name))
-    path = os.path.join('files', folder_name, file.filename)
-    print(path)
-    file.save(path)
-    return path.replace('\\', '||')
+    base = os.path.join('files', folder_name)
+    os.makedirs(base)
+    for filename in filenames:
+        file = files[filename]
+        file.save(os.path.join(base, filename))
+
+    # print(files)
+    # print(files)
+    # folder_name = generate_folder_name()
+    # os.makedirs(os.path.join('files', folder_name))
+    # path = os.path.join('files', folder_name, file.filename)
+    # print(path)
+    # file.save(path)
+    return base.replace('\\', '||')
     
 
 @app.route('/api/download/<path>', methods=['GET'])

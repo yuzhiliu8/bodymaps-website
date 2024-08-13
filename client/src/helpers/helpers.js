@@ -21,7 +21,6 @@ import {
 }from '@cornerstonejs/tools';
 
 import { cornerstoneNiftiImageVolumeLoader } from '@cornerstonejs/nifti-volume-loader';
-import vtkColorMaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps';
 import { defaultColors } from './constants';
 
 const toolGroupId = "myToolGroup";

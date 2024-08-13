@@ -8,8 +8,6 @@ const PURPLE = [145, 30, 180, 255];
 const MAGENTA = [240, 50, 230, 255];
 const LIME = [50, 205, 50, 255];
 export const defaultColors = [RED, BLUE, MAROON, BROWN, OLIVE, TEAL, PURPLE, MAGENTA, LIME];
-
-
 export const NVcolorMaps = [
     {
         name: 'RED',
@@ -96,3 +94,4 @@ export const NVcolorMaps = [
 
 export const trueCheckState = [true, true, true, true, true, true, true, true, true, true];
 export const case1 = '[false,true,true,true,true,true,true,true,true,true]';
+export const organ_names = ['aorta', 'gall_bladder', 'kidney_left', 'kidney_right', 'liver', 'pancreas', 'postcava', 'spleen', 'stomach']

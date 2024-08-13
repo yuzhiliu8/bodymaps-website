@@ -4,7 +4,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { debug, setVisibilities, renderVisualization } from '../helpers/helpers';
 import ReportScreen from '../components/ReportScreen/ReportScreen';
 import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
-import NiftiVolume3D from '../components/NiftiVolume3D/NiftiVolume3D';
 import { create3DVolume, updateOpacities } from '../helpers/Volume3D';
 import { trueCheckState, case1 } from '../helpers/constants';
 import './VisualizationPage.css';
@@ -33,6 +32,7 @@ function VisualizationPage() {
 
   useEffect(() => {
     const state = location.state;
+    console.log(state);
     if (!state){
       navigate('/');
       return;
@@ -47,6 +47,7 @@ function VisualizationPage() {
               url: URL.createObjectURL(file),
             });
           });
+      console.log(maskData);
       renderVisualization(axial_ref, sagittal_ref, coronal_ref, niftiURL, maskData)
       .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
       const nv = create3DVolume(render_ref, maskFiles);
