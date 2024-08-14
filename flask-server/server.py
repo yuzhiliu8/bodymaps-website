@@ -1,5 +1,6 @@
 from flask import Flask, send_file, make_response, request, jsonify
 from flask_cors import CORS
+from handle import processMasks
 import random
 import os
 
@@ -51,6 +52,12 @@ def download(path):
     response.headers['Content-Encoding'] = 'gzip'
 
     return response
+
+@app.route('/api/mask-data/<path>', methods=['GET'])
+def get_mask_data(path):
+    serverDir = path.replace('||', '/')
+    print(serverDir)
+    return jsonify(processMasks(serverDir=serverDir))
 
 
 if __name__ == "__main__":
