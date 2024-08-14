@@ -14,7 +14,7 @@ export const NVcolorMaps = [
         cmap: {
             R: [0, 230],
             G: [0, 25],
-            B: [0, 225],
+            B: [0, 75],
             A: [0, 255],
         }
     },

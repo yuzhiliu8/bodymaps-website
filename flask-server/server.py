@@ -4,7 +4,7 @@ import random
 import os
 
 app = Flask(__name__)
-# CORS(app)
+CORS(app)
 
 chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_"
 length = len(chars)

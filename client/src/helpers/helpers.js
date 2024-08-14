@@ -109,7 +109,6 @@ export async function renderVisualization(ref1, ref2, ref3, serverDir){
   organ_ids.forEach((organId) => {
     segmentation.state.removeSegmentation(organId);
     const segId = "nifti:" + `${API_ORIGIN}/api/download/${serverDir}||segmentations||${organId}.nii.gz`;
-    console.log(segId);
     const vol = volumeLoader.createAndCacheVolume(segId);
     segmentationVols.push(vol);
     // segVolumeIds.push({volumeId: segId});
@@ -185,7 +184,6 @@ export async function renderVisualization(ref1, ref2, ref3, serverDir){
   segmentation.addSegmentations(segmentationInputArray);
   const segRepUIDs = await segmentation.addSegmentationRepresentations(toolGroupId, segRepInputArray, toolGroupSpecificRepresentationConfig);
   console.log("labelmaps rendered");
-  console.log(segRepUIDs);
   return segRepUIDs;
 }
 
