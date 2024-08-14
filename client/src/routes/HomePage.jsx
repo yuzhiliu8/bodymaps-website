@@ -1,13 +1,12 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { organ_names } from '../helpers/constants';
 import image from '../assets/images/BodyMapsIcon.png';
 import "./HomePage.css"
 
 
 export default function HomePage() {
-  const [file, setFile] = useState();
+  const [nifti, setNifti] = useState();
   const [masks, setMasks] = useState();
   const navigate = useNavigate();
 
@@ -15,7 +14,7 @@ export default function HomePage() {
   const handleUpload = (event) => {
     const f = event.target.files[0]
     if (f){
-      setFile(f);
+      setNifti(f);
     }
   }
 
@@ -24,37 +23,24 @@ export default function HomePage() {
     setMasks(m);
   }
 
-  const getMasks = async (basePath) => {
-    const filenames = [...organ_names];
-    const promises = filenames.map(async (name) => { 
-      const blob = await fetch(`/api/download/${basePath}||${name}.nii.gz`).then((resp) => resp.blob());
-      return new File([blob], name, {type: blob.type}); 
-    });
-    await Promise.all(promises);
-    return promises;
-  }
    
   useEffect(() => {
-    (async () => {
-      if (file && masks){
-        const formData = new FormData();    
-        // console.log(masks); 
-        masks.forEach((file) => {
-          formData.append(file.name, file) 
-        })   
-        // console.log(formData); 
-        const response = await fetch('/api/upload', {method: 'POST', body: formData});
-        const basePath = await response.text();
-        console.log(basePath);
-        const maskFiles = Array.from(await getMasks(basePath));
-        console.log(maskFiles); 
-        if (maskFiles){
-          navigate('/visualization', {state: {file: file, masks: maskFiles}})
-        }
-      }
-    }) 
-    ();
-  }, [file, masks]);
+    if (nifti && masks){ 
+      const formData = new FormData();    
+      formData.append('MAIN_NIFTI', nifti)
+      masks.forEach((file) => { 
+        formData.append(file.name, file) 
+      })  
+      fetch('/api/upload', { method: 'POST', body: formData})
+      .then((response) => response.text()) 
+      .then((path) => {
+        console.log(path); 
+        navigate('/visualization', {state: {serverDir: path}});   
+      });
+    
+    }
+
+  }, [nifti, masks]);
 
 
 
@@ -87,15 +73,6 @@ export default function HomePage() {
         <br/>
         <div>Upload CT Masks Here: (Development Phase only)</div> <br/>
         <input type="file" multiple onChange={handleMaskUpload}/>
-        <button onClick={() => {
-          fetch('/api/download/files||aorta.nii.gz')
-          .then((response) => response.blob())
-          .then((blob) => {
-            console.log(blob);
-            const link = URL.createObjectURL(blob);
-            console.log(link);
-          })
-        }}> Debug </button>
       </div>
     </div>    
   )

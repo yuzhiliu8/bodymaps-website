@@ -20,10 +20,6 @@ function VisualizationPage() {
   const coronal_ref = useRef(null);
   const render_ref = useRef(null);
 
-  
-  
-  // const [serverPath, setServerPath] = useState('');
-
   const TaskMenu_ref = useRef(null);
   const ReportScreen_ref = useRef(null);
   const VisualizationContainer_ref = useRef(null);
@@ -31,26 +27,17 @@ function VisualizationPage() {
   const location = useLocation();
 
   useEffect(() => {
-    const state = location.state;
-    console.log(state);
+    const state = location.state; 
+    console.log(location);
     if (!state){
       navigate('/');
       return;
     }
     if (axial_ref, sagittal_ref, coronal_ref, render_ref){
-      const niftiURL = URL.createObjectURL(state.file);
-      const maskFiles = Array.from(state.masks);
-      const maskData = [];
-          maskFiles.forEach((file) => {
-            maskData.push({
-              id: file.name,
-              url: URL.createObjectURL(file),
-            });
-          });
-      console.log(maskData);
-      renderVisualization(axial_ref, sagittal_ref, coronal_ref, niftiURL, maskData)
+      const serverDir = state.serverDir;
+      renderVisualization(axial_ref, sagittal_ref, coronal_ref, serverDir)
       .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
-      const nv = create3DVolume(render_ref, maskFiles);
+      const nv = create3DVolume(render_ref, serverDir);
       setNV(nv);
     }
   }, [axial_ref, sagittal_ref, coronal_ref, render_ref]);
@@ -113,18 +100,7 @@ function VisualizationPage() {
         </div>
         <button onClick={() => navigate("/")}>Back</button>
         <div><br/></div> 
-        <button onClick={() => {
-          console.log(NV.volumes[0]);
-          // NV.setOpacity(0, 0);
-          NV.setOpacity(1, false);
-          NV.setOpacity(2, false);
-          NV.setOpacity(3, false);
-          NV.setOpacity(4, 0);
-          NV.setOpacity(5, 0);
-          NV.setOpacity(6, 0);
-          NV.setOpacity(7, 0);
-          NV.setOpacity(8, 0); 
-        }}>Debug</button>
+        <button onClick={() => debug()}>Debug</button>
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref} >

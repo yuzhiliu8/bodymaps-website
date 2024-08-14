@@ -94,4 +94,5 @@ export const NVcolorMaps = [
 
 export const trueCheckState = [true, true, true, true, true, true, true, true, true, true];
 export const case1 = '[false,true,true,true,true,true,true,true,true,true]';
-export const organ_names = ['aorta', 'gall_bladder', 'kidney_left', 'kidney_right', 'liver', 'pancreas', 'postcava', 'spleen', 'stomach']
+export const organ_ids = ['aorta', 'gall_bladder', 'kidney_left', 'kidney_right', 'liver', 'pancreas', 'postcava', 'spleen', 'stomach']
+export const API_ORIGIN = 'http://localhost:5000';

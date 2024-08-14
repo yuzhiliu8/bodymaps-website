@@ -1,10 +1,10 @@
 import { Niivue, NVImage, SLICE_TYPE,  } from '@niivue/niivue';
-import { NVcolorMaps } from './constants';
+import { NVcolorMaps, organ_ids, API_ORIGIN } from './constants';
 
 
 const colorMapNames = NVcolorMaps.map((map) => map.name);
 
-export function create3DVolume(canvasRef, maskFiles){
+export function create3DVolume(canvasRef, serverDir){
     const nv = new Niivue({
         sliceType: SLICE_TYPE.RENDER,
     });
@@ -14,14 +14,12 @@ export function create3DVolume(canvasRef, maskFiles){
     })
 
     let i = -1;
-    maskFiles.forEach(async (file) => {
-        console.log(i);
-        i = i + 1;
-        const image = await NVImage.loadFromFile({
-            file: file, 
+    organ_ids.forEach(async (id) => {
+        i++;
+        await nv.addVolumeFromUrl({ 
+            url: `${API_ORIGIN}/api/download/${serverDir}||segmentations||${id}.nii.gz`,
             colormap: colorMapNames[i],
         });
-        nv.addVolume(image);
         
     });
     return nv;

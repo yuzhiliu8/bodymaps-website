@@ -4,7 +4,7 @@ import random
 import os
 
 app = Flask(__name__)
-# CORS(app)
+CORS(app)
 
 chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_"
 length = len(chars)
@@ -26,14 +26,17 @@ def api():
 
 @app.route('/api/upload', methods= ['POST'])
 def upload():
-    files = request.files
-    filenames = files.keys()
     folder_name = generate_folder_name()
-    base = os.path.join('files', folder_name)
-    os.makedirs(base)
+    files = request.files
+    filenames = list(files.keys())
+    filenames.remove('MAIN_NIFTI')
+    base = os.path.join('files', folder_name, ) #base dir path 
+    os.makedirs(os.path.join(base, 'segmentations'))
+    main_nifti = files['MAIN_NIFTI']
+    main_nifti.save(os.path.join(base, 'ct.nii.gz'))
     for filename in filenames:
         file = files[filename]
-        file.save(os.path.join(base, filename))
+        file.save(os.path.join(base, 'segmentations', filename))
 
     # print(files)
     # print(files)
@@ -49,11 +52,10 @@ def upload():
 def download(path):
     path = path.replace('||', '/')
     print(path)
-    response = make_response(send_file(path))
+    response = make_response(send_file(path, mimetype='application/gzip'))
     response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
     response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
-    response.headers['Content-Disposition'] = f'attachment; filename="{path}"'
-    response.headers['Content-Type'] = 'application/x-gzip'
+    response.headers['Content-Encoding'] = 'gzip'
 
     return response
 
