@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import image from '../assets/images/BodyMapsIcon.png';
 import "./HomePage.css"
 
+import "./HomePage.css"
+
 
 export default function HomePage() {
   const [nifti, setNifti] = useState();
@@ -73,6 +75,15 @@ export default function HomePage() {
         <br/>
         <div>Upload CT Masks Here: (Development Phase only)</div> <br/>
         <input type="file" multiple onChange={handleMaskUpload}/>
+        <button onClick={() => {
+          fetch('/api/download/files||aorta.nii.gz')
+          .then((response) => response.blob())
+          .then((blob) => {
+            console.log(blob);
+            const link = URL.createObjectURL(blob);
+            console.log(link);
+          })
+        }}> Debug </button>
       </div>
     </div>    
   )

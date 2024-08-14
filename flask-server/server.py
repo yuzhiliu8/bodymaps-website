@@ -4,7 +4,7 @@ import random
 import os
 
 app = Flask(__name__)
-CORS(app)
+# CORS(app)
 
 chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_"
 length = len(chars)
@@ -38,13 +38,6 @@ def upload():
         file = files[filename]
         file.save(os.path.join(base, 'segmentations', filename))
 
-    # print(files)
-    # print(files)
-    # folder_name = generate_folder_name()
-    # os.makedirs(os.path.join('files', folder_name))
-    # path = os.path.join('files', folder_name, file.filename)
-    # print(path)
-    # file.save(path)
     return base.replace('\\', '||')
     
 
