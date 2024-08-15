@@ -23,6 +23,7 @@ import {
 
 import { cornerstoneNiftiImageVolumeLoader } from '@cornerstonejs/nifti-volume-loader';
 import { defaultColors, organ_ids, API_ORIGIN } from './constants';
+import { createAndCacheVolumesFromArrayBuffers } from './createCSVolumes';
 
 
 const toolGroupId = "myToolGroup";
@@ -48,7 +49,8 @@ const toolGroupSpecificRepresentationConfig = {
 
 
 
-export async function renderVisualization(ref1, ref2, ref3, serverDir){
+export async function renderVisualization(ref1, ref2, ref3, serverDir, segmentationInfos){
+  await createAndCacheVolumesFromArrayBuffers(segmentationInfos);
   csTools3dInit();
   await csInit();
 
@@ -95,30 +97,23 @@ export async function renderVisualization(ref1, ref2, ref3, serverDir){
   const viewportId2 = 'CT_NIFTI_SAGITTAL';
   const viewportId3 = 'CT_NIFTI_CORONAL'; 
 
-  if (cache.getVolumes().length > 0){
-    cache.purgeCache();
-  }
   
   const volume = await volumeLoader.createAndCacheVolume(volumeId);
 
   const segmentationInputArray = []
   const segRepInputArray = []
-  const segmentationVols = []
+  // const segmentationVols = []
   // const segVolumeIds = []
-  let i = 0;
-  organ_ids.forEach((organId) => {
+  segmentationInfos.forEach((segInfo, i) => {
+    const organId = segInfo.volumeId;
     segmentation.state.removeSegmentation(organId);
-    const segId = "nifti:" + `${API_ORIGIN}/api/download/${serverDir}||segmentations||${organId}.nii.gz`;
-    const vol = volumeLoader.createAndCacheVolume(segId);
-    segmentationVols.push(vol);
-    // segVolumeIds.push({volumeId: segId});
     segmentationInputArray.push(
       {
         segmentationId: organId,
         representation: {
           type: csToolsEnums.SegmentationRepresentations.Labelmap,
           data:{
-            volumeId: segId,
+            volumeId: organId,
           },
         },
       });
@@ -132,9 +127,8 @@ export async function renderVisualization(ref1, ref2, ref3, serverDir){
           ],
         },
       });
-      i++;
   });
-  await Promise.all(segmentationVols); 
+  // await Promise.all(segmentationVols); 
 
 
   const viewportInputArray = [

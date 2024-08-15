@@ -5,7 +5,11 @@ import { debug, setVisibilities, renderVisualization } from '../helpers/helpers'
 import ReportScreen from '../components/ReportScreen/ReportScreen';
 import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
 import { create3DVolume, updateOpacities } from '../helpers/Volume3D';
-import { trueCheckState, case1 } from '../helpers/constants';
+import { trueCheckState, case1, organ_ids, API_ORIGIN } from '../helpers/constants';
+
+
+import { createAndCacheVolumesFromArrayBuffers } from '../helpers/createCSVolumes';
+import { cache } from '@cornerstonejs/core';
 import './VisualizationPage.css';
 
 
@@ -28,24 +32,34 @@ function VisualizationPage() {
   const location = useLocation();
 
   useEffect(() => {
-    (async () => {
+    const fetchNiftiFilesForCornerstoneAndNV = async () => {
       const state = location.state; 
       console.log(location);
       if (!state){
         navigate('/');
         return;
       }
-      if (axial_ref, sagittal_ref, coronal_ref, render_ref){
-        const serverDir = state.serverDir;
-        setServerDir(serverDir);
-        renderVisualization(axial_ref, sagittal_ref, coronal_ref, serverDir)
-        .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
-        const nv = await create3DVolume(render_ref, serverDir);
-        setNV(nv);
-      }
-    }) ();
-    
-  }, [axial_ref, sagittal_ref, coronal_ref, render_ref]);
+      const serverDir = state.serverDir;
+      setServerDir(serverDir);
+      const organs = [...organ_ids];
+ 
+      const segmentationInfos = await Promise.all(organs.map(async (organ, i) => {
+        const response = await fetch(`/api/download/${serverDir}||segmentations||${organ}.nii.gz`);
+        const buffer = await response.arrayBuffer();
+        return {
+          volumeId: organ_ids[i],
+          buffer: buffer
+        }
+      }));
+
+      renderVisualization(axial_ref, sagittal_ref, coronal_ref, serverDir, segmentationInfos)
+      .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
+      const nv = await create3DVolume(render_ref, segmentationInfos);
+      setNV(nv);
+    }
+
+    fetchNiftiFilesForCornerstoneAndNV();
+  }, []);
 
 
   useEffect(() => {
