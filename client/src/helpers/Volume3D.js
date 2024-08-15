@@ -49,7 +49,6 @@ export async function create3DVolume(canvasRef, segmentationInfos){
 export function updateOpacities(nv, checkState){
     if (nv.volumes && checkState){
         for (let i = 1; i < checkState.length; i++){ //start at 1 bc only checking segmentations
-            // console.log(nv.volumes[i-1])
             nv.volumes[i-1].opacity = checkState[i]; 
         }
         nv.updateGLVolume();

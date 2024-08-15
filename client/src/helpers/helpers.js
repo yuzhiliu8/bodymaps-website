@@ -107,7 +107,6 @@ export async function renderVisualization(ref1, ref2, ref3, serverDir, segmentat
   segmentationInfos.forEach((segInfo, i) => {
     const organId = segInfo.volumeId;
     segmentation.state.removeSegmentation(organId);
-    console.log(organId, i);
     segmentationInputArray.push(
       {
         segmentationId: organId,

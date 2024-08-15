@@ -52,7 +52,6 @@ function VisualizationPage() {
         }
       }));
 
-      console.log(segmentationInfos);
       renderVisualization(axial_ref, sagittal_ref, coronal_ref, serverDir, segmentationInfos)
       .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
       const nv = await create3DVolume(render_ref, segmentationInfos);
@@ -119,9 +118,6 @@ function VisualizationPage() {
           </div>
         </div>
         <button onClick={() => navigate("/")}>Back</button>
-        <button onClick={() => {
-          console.log(cache.getVolumes());
-        }}> Debug </button>
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref} >
