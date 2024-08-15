@@ -7,7 +7,7 @@ function ReportScreen({ serverDir }) {
   const [maskData, setMaskData] = useState({});
 
   useEffect(() => {
-    if (serverDir){
+    if (typeof serverDir !== 'undefined'){
       fetch(`/api/mask-data/${serverDir}`)
       .then((response) => {
         if (!response.ok){

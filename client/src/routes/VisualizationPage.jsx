@@ -15,11 +15,11 @@ function VisualizationPage() {
   const [checkState, setCheckState] = useState(trueCheckState);
   const [segmentationRepresentationUIDs, setSegmentationRepresentationUIDs] = useState(null);
   const [NV, setNV] = useState(null);
-  const [serverDir, setServerDir] = useState(null);
-  const axial_ref = useRef(null);
-  const sagittal_ref = useRef(null);
-  const coronal_ref = useRef(null);
-  const render_ref = useRef(null);
+  const [serverDir, setServerDir] = useState(undefined);
+  const axial_ref = useRef();
+  const sagittal_ref = useRef();
+  const coronal_ref = useRef();
+  const render_ref = useRef();
 
   const TaskMenu_ref = useRef(null);
   const ReportScreen_ref = useRef(null);

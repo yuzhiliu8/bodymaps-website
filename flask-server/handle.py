@@ -30,10 +30,7 @@ def processMasks(serverDir):
         img = nib.load(f'{serverDir}/segmentations/{organ_ids[i]}.nii.gz')
         img_data = img.get_fdata()
         if (isComplete(img_data)):
-            voxel_dims = img.header.get_zooms()
-            voxel_volume = voxel_dims[0] * voxel_dims[1] * voxel_dims[2]
-            num_voxels = len(img_data[img_data > 0])
-            volume_cm = round(float(num_voxels * voxel_volume/1000), 2)
+            volume_cm = round(float(nib.imagestats.mask_volume(img)/1000), 2)
             organ_data['volume_cm'] = volume_cm
         else:
             organ_data['volume_cm'] = 'incomplete organ'
