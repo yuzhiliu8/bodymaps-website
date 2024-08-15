@@ -29,8 +29,8 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
-        preserveHeaderKeyCase: true,
-        secure: false,
+        // preserveHeaderKeyCase: true,
+        // secure: false,
       }
     },
   },

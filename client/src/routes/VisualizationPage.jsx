@@ -15,7 +15,7 @@ function VisualizationPage() {
   const [checkState, setCheckState] = useState(trueCheckState);
   const [segmentationRepresentationUIDs, setSegmentationRepresentationUIDs] = useState(null);
   const [NV, setNV] = useState(null);
-  const [NVvolIds, setNVvolIds] = useState(null);
+  const [serverDir, setServerDir] = useState(null);
   const axial_ref = useRef(null);
   const sagittal_ref = useRef(null);
   const coronal_ref = useRef(null);
@@ -37,6 +37,7 @@ function VisualizationPage() {
       }
       if (axial_ref, sagittal_ref, coronal_ref, render_ref){
         const serverDir = state.serverDir;
+        setServerDir(serverDir);
         renderVisualization(axial_ref, sagittal_ref, coronal_ref, serverDir)
         .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
         const nv = await create3DVolume(render_ref, serverDir);
@@ -103,8 +104,6 @@ function VisualizationPage() {
           </div>
         </div>
         <button onClick={() => navigate("/")}>Back</button>
-        <div><br/></div> 
-        <button onClick={() => debug()}>Debug</button>
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref} >
@@ -119,7 +118,7 @@ function VisualizationPage() {
       </div>
 
       <div className="report" ref={ReportScreen_ref} style={{display: "none"}}>
-        <ReportScreen />
+        <ReportScreen serverDir={serverDir}/>
       </div>
 
     </div>

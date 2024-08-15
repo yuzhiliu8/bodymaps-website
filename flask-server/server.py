@@ -45,7 +45,6 @@ def upload():
 @app.route('/api/download/<path>', methods=['GET'])
 def download(path):
     path = path.replace('||', '/')
-    print(path)
     response = make_response(send_file(path, mimetype='application/gzip'))
     response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
     response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'

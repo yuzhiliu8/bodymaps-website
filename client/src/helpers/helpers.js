@@ -206,7 +206,9 @@ function createToolGroups(){
 
 let i = 0;
 export const debug = async () => {
-  console.log(cache.getVolumes());
+  console.log(getEnabledElements()[0].viewport.getCamera());
+  console.log(getEnabledElements()[1].viewport.getCamera());
+  console.log(getEnabledElements()[2].viewport.getCamera());
 }
 export function setVisibilities(segRepUIDs, checkState){
   let i = 1;  

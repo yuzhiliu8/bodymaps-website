@@ -1,41 +1,95 @@
 import nibabel as nib
 import numpy as np
-import cv2 as cv
-organ_ids = ['aorta', 'gall_bladder', 'kidney_left', 'kidney_right', 'liver', 'pancreas', 'postcava', 'spleen', 'stomach']
+from constants import organ_ids, reportScreenNames
+
+def voxelThreshold(slice):
+    num_voxels = len(slice[slice > 0])
+    return num_voxels < 100
 
 def isComplete(img_data):
-    print(cv)
+    slices = [
+        img_data[:, :, 0],
+        img_data[:, :, -1],
+        img_data[0, :, :],
+        img_data[-1, :, :],
+        img_data[:, 0, :],
+        img_data[:, -1, :],
+    ]
+    for slice in slices:
+        if voxelThreshold(slice) is False:
+            return False
     return True
 
 
 def processMasks(serverDir):
-    data = {}
+    data = {"data": []}
     ct = nib.load(f'{serverDir}/ct.nii.gz').get_fdata()
-    for id in organ_ids:
-        data[id] = {}
-        img = nib.load(f'{serverDir}/segmentations/{id}.nii.gz')
+    for i in range(len(organ_ids)):
+        organ_data = {}
+        organ_data['id'] = reportScreenNames[i]
+        img = nib.load(f'{serverDir}/segmentations/{organ_ids[i]}.nii.gz')
         img_data = img.get_fdata()
         if (isComplete(img_data)):
             voxel_dims = img.header.get_zooms()
             voxel_volume = voxel_dims[0] * voxel_dims[1] * voxel_dims[2]
-            num_voxels = len(data[data > 0])
+            num_voxels = len(img_data[img_data > 0])
             volume_cm = round(float(num_voxels * voxel_volume/1000), 2)
-            data[id]['volume_cm'] = volume_cm
+            organ_data['volume_cm'] = volume_cm
         else:
-            data[id]['volume_cm'] = 'incomplete organ'
+            organ_data['volume_cm'] = 'incomplete organ'
         
         hu_values = ct[img_data > 0]
         mean_hu = round(float(np.mean(hu_values)), 2)
-        data[id]['mean_hu'] = mean_hu
+        organ_data['mean_hu'] = mean_hu
+        data['data'].append(organ_data)
+        
     return data
 
 
 def test():
-    ct = nib.load('dev/ct.nii.gz').get_fdata()
-    mask = nib.load('dev/segmentations/aorta.nii.gz')
-    data = mask.get_fdata()
-    print(nib.imagestats.count_nonzero_voxels(mask))
-    num_voxels = len(data[data > 0])
-    print(num_voxels)
-    
-test()
+    for organ in organ_ids:
+        mask = nib.load(f'dev/segmentations/{organ}.nii.gz').get_fdata()
+        for i in range(mask.shape[2]):
+            slice = mask[:, :, i]
+            length = len(slice[slice > 0])
+            if length > 0:
+                print(organ)
+                print('num voxels: ', length)
+                break
+        for i in range(mask.shape[2]-1, -1, -1):
+            slice = mask[:, :, i]
+            length = len(slice[slice > 0])
+            if length > 0:
+                print(organ)
+                print('num voxels: ', length)
+                break
+        for i in range(mask.shape[0]):
+            slice = mask[i, :, :]
+            length = len(slice[slice > 0])
+            if length > 0:
+                print(organ)
+                print('num voxels: ', length)
+                break
+        for i in range(mask.shape[0]-1, -1, -1):
+            slice = mask[i, :, :]
+            length = len(slice[slice > 0])
+            if length > 0:
+                print(organ)
+                print('num voxels: ', length)
+                break
+        for i in range(mask.shape[1]):
+            slice = mask[:, i, :]
+            length = len(slice[slice > 0])
+            if length > 0:
+                print(organ)
+                print('num voxels: ', length)
+                break
+        for i in range(mask.shape[1]-1, -1, -1):
+            slice = mask[:, i, :]
+            length = len(slice[slice > 0])
+            if length > 0:
+                print(organ)
+                print('num voxels: ', length)
+                break
+
+# test()
