@@ -18,7 +18,6 @@ function customHeadersPlugin() {
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), customHeadersPlugin()],
-  base: "/bodymaps-website/",
   
   server: {
     https: {
