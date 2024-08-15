@@ -1,10 +1,11 @@
 from flask import Flask, send_file, make_response, request, jsonify
 from flask_cors import CORS
+from handle import processMasks
 import random
 import os
 
 app = Flask(__name__)
-# CORS(app)
+CORS(app)
 
 chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_"
 length = len(chars)
@@ -44,13 +45,18 @@ def upload():
 @app.route('/api/download/<path>', methods=['GET'])
 def download(path):
     path = path.replace('||', '/')
-    print(path)
     response = make_response(send_file(path, mimetype='application/gzip'))
     response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
     response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
     response.headers['Content-Encoding'] = 'gzip'
 
     return response
+
+@app.route('/api/mask-data/<path>', methods=['GET'])
+def get_mask_data(path):
+    serverDir = path.replace('||', '/')
+    print(serverDir)
+    return jsonify(processMasks(serverDir=serverDir))
 
 
 if __name__ == "__main__":

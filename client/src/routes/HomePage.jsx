@@ -28,17 +28,27 @@ export default function HomePage() {
    
   useEffect(() => {
     if (nifti && masks){ 
-      const formData = new FormData();    
-      formData.append('MAIN_NIFTI', nifti)
-      masks.forEach((file) => { 
-        formData.append(file.name, file) 
-      })  
-      fetch('/api/upload', { method: 'POST', body: formData})
-      .then((response) => response.text()) 
-      .then((path) => {
-        console.log(path); 
-        navigate('/visualization', {state: {serverDir: path}});   
-      });
+      try {
+        const formData = new FormData();    
+        formData.append('MAIN_NIFTI', nifti)
+        masks.forEach((file) => { 
+          formData.append(file.name, file) 
+        }) 
+        fetch('/api/upload', { method: 'POST', body: formData})
+        .then((response) => {
+          if (!response.ok){
+            throw new Error("Could not connect to server");
+          }
+          return response.text();
+        }) 
+        .then((path) => {
+          console.log(path); 
+          navigate('/visualization', {state: {serverDir: path}});   
+        });
+      } catch (error) {
+        console.error(error.message);
+      }
+      
     
     }
 
@@ -75,15 +85,6 @@ export default function HomePage() {
         <br/>
         <div>Upload CT Masks Here: (Development Phase only)</div> <br/>
         <input type="file" multiple onChange={handleMaskUpload}/>
-        <button onClick={() => {
-          fetch('/api/download/files||aorta.nii.gz')
-          .then((response) => response.blob())
-          .then((blob) => {
-            console.log(blob);
-            const link = URL.createObjectURL(blob);
-            console.log(link);
-          })
-        }}> Debug </button>
       </div>
     </div>    
   )

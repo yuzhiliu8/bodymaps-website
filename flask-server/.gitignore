@@ -1,4 +1,6 @@
 /venv
 /nifti
-/__pycache__/*
 contourData.json
+/dev
+/__pycache__
+*.pyc

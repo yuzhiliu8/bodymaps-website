@@ -18,7 +18,6 @@ function customHeadersPlugin() {
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), customHeadersPlugin()],
-  base: "/bodymaps-website/",
   
   server: {
     https: {
@@ -29,14 +28,8 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
-        preserveHeaderKeyCase: true,
-        secure: false,
-      }
-    },
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
+        // preserveHeaderKeyCase: true,
+        // secure: false,
       }
     },
   },

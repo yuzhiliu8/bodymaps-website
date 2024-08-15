@@ -3,20 +3,9 @@
 
     display:grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    padding: 12px;
-    font-size: 18px;
+    padding: 10px;
+    font-size: 20px;
     font-family: Aptos;
     width:100%;
 }
 
-.tissue-column{
-    grid-column: 1;
-}
-
-.crossSectionArea-column{
-    grid-column: 2;
-}
-
-.meanHU-column{
-    grid-column: 3;
-}

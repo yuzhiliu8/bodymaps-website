@@ -13,7 +13,7 @@ const data = [
     {label: 'Aorta', id:1},
     {label: 'Gallbladder', id: 2},
     {label: 'Kidney (L)', id: 3},
-    {label: 'Kideny (R)', id: 4},
+    {label: 'Kidney (R)', id: 4},
     {label: 'Liver', id: 5},
     {label: 'Pancreas', id: 6},
     {label: 'Postcava', id:7},

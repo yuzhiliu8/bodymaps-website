@@ -14,7 +14,7 @@ export const NVcolorMaps = [
         cmap: {
             R: [0, 230],
             G: [0, 25],
-            B: [0, 225],
+            B: [0, 75],
             A: [0, 255],
         }
     },
@@ -95,4 +95,5 @@ export const NVcolorMaps = [
 export const trueCheckState = [true, true, true, true, true, true, true, true, true, true];
 export const case1 = '[false,true,true,true,true,true,true,true,true,true]';
 export const organ_ids = ['aorta', 'gall_bladder', 'kidney_left', 'kidney_right', 'liver', 'pancreas', 'postcava', 'spleen', 'stomach']
-export const API_ORIGIN = 'http://localhost:5000';
+// export const API_ORIGIN = 'http://localhost:5000'; #gzip correctly
+export const API_ORIGIN = ''; //automatically route to localhost:5000
