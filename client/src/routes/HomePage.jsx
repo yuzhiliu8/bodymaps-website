@@ -1,12 +1,14 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
+import image from '../assets/images/BodyMapsIcon.png';
+import "./HomePage.css"
 
 import "./HomePage.css"
-import image from '../assets/images/BodyMapsIcon.png';
+
 
 export default function HomePage() {
-  const [file, setFile] = useState();
+  const [nifti, setNifti] = useState();
   const [masks, setMasks] = useState();
   const navigate = useNavigate();
 
@@ -14,7 +16,7 @@ export default function HomePage() {
   const handleUpload = (event) => {
     const f = event.target.files[0]
     if (f){
-      setFile(f);
+      setNifti(f);
     }
   }
 
@@ -23,25 +25,34 @@ export default function HomePage() {
     setMasks(m);
   }
 
+   
   useEffect(() => {
-    console.log(file);
-    console.log(masks);
-    if (file && masks){
-      // const formData = new FormData();
-      // formData.append('file', file)
-      // fetch("/api/send", {
-      //   method: 'POST',
-      //   body: formData,
-      // })
-      // .then((response) => response.text())
-      // .then((data) => {
-      //   console.log(data)
-      //   console.log("filename: ", file.filename)
-      //   navigate('/visualization', {state: {path: data, file: file}})
-      // });
-      navigate('/visualization', {state: {file: file, masks: masks}});
+    if (nifti && masks){ 
+      try {
+        const formData = new FormData();    
+        formData.append('MAIN_NIFTI', nifti)
+        masks.forEach((file) => { 
+          formData.append(file.name, file) 
+        }) 
+        fetch('/api/upload', { method: 'POST', body: formData})
+        .then((response) => {
+          if (!response.ok){
+            throw new Error("Could not connect to server");
+          }
+          return response.text();
+        }) 
+        .then((path) => {
+          console.log(path); 
+          navigate('/visualization', {state: {serverDir: path}});   
+        });
+      } catch (error) {
+        console.error(error.message);
+      }
+      
+    
     }
-  })
+
+  }, [nifti, masks]);
 
 
 

@@ -1,34 +1,53 @@
 import { Niivue, NVImage, SLICE_TYPE,  } from '@niivue/niivue';
-import { NVcolorMaps } from './constants';
+import { NVcolorMaps, organ_ids, API_ORIGIN } from './constants';
+import { NVImageFromUrlOptions } from '@niivue/niivue';
 
 
 const colorMapNames = NVcolorMaps.map((map) => map.name);
 
-export function create3DVolume(canvasRef, maskFiles){
-    const nv = new Niivue({
-        sliceType: SLICE_TYPE.RENDER,
-    });
-    nv.attachToCanvas(canvasRef.current);
-    NVcolorMaps.forEach((map) => {
-        nv.addColormap(map.name, map.cmap);
-    })
+const nv = new Niivue({
+    sliceType: SLICE_TYPE.RENDER,
+});
+console.log('niivue created');
 
-    let i = -1;
-    maskFiles.forEach(async (file) => {
-        console.log(i);
-        i = i + 1;
-        const image = await NVImage.loadFromFile({
-            file: file, 
-            colormap: colorMapNames[i],
-        });
-        nv.addVolume(image);
-        
-    });
+NVcolorMaps.forEach((map) => {
+    nv.addColormap(map.name, map.cmap);
+})
+
+export async function create3DVolume(canvasRef, segmentationInfos){
+    if (nv.volumes.length > 0){  //remove existing volumes
+        for (let i = 0; i < nv.volumes.length; i++){
+            nv.removeVolume[i]; 
+        }
+    }
+    nv.attachToCanvas(canvasRef.current);
+    segmentationInfos.forEach(async (segInfo, i) => {
+        const name = `${segInfo.volumeId}.nii.gz`
+        const imageOptions = NVImageFromUrlOptions(name);
+        imageOptions.buffer = segInfo.buffer;
+        imageOptions.name = name;
+        imageOptions.colormap = colorMapNames[i];
+        await nv.addVolumeFromUrl(imageOptions);
+    })
+    // let i = -1;
+    // const ids = [...organ_ids];
+    // const promises = ids.map((id) => {
+    //     i++;
+    //     const image = NVImage.loadFromUrl({ 
+    //         url: `${API_ORIGIN}/api/download/${serverDir}||segmentations||${id}.nii.gz`,
+    //         colormap: colorMapNames[i],
+    //     });
+    //     return image;
+    // });
+    // for (const promise of promises) {
+    //     const image = await promise;
+    //     nv.addVolume(image);
+    // }
     return nv;
 }
 
 export function updateOpacities(nv, checkState){
-    if (nv && checkState){
+    if (nv.volumes && checkState){
         for (let i = 1; i < checkState.length; i++){ //start at 1 bc only checking segmentations
             nv.volumes[i-1].opacity = checkState[i]; 
         }

@@ -1,13 +1,21 @@
 import React from 'react'
-import NiftiVolume3D from '../components/NiftiVolume3D/NiftiVolume3D';
 import './Test.css';
+import { getGPUTier } from 'detect-gpu';
 
+const gpu = async () => {
+    const gpuTier = await getGPUTier({
+        override: {
+            gpu: "amd radeon rx 580"
+        }
+    });
+    console.log(gpuTier);
+}
 
 function Test() {
     return (
         <div className="TestPage">
-            <NiftiVolume3D />
-
+            Test
+            <button onClick={gpu}> press </button>
         </div>
     )
 }

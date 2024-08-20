@@ -4,9 +4,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { debug, setVisibilities, renderVisualization } from '../helpers/helpers';
 import ReportScreen from '../components/ReportScreen/ReportScreen';
 import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
-import NiftiVolume3D from '../components/NiftiVolume3D/NiftiVolume3D';
 import { create3DVolume, updateOpacities } from '../helpers/Volume3D';
-import { trueCheckState, case1 } from '../helpers/constants';
+import { trueCheckState, case1, organ_ids, API_ORIGIN } from '../helpers/constants';
+
+
+import { createAndCacheVolumesFromArrayBuffers } from '../helpers/createCSVolumes';
+import { cache } from '@cornerstonejs/core';
 import './VisualizationPage.css';
 
 
@@ -15,15 +18,12 @@ import './VisualizationPage.css';
 function VisualizationPage() {
   const [checkState, setCheckState] = useState(trueCheckState);
   const [segmentationRepresentationUIDs, setSegmentationRepresentationUIDs] = useState(null);
-  const [NV, setNV] = useState();
-  const axial_ref = useRef(null);
-  const sagittal_ref = useRef(null);
-  const coronal_ref = useRef(null);
-  const render_ref = useRef(null);
-
-  
-  
-  // const [serverPath, setServerPath] = useState('');
+  const [NV, setNV] = useState(null);
+  const [serverDir, setServerDir] = useState(undefined);
+  const axial_ref = useRef();
+  const sagittal_ref = useRef();
+  const coronal_ref = useRef();
+  const render_ref = useRef();
 
   const TaskMenu_ref = useRef(null);
   const ReportScreen_ref = useRef(null);
@@ -32,27 +32,34 @@ function VisualizationPage() {
   const location = useLocation();
 
   useEffect(() => {
-    const state = location.state;
-    if (!state){
-      navigate('/');
-      return;
-    }
-    if (axial_ref, sagittal_ref, coronal_ref, render_ref){
-      const niftiURL = URL.createObjectURL(state.file);
-      const maskFiles = Array.from(state.masks);
-      const maskData = [];
-          maskFiles.forEach((file) => {
-            maskData.push({
-              id: file.name,
-              url: URL.createObjectURL(file),
-            });
-          });
-      renderVisualization(axial_ref, sagittal_ref, coronal_ref, niftiURL, maskData)
+    const fetchNiftiFilesForCornerstoneAndNV = async () => {
+      const state = location.state; 
+      console.log(location);
+      if (!state){
+        navigate('/');
+        return;
+      }
+      const serverDir = state.serverDir;
+      setServerDir(serverDir);
+      const organs = [...organ_ids];
+ 
+      const segmentationInfos = await Promise.all(organs.map(async (organ, i) => {
+        const response = await fetch(`/api/download/${serverDir}||segmentations||${organ}.nii.gz`);
+        const buffer = await response.arrayBuffer();
+        return {
+          volumeId: organ_ids[i],
+          buffer: buffer
+        }
+      }));
+
+      renderVisualization(axial_ref, sagittal_ref, coronal_ref, serverDir, segmentationInfos)
       .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
-      const nv = create3DVolume(render_ref, maskFiles);
+      const nv = await create3DVolume(render_ref, segmentationInfos);
       setNV(nv);
     }
-  }, [axial_ref, sagittal_ref, coronal_ref, render_ref]);
+
+    fetchNiftiFilesForCornerstoneAndNV();
+  }, []);
 
 
   useEffect(() => {
@@ -111,19 +118,6 @@ function VisualizationPage() {
           </div>
         </div>
         <button onClick={() => navigate("/")}>Back</button>
-        <div><br/></div> 
-        <button onClick={() => {
-          console.log(NV.volumes[0]);
-          // NV.setOpacity(0, 0);
-          NV.setOpacity(1, false);
-          NV.setOpacity(2, false);
-          NV.setOpacity(3, false);
-          NV.setOpacity(4, 0);
-          NV.setOpacity(5, 0);
-          NV.setOpacity(6, 0);
-          NV.setOpacity(7, 0);
-          NV.setOpacity(8, 0); 
-        }}>Debug</button>
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref} >
@@ -138,7 +132,7 @@ function VisualizationPage() {
       </div>
 
       <div className="report" ref={ReportScreen_ref} style={{display: "none"}}>
-        <ReportScreen />
+        <ReportScreen serverDir={serverDir}/>
       </div>
 
     </div>

@@ -8,15 +8,13 @@ const PURPLE = [145, 30, 180, 255];
 const MAGENTA = [240, 50, 230, 255];
 const LIME = [50, 205, 50, 255];
 export const defaultColors = [RED, BLUE, MAROON, BROWN, OLIVE, TEAL, PURPLE, MAGENTA, LIME];
-
-
 export const NVcolorMaps = [
     {
         name: 'RED',
         cmap: {
             R: [0, 230],
             G: [0, 25],
-            B: [0, 225],
+            B: [0, 75],
             A: [0, 255],
         }
     },
@@ -96,3 +94,6 @@ export const NVcolorMaps = [
 
 export const trueCheckState = [true, true, true, true, true, true, true, true, true, true];
 export const case1 = '[false,true,true,true,true,true,true,true,true,true]';
+export const organ_ids = ['aorta', 'gall_bladder', 'kidney_left', 'kidney_right', 'liver', 'pancreas', 'postcava', 'spleen', 'stomach']
+// export const API_ORIGIN = 'http://localhost:5000'; #gzip correctly
+export const API_ORIGIN = ''; //automatically route to localhost:5000

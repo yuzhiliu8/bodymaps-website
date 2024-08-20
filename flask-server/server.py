@@ -1,8 +1,8 @@
 from flask import Flask, send_file, make_response, request, jsonify
 from flask_cors import CORS
+from handle import processMasks
 import random
 import os
-from processMasks import process_masks
 
 app = Flask(__name__)
 CORS(app)
@@ -23,36 +23,40 @@ def home():
 
 @app.route('/api', methods=['GET'])
 def api():
-    return jsonify("api")
+    return "api"
 
-@app.route('/api/send', methods= ['POST'])
+@app.route('/api/upload', methods= ['POST'])
 def upload():
-    file = request.files['file']
     folder_name = generate_folder_name()
-    os.makedirs(os.path.join('files', folder_name))
-    path = os.path.join('files', folder_name, file.filename)
-    print(path)
-    file.save(path)
-    return path.replace('\\', '||')
+    files = request.files
+    filenames = list(files.keys())
+    filenames.remove('MAIN_NIFTI')
+    base = os.path.join('files', folder_name, ) #base dir path 
+    os.makedirs(os.path.join(base, 'segmentations'))
+    main_nifti = files['MAIN_NIFTI']
+    main_nifti.save(os.path.join(base, 'ct.nii.gz'))
+    for filename in filenames:
+        file = files[filename]
+        file.save(os.path.join(base, 'segmentations', filename))
+
+    return base.replace('\\', '||')
     
 
 @app.route('/api/download/<path>', methods=['GET'])
 def download(path):
     path = path.replace('||', '/')
-    print(path)
-    response = make_response(send_file(path))
+    response = make_response(send_file(path, mimetype='application/gzip'))
     response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
     response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
-    response.headers['Content-Disposition'] = f'attachment; filename="{path}"'
-    response.headers['Content-Type'] = 'application/x-gzip'
+    response.headers['Content-Encoding'] = 'gzip'
 
     return response
 
-@app.route('/api/segmentations', methods=['GET'])
-def get_segmentations():
-    file_path = 'nifti'
-    data = process_masks(file_path)
-    return jsonify(data)
+@app.route('/api/mask-data/<path>', methods=['GET'])
+def get_mask_data(path):
+    serverDir = path.replace('||', '/')
+    print(serverDir)
+    return jsonify(processMasks(serverDir=serverDir))
 
 
 if __name__ == "__main__":
