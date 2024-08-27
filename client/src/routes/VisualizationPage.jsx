@@ -5,7 +5,7 @@ import { debug, setVisibilities, renderVisualization } from '../helpers/helpers'
 import ReportScreen from '../components/ReportScreen/ReportScreen';
 import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
 import { create3DVolume, updateOpacities } from '../helpers/Volume3D';
-import { trueCheckState, case1, organ_ids, API_ORIGIN } from '../helpers/constants';
+import { trueCheckState, case1, organ_ids } from '../helpers/constants';
 
 
 import { createAndCacheVolumesFromArrayBuffers } from '../helpers/createCSVolumes';
@@ -19,7 +19,7 @@ function VisualizationPage() {
   const [checkState, setCheckState] = useState(trueCheckState);
   const [segmentationRepresentationUIDs, setSegmentationRepresentationUIDs] = useState(null);
   const [NV, setNV] = useState(null);
-  const [serverDir, setServerDir] = useState(undefined);
+  const [sessionKey, setSessionKey] = useState(undefined);
   const axial_ref = useRef();
   const sagittal_ref = useRef();
   const coronal_ref = useRef();
@@ -39,12 +39,12 @@ function VisualizationPage() {
         navigate('/');
         return;
       }
-      const serverDir = state.serverDir;
-      setServerDir(serverDir);
+      const sessionKey = state.sessionKey;
+      setSessionKey(sessionKey);
       const organs = [...organ_ids];
  
       const segmentationInfos = await Promise.all(organs.map(async (organ, i) => {
-        const response = await fetch(`/api/download/${serverDir}||segmentations||${organ}.nii.gz`);
+        const response = await fetch(`/api/download/${sessionKey}||segmentations||${organ}.nii.gz`);
         const buffer = await response.arrayBuffer();
         return {
           volumeId: organ_ids[i],
@@ -52,7 +52,7 @@ function VisualizationPage() {
         }
       }));
 
-      renderVisualization(axial_ref, sagittal_ref, coronal_ref, serverDir, segmentationInfos)
+      renderVisualization(axial_ref, sagittal_ref, coronal_ref, sessionKey, segmentationInfos)
       .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
       const nv = await create3DVolume(render_ref, segmentationInfos);
       setNV(nv);
@@ -132,7 +132,7 @@ function VisualizationPage() {
       </div>
 
       <div className="report" ref={ReportScreen_ref} style={{display: "none"}}>
-        <ReportScreen serverDir={serverDir}/>
+        <ReportScreen sessionKey={sessionKey}/>
       </div>
 
     </div>

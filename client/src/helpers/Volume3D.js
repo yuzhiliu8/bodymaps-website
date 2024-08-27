@@ -1,5 +1,5 @@
-import { Niivue, NVImage, SLICE_TYPE,  } from '@niivue/niivue';
-import { NVcolorMaps, organ_ids, API_ORIGIN } from './constants';
+import { Niivue, SLICE_TYPE } from '@niivue/niivue';
+import { NVcolorMaps, organ_ids } from './constants';
 import { NVImageFromUrlOptions } from '@niivue/niivue';
 
 
@@ -29,20 +29,6 @@ export async function create3DVolume(canvasRef, segmentationInfos){
         imageOptions.colormap = colorMapNames[i];
         await nv.addVolumeFromUrl(imageOptions);
     })
-    // let i = -1;
-    // const ids = [...organ_ids];
-    // const promises = ids.map((id) => {
-    //     i++;
-    //     const image = NVImage.loadFromUrl({ 
-    //         url: `${API_ORIGIN}/api/download/${serverDir}||segmentations||${id}.nii.gz`,
-    //         colormap: colorMapNames[i],
-    //     });
-    //     return image;
-    // });
-    // for (const promise of promises) {
-    //     const image = await promise;
-    //     nv.addVolume(image);
-    // }
     return nv;
 }
 

@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react';
 import ReportScreenItem from './ReportScreenItem';
 import './ReportScreen.css';
 
-function ReportScreen({ serverDir }) {
+function ReportScreen({ sessionKey }) {
   const [maskData, setMaskData] = useState({});
 
   useEffect(() => {
-    if (typeof serverDir !== 'undefined'){
-      fetch(`/api/mask-data/${serverDir}`)
+    if (typeof sessionKey !== 'undefined'){
+      fetch(`/api/mask-data/${sessionKey}`) // change
       .then((response) => {
         if (!response.ok){
           console.error("Cannot connect to server!");
@@ -19,7 +19,7 @@ function ReportScreen({ serverDir }) {
         setMaskData(data);
       })
     }
-  }, [serverDir])
+  }, [sessionKey])
   return (
     <div className="ReportScreen">
       <div className="header-line"></div>

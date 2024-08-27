@@ -22,7 +22,7 @@ import {
 }from '@cornerstonejs/tools';
 
 import { cornerstoneNiftiImageVolumeLoader } from '@cornerstonejs/nifti-volume-loader';
-import { defaultColors, organ_ids, API_ORIGIN } from './constants';
+import { defaultColors, organ_ids } from './constants';
 import { createAndCacheVolumesFromArrayBuffers } from './createCSVolumes';
 
 
@@ -91,7 +91,7 @@ export async function renderVisualization(ref1, ref2, ref3, serverDir, segmentat
     renderingEngine = new RenderingEngine(renderingEngineId); 
   }
   
-  const niftiURL = `${API_ORIGIN}/api/download/${serverDir}||ct.nii.gz`
+  const niftiURL = `/api/download/${serverDir}||ct.nii.gz`
   const volumeId = 'nifti:' + niftiURL;
   const viewportId1 = 'CT_NIFTI_AXIAL';
   const viewportId2 = 'CT_NIFTI_SAGITTAL';

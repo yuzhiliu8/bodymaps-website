@@ -1,33 +1,60 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { accepted_exts } from '../helpers/constants';
 import image from '../assets/images/BodyMapsIcon.png';
 import "./HomePage.css"
 
-import "./HomePage.css"
 
 
 export default function HomePage() {
-  const [nifti, setNifti] = useState();
+  const [nifti, setNifti] = useState({});
   const [masks, setMasks] = useState();
   const navigate = useNavigate();
 
 
   const handleUpload = (event) => {
-    const f = event.target.files[0]
-    if (f){
-      setNifti(f);
+    const file = event.target.files[0]
+    if (!file){
+      return
+    }
+
+    const ext = file.name.substring(file.name.indexOf('.'))
+    if (accepted_exts.includes(ext)){
+      setNifti(file);
+    } else {
+      window.alert(`file extension ${ext} not accepted!`);
     }
   }
 
   const handleMaskUpload = (event) => {
-    const m = Array.from(event.target.files);
-    setMasks(m);
+    const masks = Array.from(event.target.files);
+    if (masks.length === 0 ){
+      return 
+    }
+
+    let accept = true;
+
+    for (let i = 0; i < masks.length; i++){
+      const mask = masks[i];
+      const ext = mask.name.substring(mask.name.indexOf('.'))
+      if (!accepted_exts.includes(ext)){
+        window.alert(`file extension ${ext} not accepted!`);
+        accept = false;
+        event.target.value = '';
+        break;
+      }
+    }
+    
+    if (accept){
+      setMasks(masks);
+      console.log('set');
+    }
   }
 
    
   useEffect(() => {
-    if (nifti && masks){ 
+    if (nifti.name && masks){ 
       try {
         const formData = new FormData();    
         formData.append('MAIN_NIFTI', nifti)
@@ -41,9 +68,9 @@ export default function HomePage() {
           }
           return response.text();
         }) 
-        .then((path) => {
-          console.log(path); 
-          navigate('/visualization', {state: {serverDir: path}});   
+        .then((sessionKey) => {
+          console.log(sessionKey); 
+          navigate('/visualization', {state: {sessionKey: sessionKey}});   
         });
       } catch (error) {
         console.error(error.message);
@@ -72,19 +99,22 @@ export default function HomePage() {
             <div className="input-label">
               or Click to Upload
             </div>
+            {
+              (typeof nifti.name === "undefined") ? (
+                <> No File Selected</>
+              ) : (
+                <div> {nifti.name} </div>
+              )
+            }
           </div>
-          
-          
-          
-          <input className="fileInput" type="file" onChange={handleUpload}/>
-          
+          <input className="fileInput" type="file" accept=".nii.gz, .nii" onChange={handleUpload}/>
         </div>
         <div className="note">
           By using this online service ​<br/> you agree that the data can be used to improve the model.​
         </div>
         <br/>
         <div>Upload CT Masks Here: (Development Phase only)</div> <br/>
-        <input type="file" multiple onChange={handleMaskUpload}/>
+        <input type="file" multiple accept=".nii.gz, .nii" onChange={handleMaskUpload}/>
       </div>
     </div>    
   )

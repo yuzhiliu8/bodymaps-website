@@ -47,14 +47,14 @@ def processMasks(serverDir):
         
         erosion_data = ndimage.binary_erosion(img_data, structure=structuring_element)
         hu_values = ct[erosion_data > 0]
-        # hu_values = ct[img_data > 0]
-        mean_hu = round(float(np.mean(hu_values)), 2)
-        if np.isnan(mean_hu):
+        if len(hu_values) == 0:
             organ_data['mean_hu'] = 'N/A'
         else:
+            mean_hu = round(float(np.mean(hu_values)), 2)
             organ_data['mean_hu'] = mean_hu 
+
         data['data'].append(organ_data)
-        
+
     return data
 
 
