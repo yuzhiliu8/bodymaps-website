@@ -35,7 +35,7 @@ function ReportScreen({ serverDir }) {
           <div>Loading...</div>
         ) : (
           maskData.data.map((organData, i) => {
-            const crossSectionArea = (typeof organData.volume_cm === 'number') ? <div>{organData.volume_cm} cm<sup>3</sup></div> : "Incomplete Organ"
+            const crossSectionArea = (typeof organData.volume_cm === 'number') ? <>{organData.volume_cm} cm<sup>3</sup></> : organData.volume_cm
             return (<ReportScreenItem
               key={i}
               tissue={organData.id}
