@@ -28,6 +28,12 @@ function VisualizationPage() {
   const location = useLocation();
 
   useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      console.log('beforeunload');
+      event.preventDefault();
+      event.returnValue = '';
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload);
     const fetchNiftiFilesForCornerstoneAndNV = async () => {
       const state = location.state; 
       console.log(location);
