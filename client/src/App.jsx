@@ -1,6 +1,5 @@
 import VisualizationPage from './routes/VisualizationPage'
 import HomePage from './routes/HomePage';
-import Test from './routes/Test';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import './App.css'
@@ -13,7 +12,6 @@ function App() {
         <Routes>
           <Route path='/' element={<HomePage />}/>
           <Route path='/visualization' element={<VisualizationPage/>}/>
-          <Route path='/test' element={<Test />}/>
         </Routes>
       </Router>
     </div>

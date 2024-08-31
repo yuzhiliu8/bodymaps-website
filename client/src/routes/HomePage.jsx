@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { accepted_exts } from '../helpers/constants';
+import { accepted_exts, API_ORIGIN } from '../helpers/constants';
 import image from '../assets/images/BodyMapsIcon.png';
 import "./HomePage.css"
 
@@ -60,7 +60,7 @@ export default function HomePage() {
         masks.forEach((file) => { 
           formData.append(file.name, file) 
         }) 
-        fetch('/api/upload', { method: 'POST', body: formData})
+        fetch(`${API_ORIGIN}/api/upload`, { method: 'POST', body: formData})
         .then((response) => {
           if (!response.ok){
             throw new Error("Could not connect to server");
@@ -74,8 +74,6 @@ export default function HomePage() {
         const fileInfo = {};
         fileInfo.MAIN_NIFTI = nifti;
         fileInfo.masks = fileNames;
-        console.log(fileInfo);
-        console.log(sessionKey); 
         navigate('/visualization', {state: {sessionKey: sessionKey, fileInfo: fileInfo}});   
         });
       } catch (error) {

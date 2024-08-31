@@ -11,7 +11,8 @@
     "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "push-prod": "gh-pages -d dist -b production"
   },
   "dependencies": {
     "@cornerstonejs/core": "^1.83.0",

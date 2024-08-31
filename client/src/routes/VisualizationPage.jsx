@@ -5,7 +5,7 @@ import { setVisibilities, renderVisualization } from '../helpers/helpers';
 import ReportScreen from '../components/ReportScreen/ReportScreen';
 import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
 import { create3DVolume, updateOpacities } from '../helpers/Volume3D';
-import { trueCheckState, case1, organ_ids } from '../helpers/constants';
+import { trueCheckState, case1, API_ORIGIN } from '../helpers/constants';
 import './VisualizationPage.css';
 
 
@@ -28,15 +28,8 @@ function VisualizationPage() {
   const location = useLocation();
 
   useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      console.log('beforeunload');
-      event.preventDefault();
-      event.returnValue = '';
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload);
     const fetchNiftiFilesForCornerstoneAndNV = async () => {
       const state = location.state; 
-      console.log(location);
       if (!state){
         window.alert('No Nifti Files Uploaded!');
         navigate('/');
@@ -45,17 +38,14 @@ function VisualizationPage() {
       const sessionKey = state.sessionKey;
       const fileInfo = state.fileInfo;
       setSessionKey(sessionKey);
-      console.log(fileInfo);
       const masks = fileInfo.masks;
-      console.log(masks);
-      console.log(sessionKey);
 
       const formData = new FormData();
       formData.append('sessionKey', sessionKey);
       formData.append('isSegmentation', true);
  
       const segmentationBuffers = await Promise.all(masks.map(async (mask) => {
-        const response = await fetch(`/api/download/${mask}`, {
+        const response = await fetch(`${API_ORIGIN}/api/download/${mask}`, {
           method: 'POST',
           body: formData,
         });
@@ -68,10 +58,6 @@ function VisualizationPage() {
 
       const mainNifti = fileInfo.MAIN_NIFTI;
       const mainNiftiURL = URL.createObjectURL(mainNifti);
-      console.log(mainNiftiURL);
-
-
-      console.log(segmentationBuffers);
 
       renderVisualization(axial_ref, sagittal_ref, coronal_ref, segmentationBuffers, mainNiftiURL)
       .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
@@ -123,7 +109,7 @@ function VisualizationPage() {
 const navBack = () => {
   const formData = new FormData()
   formData.append('sessionKey', sessionKey)
-  fetch(`/api/terminate-session`, {
+  fetch(`${API_ORIGIN}/api/terminate-session`, {
     method: 'POST', 
     body: formData,
   }).then((response) => response.json())
