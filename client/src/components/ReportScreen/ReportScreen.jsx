@@ -8,7 +8,12 @@ function ReportScreen({ sessionKey }) {
 
   useEffect(() => {
     if (typeof sessionKey !== 'undefined'){
-      fetch(`/api/mask-data/${sessionKey}`) // change
+      const formData = new FormData();
+      formData.append('sessionKey', sessionKey)
+      fetch(`/api/mask-data`, {
+        method: 'POST',
+        body: formData,
+      })
       .then((response) => {
         if (!response.ok){
           console.error("Cannot connect to server!");

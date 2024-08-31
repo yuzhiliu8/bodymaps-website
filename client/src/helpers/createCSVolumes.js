@@ -61,7 +61,6 @@ export async function createAndCacheVolumesFromArrayBuffers(volumeInfos){
 
       try{
         await cache.putVolumeLoadObject(volumeId, {promise: volumePromise, cancel: {}});
-        console.log(`${volumeId} added to CS cache`);
       } catch {
         console.error(`could not add ${volumeId} to cache`);
       }

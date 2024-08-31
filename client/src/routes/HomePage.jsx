@@ -45,10 +45,9 @@ export default function HomePage() {
         break;
       }
     }
-    
+
     if (accept){
       setMasks(masks);
-      console.log('set');
     }
   }
 
@@ -69,8 +68,15 @@ export default function HomePage() {
           return response.text();
         }) 
         .then((sessionKey) => {
-          console.log(sessionKey); 
-          navigate('/visualization', {state: {sessionKey: sessionKey}});   
+          const fileNames = masks.map((mask) => {
+            return mask.name;
+          });
+        const fileInfo = {};
+        fileInfo.MAIN_NIFTI = nifti;
+        fileInfo.masks = fileNames;
+        console.log(fileInfo);
+        console.log(sessionKey); 
+        navigate('/visualization', {state: {sessionKey: sessionKey, fileInfo: fileInfo}});   
         });
       } catch (error) {
         console.error(error.message);
@@ -101,7 +107,7 @@ export default function HomePage() {
             </div>
             {
               (typeof nifti.name === "undefined") ? (
-                <> No File Selected</>
+                <></>
               ) : (
                 <div> {nifti.name} </div>
               )
