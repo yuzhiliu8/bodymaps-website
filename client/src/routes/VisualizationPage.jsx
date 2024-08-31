@@ -1,15 +1,11 @@
 import React from 'react'
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
-import { debug, setVisibilities, renderVisualization } from '../helpers/helpers';
+import { setVisibilities, renderVisualization } from '../helpers/helpers';
 import ReportScreen from '../components/ReportScreen/ReportScreen';
 import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
 import { create3DVolume, updateOpacities } from '../helpers/Volume3D';
-import { trueCheckState, case1, organ_ids, API_ORIGIN } from '../helpers/constants';
-
-
-import { createAndCacheVolumesFromArrayBuffers } from '../helpers/createCSVolumes';
-import { cache } from '@cornerstonejs/core';
+import { trueCheckState, case1, organ_ids } from '../helpers/constants';
 import './VisualizationPage.css';
 
 
@@ -19,7 +15,7 @@ function VisualizationPage() {
   const [checkState, setCheckState] = useState(trueCheckState);
   const [segmentationRepresentationUIDs, setSegmentationRepresentationUIDs] = useState(null);
   const [NV, setNV] = useState(null);
-  const [serverDir, setServerDir] = useState(undefined);
+  const [sessionKey, setSessionKey] = useState(undefined);
   const axial_ref = useRef();
   const sagittal_ref = useRef();
   const coronal_ref = useRef();
@@ -32,29 +28,54 @@ function VisualizationPage() {
   const location = useLocation();
 
   useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      console.log('beforeunload');
+      event.preventDefault();
+      event.returnValue = '';
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload);
     const fetchNiftiFilesForCornerstoneAndNV = async () => {
       const state = location.state; 
       console.log(location);
       if (!state){
+        window.alert('No Nifti Files Uploaded!');
         navigate('/');
         return;
       }
-      const serverDir = state.serverDir;
-      setServerDir(serverDir);
-      const organs = [...organ_ids];
+      const sessionKey = state.sessionKey;
+      const fileInfo = state.fileInfo;
+      setSessionKey(sessionKey);
+      console.log(fileInfo);
+      const masks = fileInfo.masks;
+      console.log(masks);
+      console.log(sessionKey);
+
+      const formData = new FormData();
+      formData.append('sessionKey', sessionKey);
+      formData.append('isSegmentation', true);
  
-      const segmentationInfos = await Promise.all(organs.map(async (organ, i) => {
-        const response = await fetch(`/api/download/${serverDir}||segmentations||${organ}.nii.gz`);
+      const segmentationBuffers = await Promise.all(masks.map(async (mask) => {
+        const response = await fetch(`/api/download/${mask}`, {
+          method: 'POST',
+          body: formData,
+        });
         const buffer = await response.arrayBuffer();
         return {
-          volumeId: organ_ids[i],
+          volumeId: mask,
           buffer: buffer
         }
       }));
 
-      renderVisualization(axial_ref, sagittal_ref, coronal_ref, serverDir, segmentationInfos)
+      const mainNifti = fileInfo.MAIN_NIFTI;
+      const mainNiftiURL = URL.createObjectURL(mainNifti);
+      console.log(mainNiftiURL);
+
+
+      console.log(segmentationBuffers);
+
+      renderVisualization(axial_ref, sagittal_ref, coronal_ref, segmentationBuffers, mainNiftiURL)
       .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
-      const nv = await create3DVolume(render_ref, segmentationInfos);
+      const nv = await create3DVolume(render_ref, segmentationBuffers);
       setNV(nv);
     }
 
@@ -99,6 +120,17 @@ function VisualizationPage() {
     setCheckState(newCheckState);
 }
 
+const navBack = () => {
+  const formData = new FormData()
+  formData.append('sessionKey', sessionKey)
+  fetch(`/api/terminate-session`, {
+    method: 'POST', 
+    body: formData,
+  }).then((response) => response.json())
+  .then((data) => console.log(data.message))
+  navigate('/');
+}
+
 
  
 
@@ -117,7 +149,7 @@ function VisualizationPage() {
             <div className="dropdown-header" onClick={showReportScreen}>Report</div>
           </div>
         </div>
-        <button onClick={() => navigate("/")}>Back</button>
+        <button onClick={navBack}>Back</button>
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref} >
@@ -132,7 +164,7 @@ function VisualizationPage() {
       </div>
 
       <div className="report" ref={ReportScreen_ref} style={{display: "none"}}>
-        <ReportScreen serverDir={serverDir}/>
+        <ReportScreen sessionKey={sessionKey}/>
       </div>
 
     </div>

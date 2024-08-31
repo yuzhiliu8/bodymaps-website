@@ -22,7 +22,7 @@ import {
 }from '@cornerstonejs/tools';
 
 import { cornerstoneNiftiImageVolumeLoader } from '@cornerstonejs/nifti-volume-loader';
-import { defaultColors, organ_ids, API_ORIGIN } from './constants';
+import { defaultColors, organ_ids } from './constants';
 import { createAndCacheVolumesFromArrayBuffers } from './createCSVolumes';
 
 
@@ -49,8 +49,8 @@ const toolGroupSpecificRepresentationConfig = {
 
 
 
-export async function renderVisualization(ref1, ref2, ref3, serverDir, segmentationInfos){
-  await createAndCacheVolumesFromArrayBuffers(segmentationInfos);
+export async function renderVisualization(ref1, ref2, ref3, segmentationBuffers, mainNiftiURL){
+  await createAndCacheVolumesFromArrayBuffers(segmentationBuffers);
   csTools3dInit();
   await csInit();
 
@@ -90,9 +90,8 @@ export async function renderVisualization(ref1, ref2, ref3, serverDir, segmentat
   } else {
     renderingEngine = new RenderingEngine(renderingEngineId); 
   }
-  
-  const niftiURL = `${API_ORIGIN}/api/download/${serverDir}||ct.nii.gz`
-  const volumeId = 'nifti:' + niftiURL;
+
+  const volumeId = 'nifti:' + mainNiftiURL;
   const viewportId1 = 'CT_NIFTI_AXIAL';
   const viewportId2 = 'CT_NIFTI_SAGITTAL';
   const viewportId3 = 'CT_NIFTI_CORONAL'; 
@@ -102,9 +101,7 @@ export async function renderVisualization(ref1, ref2, ref3, serverDir, segmentat
 
   const segmentationInputArray = []
   const segRepInputArray = []
-  // const segmentationVols = []
-  // const segVolumeIds = []
-  segmentationInfos.forEach((segInfo, i) => {
+  segmentationBuffers.forEach((segInfo, i) => {
     const organId = segInfo.volumeId;
     segmentation.state.removeSegmentation(organId);
     segmentationInputArray.push(
@@ -128,7 +125,6 @@ export async function renderVisualization(ref1, ref2, ref3, serverDir, segmentat
         },
       });
   });
-  // await Promise.all(segmentationVols); 
 
 
   const viewportInputArray = [

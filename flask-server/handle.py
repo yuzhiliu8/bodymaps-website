@@ -1,7 +1,8 @@
 import nibabel as nib
 import numpy as np
-from constants import organ_ids, reportScreenNames, organ_ids_volumeNA
+from constants import main_nifti_filename, reportScreenNames, organ_ids_volumeNA
 import scipy.ndimage as ndimage
+import os
 
 EROSION_PIXELS = 4
 cube_len = (2 * EROSION_PIXELS) + 1
@@ -28,13 +29,14 @@ def getCalcVolumeState(img_data, organ):
     return "complete"
 
 
-def processMasks(serverDir):
+def processMasks(sessionKey):
     data = {"data": []}
-    ct = nib.load(f'{serverDir}/ct.nii.gz').get_fdata()
+    ct = nib.load(os.path.join('sessions', sessionKey, main_nifti_filename)).get_fdata()
+    organ_ids = os.listdir(os.path.join('sessions', sessionKey, 'segmentations'))
     for i in range(len(organ_ids)):
         organ_data = {}
         organ_data['id'] = reportScreenNames[i]
-        img = nib.load(f'{serverDir}/segmentations/{organ_ids[i]}.nii.gz')
+        img = nib.load(os.path.join('sessions', sessionKey, 'segmentations', organ_ids[i]))
         img_data = img.get_fdata()
         state = getCalcVolumeState(img_data, organ_ids[i])
         if state == "complete":
@@ -47,61 +49,61 @@ def processMasks(serverDir):
         
         erosion_data = ndimage.binary_erosion(img_data, structure=structuring_element)
         hu_values = ct[erosion_data > 0]
-        # hu_values = ct[img_data > 0]
-        mean_hu = round(float(np.mean(hu_values)), 2)
-        if np.isnan(mean_hu):
+        if len(hu_values) == 0:
             organ_data['mean_hu'] = 'N/A'
         else:
+            mean_hu = round(float(np.mean(hu_values)), 2)
             organ_data['mean_hu'] = mean_hu 
+
         data['data'].append(organ_data)
-        
+
     return data
 
 
-def test():
-    for organ in organ_ids:
-        mask = nib.load(f'dev/segmentations/{organ}.nii.gz').get_fdata()
-        for i in range(mask.shape[2]):
-            slice = mask[:, :, i]
-            length = len(slice[slice > 0])
-            if length > 0:
-                print(organ)
-                print('num voxels: ', length)
-                break
-        for i in range(mask.shape[2]-1, -1, -1):
-            slice = mask[:, :, i]
-            length = len(slice[slice > 0])
-            if length > 0:
-                print(organ)
-                print('num voxels: ', length)
-                break
-        for i in range(mask.shape[0]):
-            slice = mask[i, :, :]
-            length = len(slice[slice > 0])
-            if length > 0:
-                print(organ)
-                print('num voxels: ', length)
-                break
-        for i in range(mask.shape[0]-1, -1, -1):
-            slice = mask[i, :, :]
-            length = len(slice[slice > 0])
-            if length > 0:
-                print(organ)
-                print('num voxels: ', length)
-                break
-        for i in range(mask.shape[1]):
-            slice = mask[:, i, :]
-            length = len(slice[slice > 0])
-            if length > 0:
-                print(organ)
-                print('num voxels: ', length)
-                break
-        for i in range(mask.shape[1]-1, -1, -1):
-            slice = mask[:, i, :]
-            length = len(slice[slice > 0])
-            if length > 0:
-                print(organ)
-                print('num voxels: ', length)
-                break
+# def test():
+#     for organ in organ_ids:
+#         mask = nib.load(f'dev/segmentations/{organ}.nii.gz').get_fdata()
+#         for i in range(mask.shape[2]):
+#             slice = mask[:, :, i]
+#             length = len(slice[slice > 0])
+#             if length > 0:
+#                 print(organ)
+#                 print('num voxels: ', length)
+#                 break
+#         for i in range(mask.shape[2]-1, -1, -1):
+#             slice = mask[:, :, i]
+#             length = len(slice[slice > 0])
+#             if length > 0:
+#                 print(organ)
+#                 print('num voxels: ', length)
+#                 break
+#         for i in range(mask.shape[0]):
+#             slice = mask[i, :, :]
+#             length = len(slice[slice > 0])
+#             if length > 0:
+#                 print(organ)
+#                 print('num voxels: ', length)
+#                 break
+#         for i in range(mask.shape[0]-1, -1, -1):
+#             slice = mask[i, :, :]
+#             length = len(slice[slice > 0])
+#             if length > 0:
+#                 print(organ)
+#                 print('num voxels: ', length)
+#                 break
+#         for i in range(mask.shape[1]):
+#             slice = mask[:, i, :]
+#             length = len(slice[slice > 0])
+#             if length > 0:
+#                 print(organ)
+#                 print('num voxels: ', length)
+#                 break
+#         for i in range(mask.shape[1]-1, -1, -1):
+#             slice = mask[:, i, :]
+#             length = len(slice[slice > 0])
+#             if length > 0:
+#                 print(organ)
+#                 print('num voxels: ', length)
+#                 break
 
 # test()
