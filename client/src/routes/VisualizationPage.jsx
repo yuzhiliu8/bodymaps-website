@@ -5,7 +5,7 @@ import { setVisibilities, renderVisualization } from '../helpers/helpers';
 import ReportScreen from '../components/ReportScreen/ReportScreen';
 import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
 import { create3DVolume, updateOpacities } from '../helpers/Volume3D';
-import { trueCheckState, case1, organ_ids } from '../helpers/constants';
+import { trueCheckState, case1, API_ORIGIN } from '../helpers/constants';
 import './VisualizationPage.css';
 
 
@@ -55,7 +55,7 @@ function VisualizationPage() {
       formData.append('isSegmentation', true);
  
       const segmentationBuffers = await Promise.all(masks.map(async (mask) => {
-        const response = await fetch(`/api/download/${mask}`, {
+        const response = await fetch(`${API_ORIGIN}/api/download/${mask}`, {
           method: 'POST',
           body: formData,
         });
@@ -123,7 +123,7 @@ function VisualizationPage() {
 const navBack = () => {
   const formData = new FormData()
   formData.append('sessionKey', sessionKey)
-  fetch(`/api/terminate-session`, {
+  fetch(`${API_ORIGIN}/api/terminate-session`, {
     method: 'POST', 
     body: formData,
   }).then((response) => response.json())

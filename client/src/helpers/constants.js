@@ -1,3 +1,5 @@
+export const API_ORIGIN = import.meta.env.VITE_API_ORIGIN;
+
 const RED = [230, 25, 75, 255];
 const BLUE = [0, 130, 200, 255];
 const MAROON = [128, 0, 0, 255];
