@@ -28,15 +28,8 @@ function VisualizationPage() {
   const location = useLocation();
 
   useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      console.log('beforeunload');
-      event.preventDefault();
-      event.returnValue = '';
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload);
     const fetchNiftiFilesForCornerstoneAndNV = async () => {
       const state = location.state; 
-      console.log(location);
       if (!state){
         window.alert('No Nifti Files Uploaded!');
         navigate('/');
@@ -45,10 +38,7 @@ function VisualizationPage() {
       const sessionKey = state.sessionKey;
       const fileInfo = state.fileInfo;
       setSessionKey(sessionKey);
-      console.log(fileInfo);
       const masks = fileInfo.masks;
-      console.log(masks);
-      console.log(sessionKey);
 
       const formData = new FormData();
       formData.append('sessionKey', sessionKey);
@@ -68,10 +58,6 @@ function VisualizationPage() {
 
       const mainNifti = fileInfo.MAIN_NIFTI;
       const mainNiftiURL = URL.createObjectURL(mainNifti);
-      console.log(mainNiftiURL);
-
-
-      console.log(segmentationBuffers);
 
       renderVisualization(axial_ref, sagittal_ref, coronal_ref, segmentationBuffers, mainNiftiURL)
       .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
