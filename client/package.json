@@ -2,8 +2,8 @@
   "name": "client",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://yuzhiliu8.github.io/bodymaps-website",
   "type": "module",
+  "homepage": "./",
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
