@@ -19,20 +19,19 @@ function customHeadersPlugin() {
 export default defineConfig({
   base: "./",
   plugins: [react(), customHeadersPlugin()],
-  
-  server: {
-    https: {
-      key: fs.readFileSync('https/key.pem'),
-      cert: fs.readFileSync('https/cert.pem'),
-    },
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        // preserveHeaderKeyCase: true,
-        // secure: false,
-      }
-    },
+
+
+
+
+
+
+  proxy: {
+    '/api': {
+      target: 'http://localhost:5000',
+      changeOrigin: true,
+      // preserveHeaderKeyCase: true,
+      // secure: false,
+    }
   },
   resolve: {
     alias: {
