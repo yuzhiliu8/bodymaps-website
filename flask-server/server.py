@@ -1,7 +1,7 @@
 from flask import Flask, send_file, make_response, request, jsonify
 from flask_cors import CORS
 from handle import processMasks
-from constants import main_nifti_filename
+from constants import main_nifti_filename, BASE_PATH
 import secrets
 import os
 import shutil
@@ -12,15 +12,11 @@ CORS(app)
 def generate_session_key(length=32):
     return secrets.token_hex(length)
 
-@app.route('/')
-def home():
-    return "home"
-
-@app.route('/api', methods=['GET'])
+@app.route(f'{BASE_PATH}/api', methods=['GET'])
 def api():
     return "api"
 
-@app.route('/api/upload', methods= ['POST'])
+@app.route(f'{BASE_PATH}/api/upload', methods= ['POST'])
 def upload():
     session_key = generate_session_key(length=32)
     files = request.files
@@ -37,7 +33,7 @@ def upload():
     return session_key
     
 
-@app.route('/api/download/<file>', methods=['POST'])
+@app.route(f'{BASE_PATH}/api/download/<file>', methods=['POST'])
 def download(file):
     sessionKey = request.form['sessionKey']
     isSegmentation = request.form['isSegmentation']
@@ -53,12 +49,12 @@ def download(file):
 
     return response
 
-@app.route('/api/mask-data', methods=['POST'])
+@app.route(f'{BASE_PATH}/api/mask-data', methods=['POST'])
 def get_mask_data():
     session_key = request.form['sessionKey']
     return jsonify(processMasks(session_key))
 
-@app.route('/api/terminate-session', methods=['POST'])
+@app.route(f'{BASE_PATH}/api/terminate-session', methods=['POST'])
 def terminate_session():
     session_key = request.form['sessionKey']
     try:
