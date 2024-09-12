@@ -17,6 +17,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 5000:5000
+    volumes:
+      - ./flask-server/sessions:/app/sessions
     restart: unless-stopped
     networks:
       - host-global
