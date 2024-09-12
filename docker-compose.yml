@@ -1,0 +1,27 @@
+version: '3'
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    networks:
+      - host-global
+    container_name: bodymaps-client
+
+  server:
+    build:
+      context: ./flask-server
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    restart: unless-stopped
+    networks:
+      - host-global
+    container_name: bodymaps-server
+
+networks:
+  host-global:
+    external: true
