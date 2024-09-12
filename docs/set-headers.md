@@ -17,10 +17,8 @@ server {
         add_header Cross-Origin-Opener-Policy "same-origin";
         add_header Cross-Origin-Embedder-Policy "require-corp";
     }
-
-  ...
-
-  }
+...
+}
 ```
 
 Other server block configurations, such as setting up HTTPS, should already be done.
