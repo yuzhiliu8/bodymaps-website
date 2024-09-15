@@ -8,7 +8,7 @@
 ```
 server {
     listen 443 ssl;
-	server_name cs.jhu.edu;
+	server_name [domain];
 
   ...
 
@@ -27,7 +27,8 @@ Other server block configurations, such as setting up HTTPS, should already be d
 `server_name` should be `cs.jhu.edu`
 Values to replace:
 
-- [route] → The route to access the website is **/~zongwei/yuzhi/bodymaps-website/**
-  (current full URL is https://www.cs.jhu.edu/~zongwei/yuzhi/bodymaps-website/)
+- [domain] → registered domain name
+- [route] → The route to access the website is **/~zongwei/yuzhi/bodymaps/**
+  (current full URL is https://www.cs.jhu.edu/~zongwei/yuzhi/bodymaps/)
 
 3. Reload Nginx service to apply changes.
