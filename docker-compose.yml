@@ -4,6 +4,9 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+      args:
+        VITE_API_ORIGIN: ${VITE_API_ORIGIN}
+        VITE_BASENAME: ${VITE_BASENAME}
     ports:
       - 3000:3000
     restart: unless-stopped
@@ -19,6 +22,8 @@ services:
       - 5000:5000
     volumes:
       - ./flask-server/sessions:/app/sessions
+    environment:
+      - BASE_PATH=${SERVER_BASE_PATH}
     restart: unless-stopped
     networks:
       - host-global

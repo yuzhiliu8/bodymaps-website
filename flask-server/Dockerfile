@@ -2,6 +2,8 @@ FROM "python:3.9"
 
 WORKDIR /app
 
+ENV BASE_PATH=${BASE_PATH}
+
 COPY . .
 
 #Install Dependencies
