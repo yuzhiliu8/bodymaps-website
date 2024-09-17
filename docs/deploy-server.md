@@ -2,7 +2,7 @@
 
 Prerequisites:
 
-- Docker (installation docs here: https://docs.docker.com/engine/install/)
+- Docker/Docker-compose (installation docs here: https://docs.docker.com/engine/install/)
 - Git
 
 1. Clone the repo
@@ -19,4 +19,6 @@ Prerequisites:
 - If the build was successful, you can view this image, **img/bodymaps-server**, using `docker images`
 - run `docker run -d -p 5000:5000 --name bodymaps-server img/bodymaps-server`
 
-You should now be able to view the flask application at http://localhost:5000
+You should now be able to view the flask application at http://localhost:5000/bodymaps
+or
+http://{private-ip-of-device}:5000/bodymaps
