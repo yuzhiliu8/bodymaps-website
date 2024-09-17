@@ -19,12 +19,10 @@ function customHeadersPlugin() {
 export default defineConfig({
   base: "./",
   plugins: [react(), customHeadersPlugin()],
-
-
-
-
-
-
+  build: {
+    outDir: '../dist',
+    emptyOutDir: true,
+  },
   proxy: {
     '/api': {
       target: 'http://localhost:5000',
