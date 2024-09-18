@@ -20,7 +20,7 @@ export default defineConfig({
   base: "./",
   plugins: [react(), customHeadersPlugin()],
   build: {
-    outDir: '../dist',
+    outDir: './build/dist',
     emptyOutDir: true,
   },
   proxy: {
