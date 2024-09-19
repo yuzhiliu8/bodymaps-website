@@ -9,16 +9,35 @@ Prerequisites:
 
    ` git clone https://github.com/yuzhiliu8/bodymaps-website.git`
 
-2. go to flask-server directory
+2. Enter project directory
 
-   `cd bodymaps-website/flask-server`
+   `cd bodymaps-website`
 
-3. run `docker build -t img/bodymaps-server .`
+3. Create a .env file and edit using nano
 
-- This will create a docker image called **img/bodymaps-server**
-- If the build was successful, you can view this image, **img/bodymaps-server**, using `docker images`
-- run `docker run -d -p 5000:5000 --name bodymaps-server img/bodymaps-server`
+   `touch .env`
 
-You should now be able to view the flask application at http://localhost:5000/bodymaps
+   `nano .env`
+
+4. Add value for SERVER_BASE_PATH
+
+   ```
+   SERVER_BASE_PATH="/bodymaps"
+   ```
+
+5. Save and Exit
+
+   `Ctrl + O`, `Enter`, `Ctrl + X`
+
+6. Run
+
+   `docker-compose up -d --build --create-externals server`
+
+You should now be able to view the flask application at `http://localhost:5000/bodymaps/api`
+
 or
-http://{private-ip-of-device}:5000/bodymaps
+
+`http://{private-ip-of-device}:5000/bodymaps/api`
+
+Using private ip:
+![deploy_server(1)](<imgs/deploy_server(1).png>)
