@@ -33,14 +33,18 @@ function CheckBox({itemData, checkStateProp, update}) {
     )
 }
 
-function NestedCheckBox({ innerRef, checkState, update }) { 
-    
+function NestedCheckBox({ checkBoxData, innerRef, checkState, update }) {
     return (
         <div className="NestedCheckBox" style={{display:"block"}} ref={innerRef}>
             {
-            data.map((itemData) => (
-                <CheckBox key={itemData.id} itemData={itemData} checkStateProp={checkState} update={update}/>
-            ))
+            
+            (typeof checkBoxData === "undefined" && checkState.length > 0) ? (
+                <p>Undefined</p>
+            ) : (
+                checkBoxData.map((itemData) => (
+                    <CheckBox key={itemData.id} itemData={itemData} checkStateProp={checkState} update={update}/>
+                ))
+            )
             }
         </div>
     )

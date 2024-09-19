@@ -94,7 +94,7 @@ export const NVcolorMaps = [
     },
 ]
 
-export const trueCheckState = [true, true, true, true, true, true, true, true, true, true];
+export const trueCheckState = [true];
 export const case1 = '[false,true,true,true,true,true,true,true,true,true]';
 export const organ_ids = ['aorta', 'gall_bladder', 'kidney_left', 'kidney_right', 'liver', 'pancreas', 'postcava', 'spleen', 'stomach']
 export const accepted_exts = ['.nii.gz', '.nii']

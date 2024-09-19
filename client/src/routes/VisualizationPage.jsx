@@ -6,16 +6,19 @@ import ReportScreen from '../components/ReportScreen/ReportScreen';
 import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
 import { create3DVolume, updateOpacities } from '../helpers/Volume3D';
 import { trueCheckState, case1, API_ORIGIN } from '../helpers/constants';
+import { filenameToName } from '../helpers/util';
 import './VisualizationPage.css';
 
 
 
 
+
 function VisualizationPage() {
-  const [checkState, setCheckState] = useState(trueCheckState);
+  const [checkState, setCheckState] = useState([true]);
   const [segmentationRepresentationUIDs, setSegmentationRepresentationUIDs] = useState(null);
   const [NV, setNV] = useState(null);
   const [sessionKey, setSessionKey] = useState(undefined);
+  const [checkBoxData, setCheckBoxData] = useState([]);
   const axial_ref = useRef();
   const sagittal_ref = useRef();
   const coronal_ref = useRef();
@@ -39,6 +42,14 @@ function VisualizationPage() {
       const fileInfo = state.fileInfo;
       setSessionKey(sessionKey);
       const masks = fileInfo.masks;
+      const _checkBoxData = masks.map((filename, i) => {
+        console.log(filename, i);
+        return {label: filenameToName(filename), id: i+1}
+      })
+      _checkBoxData.unshift({label: "Default (All)", id: 0})
+      console.log(_checkBoxData);
+      setCheckBoxData(_checkBoxData);
+      setCheckState(Array(_checkBoxData.length).fill(1));
 
       const formData = new FormData();
       formData.append('sessionKey', sessionKey);
@@ -71,6 +82,7 @@ function VisualizationPage() {
 
   useEffect(() => {
     if (segmentationRepresentationUIDs && checkState && NV){
+      console.log('update visibility');
       setVisibilities(segmentationRepresentationUIDs, checkState);
       updateOpacities(NV, checkState);
     }
@@ -100,9 +112,9 @@ function VisualizationPage() {
   const update = (id, checked) => {
     let newCheckState = [...checkState];
     newCheckState[id] = checked;
-    if (JSON.stringify(newCheckState) === case1) newCheckState = trueCheckState;
-    if (id !== 0 && checked === false && newCheckState[0] === true) newCheckState[0] = false;
-    newCheckState = (id === 0) ? Array(10).fill(checked) : newCheckState;
+    if (JSON.stringify(newCheckState) === case1) newCheckState = Array(checkBoxData.length).fill(true); //Checks All tasks when everything except All tasks has been checked
+    if (id !== 0 && checked === false && newCheckState[0] === true) newCheckState[0] = false; //Unchecks All tasks checkbox when making a segmentation transparent
+    newCheckState = (id === 0) ? Array(checkBoxData.length).fill(checked) : newCheckState; //Pressing  All button
     setCheckState(newCheckState);
 }
 
@@ -127,7 +139,7 @@ const navBack = () => {
         <div className="tasks-container">
           <div className="dropdown">
             <div className="dropdown-header" onClick={showTaskMenu}>Selected Task</div>
-            <NestedCheckBox innerRef={TaskMenu_ref} checkState={checkState} update={update} />
+            <NestedCheckBox checkBoxData={checkBoxData} innerRef={TaskMenu_ref} checkState={checkState} update={update} />
           </div>
         </div>
         <div className="report-container">
@@ -136,6 +148,10 @@ const navBack = () => {
           </div>
         </div>
         <button onClick={navBack}>Back</button>
+        <br/>
+        <button onClick={() => {
+          console.log(filenameToName('aorta.nii.gz'))
+        }}> Debug </button>
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref} >
