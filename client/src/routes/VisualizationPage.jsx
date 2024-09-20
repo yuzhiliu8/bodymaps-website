@@ -112,7 +112,7 @@ function VisualizationPage() {
   const update = (id, checked) => {
     let newCheckState = [...checkState];
     newCheckState[id] = checked;
-    if (JSON.stringify(newCheckState) === case1) newCheckState = Array(checkBoxData.length).fill(true); //Checks All tasks when everything except All tasks has been checked
+    if (JSON.stringify(newCheckState) === JSON.stringify([false].concat(Array(checkBoxData.length-1).fill(true)))) newCheckState = Array(checkBoxData.length).fill(true); //Checks All tasks when everything except All tasks has been checked
     if (id !== 0 && checked === false && newCheckState[0] === true) newCheckState[0] = false; //Unchecks All tasks checkbox when making a segmentation transparent
     newCheckState = (id === 0) ? Array(checkBoxData.length).fill(checked) : newCheckState; //Pressing  All button
     setCheckState(newCheckState);
