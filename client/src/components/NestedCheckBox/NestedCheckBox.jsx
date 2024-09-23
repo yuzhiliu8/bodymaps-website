@@ -5,22 +5,6 @@ import './NestedCheckBox.css'
 
 
 
-
-
-
-const data = [
-    {label: "All (Default)", id: 0},
-    {label: 'Aorta', id:1},
-    {label: 'Gallbladder', id: 2},
-    {label: 'Kidney (L)', id: 3},
-    {label: 'Kidney (R)', id: 4},
-    {label: 'Liver', id: 5},
-    {label: 'Pancreas', id: 6},
-    {label: 'Postcava', id:7},
-    {label: 'Spleen', id: 8},
-    {label: 'Stomach', id: 9},
-]
-
 function CheckBox({itemData, checkStateProp, update}) {
     const isChecked = checkStateProp[itemData.id];
 
@@ -33,14 +17,18 @@ function CheckBox({itemData, checkStateProp, update}) {
     )
 }
 
-function NestedCheckBox({ innerRef, checkState, update }) { 
-    
+function NestedCheckBox({ checkBoxData, innerRef, checkState, update }) {
     return (
         <div className="NestedCheckBox" style={{display:"block"}} ref={innerRef}>
             {
-            data.map((itemData) => (
-                <CheckBox key={itemData.id} itemData={itemData} checkStateProp={checkState} update={update}/>
-            ))
+            
+            (typeof checkBoxData === "undefined" && checkState.length > 0) ? (
+                <p>Undefined</p>
+            ) : (
+                checkBoxData.map((itemData) => (
+                    <CheckBox key={itemData.id} itemData={itemData} checkStateProp={checkState} update={update}/>
+                ))
+            )
             }
         </div>
     )
