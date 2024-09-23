@@ -49,7 +49,7 @@ function VisualizationPage() {
       _checkBoxData.unshift({label: "Default (All)", id: 0})
       console.log(_checkBoxData);
       setCheckBoxData(_checkBoxData);
-      setCheckState(Array(_checkBoxData.length).fill(1));
+      setCheckState(Array(_checkBoxData.length).fill(true));
 
       const formData = new FormData();
       formData.append('sessionKey', sessionKey);
@@ -116,6 +116,7 @@ function VisualizationPage() {
     if (id !== 0 && checked === false && newCheckState[0] === true) newCheckState[0] = false; //Unchecks All tasks checkbox when making a segmentation transparent
     newCheckState = (id === 0) ? Array(checkBoxData.length).fill(checked) : newCheckState; //Pressing  All button
     setCheckState(newCheckState);
+    console.log(newCheckState);
 }
 
 const navBack = () => {

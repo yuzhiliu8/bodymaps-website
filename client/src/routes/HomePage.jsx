@@ -111,14 +111,14 @@ export default function HomePage() {
               )
             }
           </div>
-          <input className="fileInput" type="file" accept=".nii.gz, .nii" onChange={handleUpload}/>
+          <input className="fileInput" type="file" onChange={handleUpload}/>
         </div>
         <div className="note">
           By using this online service ​<br/> you agree that the data can be used to improve the model.​
         </div>
         <br/>
         <div>Upload CT Masks Here: (Development Phase only)</div> <br/>
-        <input type="file" multiple accept=".nii.gz, .nii" onChange={handleMaskUpload}/>
+        <input type="file" multiple onChange={handleMaskUpload}/>
       </div>
     </div>    
   )
