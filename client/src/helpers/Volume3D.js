@@ -1,5 +1,5 @@
 import { Niivue, SLICE_TYPE } from '@niivue/niivue';
-import { NVcolorMaps, organ_ids } from './constants';
+import { NVcolorMaps } from './constants';
 import { NVImageFromUrlOptions } from '@niivue/niivue';
 
 
@@ -15,6 +15,7 @@ NVcolorMaps.forEach((map) => {
 })
 
 export async function create3DVolume(canvasRef, segmentationInfos){
+    console.log(nv.volumes);
     if (nv.volumes.length > 0){  //remove existing volumes
         for (let i = 0; i < nv.volumes.length; i++){
             nv.removeVolume[i]; 
