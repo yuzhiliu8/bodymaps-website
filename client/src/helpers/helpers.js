@@ -22,7 +22,7 @@ import {
 }from '@cornerstonejs/tools';
 
 import { cornerstoneNiftiImageVolumeLoader } from '@cornerstonejs/nifti-volume-loader';
-import { defaultColors, organ_ids } from './constants';
+import { defaultColors } from './constants';
 import { createAndCacheVolumesFromArrayBuffers } from './createCSVolumes';
 
 

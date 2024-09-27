@@ -16,7 +16,7 @@ import './VisualizationPage.css';
 function VisualizationPage() {
   const [checkState, setCheckState] = useState([true]);
   const [segmentationRepresentationUIDs, setSegmentationRepresentationUIDs] = useState(null);
-  const [NV, setNV] = useState(null);
+  const [NV, setNV] = useState();
   const [sessionKey, setSessionKey] = useState(undefined);
   const [checkBoxData, setCheckBoxData] = useState([]);
   const axial_ref = useRef();
@@ -31,6 +31,14 @@ function VisualizationPage() {
   const location = useLocation();
 
   useEffect(() => {
+    if (NV){
+      console.log("HAS NV");
+      console.log(NV);
+    }
+    else {  
+      console.log("NO NV");
+      console.log(NV);
+    }
     const fetchNiftiFilesForCornerstoneAndNV = async () => {
       const state = location.state; 
       if (!state){
@@ -43,11 +51,9 @@ function VisualizationPage() {
       setSessionKey(sessionKey);
       const masks = fileInfo.masks;
       const _checkBoxData = masks.map((filename, i) => {
-        console.log(filename, i);
         return {label: filenameToName(filename), id: i+1}
       })
       _checkBoxData.unshift({label: "Default (All)", id: 0})
-      console.log(_checkBoxData);
       setCheckBoxData(_checkBoxData);
       setCheckState(Array(_checkBoxData.length).fill(true));
 
@@ -116,7 +122,6 @@ function VisualizationPage() {
     if (id !== 0 && checked === false && newCheckState[0] === true) newCheckState[0] = false; //Unchecks All tasks checkbox when making a segmentation transparent
     newCheckState = (id === 0) ? Array(checkBoxData.length).fill(checked) : newCheckState; //Pressing  All button
     setCheckState(newCheckState);
-    console.log(newCheckState);
 }
 
 const navBack = () => {
@@ -150,9 +155,9 @@ const navBack = () => {
         </div>
         <button onClick={navBack}>Back</button>
         <br/>
-        <button onClick={() => {
+        {/* <button onClick={() => {
           console.log(filenameToName('aorta.nii.gz'))
-        }}> Debug </button>
+        }}> Debug </button> */}
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref} >

@@ -1,5 +1,5 @@
 export function filenameToName(filename) {
-    return filename.substring(0, filename.indexOf('.')).replace('_', '');
+    return filename.substring(0, filename.indexOf('.'));
 }
 
 export function arrayIsEqual(arr1, arr2) {

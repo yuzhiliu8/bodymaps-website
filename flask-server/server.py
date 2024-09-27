@@ -36,18 +36,19 @@ def upload():
 @app.route(f'{BASE_PATH}/api/download/<file>', methods=['POST'])
 def download(file):
     sessionKey = request.form['sessionKey']
-    isSegmentation = request.form['isSegmentation']
-    if isSegmentation:
-        path = os.path.join('sessions', sessionKey, 'segmentations', file)
-    else:
-        path = os.path.join('sessions', sessionKey, file)
-    
-    response = make_response(send_file(path, mimetype='application/gzip'))
-    response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
-    response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
-    response.headers['Content-Encoding'] = 'gzip'
+    if os.path.exists(os.path.join('sessions', sessionKey)):
+        isSegmentation = request.form['isSegmentation']
+        if isSegmentation:
+            path = os.path.join('sessions', sessionKey, 'segmentations', file)
+        else:
+            path = os.path.join('sessions', sessionKey, file)
+        
+        response = make_response(send_file(path, mimetype='application/gzip'))
+        response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
+        response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
+        response.headers['Content-Encoding'] = 'gzip'
 
-    return response
+        return response
 
 @app.route(f'{BASE_PATH}/api/mask-data', methods=['POST'])
 def get_mask_data():

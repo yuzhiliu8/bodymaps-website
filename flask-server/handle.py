@@ -1,10 +1,11 @@
 import nibabel as nib
 import numpy as np
-from constants import main_nifti_filename, reportScreenNames, organ_ids_volumeNA
+from constants import main_nifti_filename, organ_ids_volumeNA, EROSION_PIXELS
+from utils import removeFileExt
 import scipy.ndimage as ndimage
 import os
 
-EROSION_PIXELS = 4
+
 cube_len = (2 * EROSION_PIXELS) + 1
 structuring_element = np.ones([cube_len, cube_len, cube_len], dtype=bool)
 
@@ -35,7 +36,7 @@ def processMasks(sessionKey):
     organ_ids = os.listdir(os.path.join('sessions', sessionKey, 'segmentations'))
     for i in range(len(organ_ids)):
         organ_data = {}
-        organ_data['id'] = reportScreenNames[i]
+        organ_data['id'] = removeFileExt(organ_ids[i])
         img = nib.load(os.path.join('sessions', sessionKey, 'segmentations', organ_ids[i]))
         img_data = img.get_fdata()
         state = getCalcVolumeState(img_data, organ_ids[i])
