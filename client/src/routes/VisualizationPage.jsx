@@ -5,7 +5,7 @@ import { setVisibilities, renderVisualization } from '../helpers/helpers';
 import ReportScreen from '../components/ReportScreen/ReportScreen';
 import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
 import { create3DVolume, updateOpacities } from '../helpers/Volume3D';
-import { trueCheckState, case1, API_ORIGIN } from '../helpers/constants';
+import { API_ORIGIN } from '../helpers/constants';
 import { filenameToName } from '../helpers/util';
 import './VisualizationPage.css';
 
@@ -22,7 +22,7 @@ function VisualizationPage() {
   const axial_ref = useRef();
   const sagittal_ref = useRef();
   const coronal_ref = useRef();
-  const render_ref = useRef();
+  const render_ref = useRef(null);
 
   const TaskMenu_ref = useRef(null);
   const ReportScreen_ref = useRef(null);
