@@ -1,10 +1,8 @@
 import React from 'react'
-import { useRef, useEffect } from 'react';
-
 
 import './ReportScreenItem.css';
 
-function ReportScreenItem({ tissue, crossSectionArea, meanHU, isHeader}) {
+function ReportScreenItem({ tissue, crossSectionArea, meanHU }) {
 
   return (
     <div className="ReportScreenItem">

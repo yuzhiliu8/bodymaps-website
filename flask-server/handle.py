@@ -5,9 +5,12 @@ from utils import removeFileExt
 import scipy.ndimage as ndimage
 import os
 
+# ****** CONSTANTS ********
+DECIMAL_PRECISION_VOLUME = 2
+DECIMAL_PRECISION_HU = 1
 
 cube_len = (2 * EROSION_PIXELS) + 1
-structuring_element = np.ones([cube_len, cube_len, cube_len], dtype=bool)
+STRUCTURING_ELEMENT = np.ones([cube_len, cube_len, cube_len], dtype=bool)
 
 def voxelThreshold(slice):
     num_voxels = len(slice[slice > 0])
@@ -41,19 +44,19 @@ def processMasks(sessionKey):
         img_data = img.get_fdata()
         state = getCalcVolumeState(img_data, organ_ids[i])
         if state == "complete":
-            volume_cm = round(float(nib.imagestats.mask_volume(img)/1000), 2)
+            volume_cm = round(float(nib.imagestats.mask_volume(img)/1000), DECIMAL_PRECISION_VOLUME)
             organ_data['volume_cm'] = volume_cm
         elif state == "incomplete":
             organ_data['volume_cm'] = "Incomplete organ"
         elif state == "NA":
             organ_data['volume_cm'] = "N/A"
         
-        erosion_data = ndimage.binary_erosion(img_data, structure=structuring_element)
+        erosion_data = ndimage.binary_erosion(img_data, structure=STRUCTURING_ELEMENT)
         hu_values = ct[erosion_data > 0]
         if len(hu_values) == 0:
             organ_data['mean_hu'] = 'N/A'
         else:
-            mean_hu = round(float(np.mean(hu_values)), 2)
+            mean_hu = round(float(np.mean(hu_values)), DECIMAL_PRECISION_HU)
             organ_data['mean_hu'] = mean_hu 
 
         data['data'].append(organ_data)
