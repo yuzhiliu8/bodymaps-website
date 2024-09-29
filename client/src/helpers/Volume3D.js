@@ -33,15 +33,16 @@ export async function create3DVolume(canvasRef, segmentationInfos){
     return nv;
 }
 
-export function updateOpacities(nv, checkState){
+export function updateVisibilities(nv, checkState){         //Visible or not visible, 0 or 1
     if (nv.volumes && checkState){
         for (let i = 1; i < checkState.length; i++){ //start at 1 bc only checking segmentations
             nv.volumes[i-1].opacity = checkState[i]; 
         }
         nv.updateGLVolume();
     }
-    
 }
 
-
+export function updateGeneralOpacity(canvasRef, opacityValue){ //for all volumes, continuous opacity values
+    canvasRef.current.style.opacity = opacityValue;
+}
     

@@ -21,6 +21,7 @@ function ReportScreen({ sessionKey }) {
         }
         return response.json()
       }).then((data) => {
+        console.log(data);
         setMaskData(data);
       })
     }

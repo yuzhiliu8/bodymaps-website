@@ -1,11 +1,12 @@
 import React from 'react'
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
-import { setVisibilities, renderVisualization } from '../helpers/helpers';
+import { setVisibilities, renderVisualization, setToolGroupOpacity } from '../helpers/helpers';
 import ReportScreen from '../components/ReportScreen/ReportScreen';
 import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
-import { create3DVolume, updateOpacities } from '../helpers/Volume3D';
-import { trueCheckState, case1, API_ORIGIN } from '../helpers/constants';
+import OpacitySlider from '../components/OpacitySlider/OpacitySlider';
+import { create3DVolume, updateVisibilities, updateGeneralOpacity } from '../helpers/Volume3D';
+import {  API_ORIGIN, DEFAULT_SEGMENTATION_OPACITY } from '../helpers/constants';
 import { filenameToName } from '../helpers/util';
 import './VisualizationPage.css';
 
@@ -19,6 +20,7 @@ function VisualizationPage() {
   const [NV, setNV] = useState();
   const [sessionKey, setSessionKey] = useState(undefined);
   const [checkBoxData, setCheckBoxData] = useState([]);
+  const [opacityValue, setOpacityValue] = useState(DEFAULT_SEGMENTATION_OPACITY*100);
   const axial_ref = useRef();
   const sagittal_ref = useRef();
   const coronal_ref = useRef();
@@ -90,7 +92,7 @@ function VisualizationPage() {
     if (segmentationRepresentationUIDs && checkState && NV){
       console.log('update visibility');
       setVisibilities(segmentationRepresentationUIDs, checkState);
-      updateOpacities(NV, checkState);
+      updateVisibilities(NV, checkState);
     }
   }, [segmentationRepresentationUIDs, checkState, NV])
 
@@ -124,6 +126,15 @@ function VisualizationPage() {
     setCheckState(newCheckState);
 }
 
+  const handleOpacityChange = (event) => {
+    const _opacityValue = event.target.value;
+    setOpacityValue(_opacityValue);
+    setToolGroupOpacity(_opacityValue/100);
+    updateGeneralOpacity(render_ref, _opacityValue/100);
+  }
+
+
+
 const navBack = () => {
   const formData = new FormData()
   formData.append('sessionKey', sessionKey)
@@ -146,6 +157,7 @@ const navBack = () => {
           <div className="dropdown">
             <div className="dropdown-header" onClick={showTaskMenu}>Selected Task</div>
             <NestedCheckBox checkBoxData={checkBoxData} innerRef={TaskMenu_ref} checkState={checkState} update={update} />
+            <OpacitySlider opacityValue={opacityValue} handleOpacityChange={handleOpacityChange}/>
           </div>
         </div>
         <div className="report-container">
