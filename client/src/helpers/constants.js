@@ -1,5 +1,7 @@
 export const API_ORIGIN = import.meta.env.VITE_API_ORIGIN;
 
+export const DEFAULT_SEGMENTATION_OPACITY = 0.60;
+
 const RED = [230, 25, 75, 255];
 const BLUE = [0, 130, 200, 255];
 const MAROON = [128, 0, 0, 255];
@@ -94,7 +96,4 @@ export const NVcolorMaps = [
     },
 ]
 
-export const trueCheckState = [true];
-export const case1 = '[false,true,true,true,true,true,true,true,true,true]';
-export const organ_ids = ['aorta', 'gall_bladder', 'kidney_left', 'kidney_right', 'liver', 'pancreas', 'postcava', 'spleen', 'stomach']
 export const accepted_exts = ['.nii.gz', '.nii']

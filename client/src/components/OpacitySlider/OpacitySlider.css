@@ -1,0 +1,27 @@
+.op-slider{
+    margin:5px 10px;
+}
+
+
+.opacity-slider-label{
+    font-size:20px;
+    text-align:left;
+}
+
+.op-slider-container{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 10px;
+}
+
+.slider-value-label{
+    height:20px;
+    width:30px;
+}
+
+.slider{
+    width:80%;
+    margin: 0 20px;
+    
+}

@@ -12,17 +12,18 @@ import {
 import {
   init as csTools3dInit,
   StackScrollMouseWheelTool,
+  ZoomTool,
+  PanTool,
   ToolGroupManager,
   addTool,
   Enums as csToolsEnums, 
   SegmentationDisplayTool,
   segmentation,
-  TrackballRotateTool,
   state as csToolState
 }from '@cornerstonejs/tools';
 
 import { cornerstoneNiftiImageVolumeLoader } from '@cornerstonejs/nifti-volume-loader';
-import { defaultColors } from './constants';
+import { defaultColors, DEFAULT_SEGMENTATION_OPACITY  } from './constants';
 import { createAndCacheVolumesFromArrayBuffers } from './createCSVolumes';
 
 
@@ -31,12 +32,12 @@ const toolGroup3DId = "3DToolGroup";
 const renderingEngineId = "myRenderingEngine";
 
 const DEFAULT_SEGMENTATION_CONFIG = {
-  fillAlpha: 0.5,
-  fillAlphaInactive: 0.5,
-  outlineOpacity: 0,
-  outlineOpacityInactive: 0,
-  outlineWidth: 0,
-  outlineWidthInactive: 0,
+  fillAlpha: DEFAULT_SEGMENTATION_OPACITY,
+  fillAlphaInactive: DEFAULT_SEGMENTATION_OPACITY,
+  outlineOpacity: DEFAULT_SEGMENTATION_OPACITY,
+  outlineOpacityInactive: DEFAULT_SEGMENTATION_OPACITY,
+  outlineWidth: 3,
+  outlineWidthInactive: 3,
 };
 
 const toolGroupSpecificRepresentationConfig = {
@@ -60,25 +61,23 @@ export async function renderVisualization(ref1, ref2, ref3, segmentationBuffers,
 
   
   addToolsToCornerstone();  
-  const [toolGroup, toolGroup3D] = createToolGroups();
+  const toolGroup = createToolGroup();
 
   toolGroup.addTool(StackScrollMouseWheelTool.toolName);
   toolGroup.addTool(SegmentationDisplayTool.toolName);
+  toolGroup.addTool(ZoomTool.toolName);
+  toolGroup.addTool(PanTool.toolName);
 
   toolGroup.setToolActive(StackScrollMouseWheelTool.toolName);
   toolGroup.setToolEnabled(SegmentationDisplayTool.toolName);
 
-  toolGroup3D.addTool(TrackballRotateTool.toolName);
-  toolGroup3D.addTool(StackScrollMouseWheelTool.toolName);
-
-  toolGroup3D.setToolActive(TrackballRotateTool.toolName, {
-    bindings: [
-      {
-        mouseButton: csToolsEnums.MouseBindings.Primary,
-      },
-    ],
+  toolGroup.setToolActive(PanTool.toolName, {
+    bindings: [{mouseButton: csToolsEnums.MouseBindings.Primary}],
   });
-  toolGroup.setToolActive(StackScrollMouseWheelTool.toolName);
+
+  toolGroup.setToolActive(ZoomTool.toolName, {
+    bindings: [{ mouseButton: csToolsEnums.MouseBindings.Secondary}],
+  });
 
   volumeLoader.registerVolumeLoader('nifti', cornerstoneNiftiImageVolumeLoader);
 
@@ -181,18 +180,18 @@ export async function renderVisualization(ref1, ref2, ref3, segmentationBuffers,
 
 function addToolsToCornerstone(){
   const addedTools = csToolState.tools;
+  console.log(addedTools);
   if (!addedTools.StackScrollMouseWheel) addTool(StackScrollMouseWheelTool);
   if (!addedTools.SegmentationDisplay) addTool(SegmentationDisplayTool);
-  if (!addedTools.TrackballRotate) addTool(TrackballRotateTool);
+  if (!addedTools.Zoom) addTool(ZoomTool);
+  if (!addedTools.Pan) addTool(PanTool);
 }
 
-function createToolGroups(){
+function createToolGroup(){
   ToolGroupManager.destroyToolGroup(toolGroupId);
-  ToolGroupManager.destroyToolGroup(toolGroup3DId);
   const toolGroup = ToolGroupManager.createToolGroup(toolGroupId);
-  const toolGroup3D = ToolGroupManager.createToolGroup(toolGroup3DId);
-  return [toolGroup, toolGroup3D];
-}
+  return toolGroup;
+} 
 
 let i = 0;
 export const debug = async () => {
@@ -205,3 +204,21 @@ export function setVisibilities(segRepUIDs, checkState){
     i++;
   });
 };
+
+
+export function setToolGroupOpacity(opacityValue){
+  const newSegConfig = { ...DEFAULT_SEGMENTATION_CONFIG };
+  newSegConfig.fillAlpha = opacityValue;
+  newSegConfig.fillAlphaInactive = opacityValue;
+  newSegConfig.outlineOpacity = opacityValue;
+  newSegConfig.outlineOpacityInactive = opacityValue;
+
+  const newToolGroupConfig = {
+    renderInactiveSegmentations: true,
+    representations: {
+      [csToolsEnums.SegmentationRepresentations.Labelmap]: newSegConfig
+    },
+  };
+
+  segmentation.config.setToolGroupSpecificConfig(toolGroupId, newToolGroupConfig);
+}
