@@ -126,11 +126,17 @@ function VisualizationPage() {
     setCheckState(newCheckState);
 }
 
-  const handleOpacityChange = (event) => {
+  const handleOpacityOnSliderChange = (event) => {
     const _opacityValue = event.target.value;
     setOpacityValue(_opacityValue);
     setToolGroupOpacity(_opacityValue/100);
     updateGeneralOpacity(render_ref, _opacityValue/100);
+  }
+
+  const handleOpacityOnFormSubmit = (value) => {
+    setOpacityValue(value);
+    setToolGroupOpacity(value/100);
+    updateGeneralOpacity(render_ref, value/100);
   }
 
 
@@ -157,7 +163,7 @@ const navBack = () => {
           <div className="dropdown">
             <div className="dropdown-header" onClick={showTaskMenu}>Selected Task</div>
             <NestedCheckBox checkBoxData={checkBoxData} innerRef={TaskMenu_ref} checkState={checkState} update={update} />
-            <OpacitySlider opacityValue={opacityValue} handleOpacityChange={handleOpacityChange}/>
+            <OpacitySlider opacityValue={opacityValue} handleOpacityOnSliderChange={handleOpacityOnSliderChange} handleOpacityOnFormSubmit={handleOpacityOnFormSubmit}/>
           </div>
         </div>
         <div className="report-container">
