@@ -37,6 +37,7 @@ def processMasks(sessionKey):
     data = {"data": []}
     ct = nib.load(os.path.join('sessions', sessionKey, main_nifti_filename)).get_fdata()
     organ_ids = os.listdir(os.path.join('sessions', sessionKey, 'segmentations'))
+    print(organ_ids)
     for i in range(len(organ_ids)):
         organ_data = {}
         organ_data['id'] = removeFileExt(organ_ids[i])
