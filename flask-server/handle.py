@@ -5,12 +5,23 @@ from utils import removeFileExt
 import scipy.ndimage as ndimage
 import os
 
-# ****** CONSTANTS ********
 DECIMAL_PRECISION_VOLUME = 2
 DECIMAL_PRECISION_HU = 1
 
 cube_len = (2 * EROSION_PIXELS) + 1
 STRUCTURING_ELEMENT = np.ones([cube_len, cube_len, cube_len], dtype=bool)
+
+def combine_labels(files, session_key):
+    filenames = list(files.keys())
+    filenames.remove('MAIN_NIFTI')
+    base = os.path.join('sessions', session_key) #base dir path 
+    os.makedirs(os.path.join(base, 'segmentations'))
+    main_nifti = files['MAIN_NIFTI']
+    main_nifti.save(os.path.join(base, main_nifti_filename))
+    print(filenames)
+    aorta = files['aorta.nii.gz']
+    nib.Nifti1Image.from_bytes(aorta.read())
+    return 
 
 def voxelThreshold(slice):
     num_voxels = len(slice[slice > 0])

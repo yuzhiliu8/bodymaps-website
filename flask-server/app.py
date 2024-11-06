@@ -1,6 +1,6 @@
 from flask import Flask, send_file, make_response, request, jsonify
 from flask_cors import CORS
-from handle import processMasks
+from handle import processMasks, combine_labels
 from constants import main_nifti_filename, BASE_PATH
 import secrets
 import os
@@ -14,21 +14,17 @@ def generate_session_key(length=32):
 
 @app.route(f'{BASE_PATH}/api', methods=['GET'])
 def api():
-    return "api"
+    return "api home"
 
 @app.route(f'{BASE_PATH}/api/upload', methods= ['POST'])
 def upload():
     session_key = generate_session_key(length=32)
     files = request.files
-    filenames = list(files.keys())
-    filenames.remove('MAIN_NIFTI')
-    base = os.path.join('sessions', session_key, ) #base dir path 
-    os.makedirs(os.path.join(base, 'segmentations'))
-    main_nifti = files['MAIN_NIFTI']
-    main_nifti.save(os.path.join(base, main_nifti_filename))
-    for filename in filenames:
-        file = files[filename]
-        file.save(os.path.join(base, 'segmentations', filename))
+    combine_labels(files, session_key)
+    
+    # for filename in filenames:
+    #     file = files[filename]
+    #     file.save(os.path.join(base, 'segmentations', filename))
 
     return session_key
     
