@@ -1,7 +1,8 @@
 from flask import Blueprint, Flask, send_file, make_response, request, jsonify
 from services.nifti_processor import NiftiProcessor
+from services.session_manager import SessionManager
+from constants import Constants
 import shutil
-import secrets
 import os
 
 
@@ -11,14 +12,25 @@ api_blueprint = Blueprint('api', __name__)
 def home():
     return "api"
 
-def generate_session_key(length=32):
-    return secrets.token_hex(length)
 
 @api_blueprint.route(f'/upload', methods= ['POST'])
 def upload():
-    session_key = generate_session_key(length=32)
+    #if MAIN_NIFTI
+    session_manager = SessionManager.instance()
+    session_key = session_manager.generate_session_key()
+    print(session_key)
     files = request.files
-    # combine_labels(files, session_key)  REFACTOR
+    filenames = list(files)
+    main_nifti = files[Constants.MAIN_NIFTI_FORM_NAME]
+    filenames.remove(Constants.MAIN_NIFTI_FORM_NAME)
+    print(filenames)
+    base_path = os.path.join(Constants.SESSIONS_DIR_NAME, session_key)
+    os.makedirs(os.path.join(base_path, 'segmentations'), exist_ok=True)
+    main_nifti.save(os.path.join(base_path, Constants.MAIN_NIFTI_FILENAME))
+    for filename in filenames:
+        segmentation = files[filename]
+        segmentation.save(os.path.join(base_path, 'segmentations', filename))
+        print(filename)
     
     # for filename in filenames:
     #     file = files[filename]

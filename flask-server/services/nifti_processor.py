@@ -14,7 +14,6 @@ class NiftiProcessor:
 
         self.set_ct_data()
 
-        print('NiftiProcessor')
     
     def set_ct_data(self):
         pass
@@ -32,3 +31,5 @@ class NiftiProcessor:
     @staticmethod
     def combine_labels(nifti_files):
         pass
+
+    
