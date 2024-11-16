@@ -8,6 +8,10 @@ import OpacitySlider from '../components/OpacitySlider/OpacitySlider';
 import { create3DVolume, updateVisibilities, updateGeneralOpacity } from '../helpers/Volume3D';
 import {  API_ORIGIN, DEFAULT_SEGMENTATION_OPACITY } from '../helpers/constants';
 import { filenameToName } from '../helpers/util';
+import { init as csRenderInit } from "@cornerstonejs/core"
+import { init as csToolsInit } from "@cornerstonejs/tools"
+
+
 import './VisualizationPage.css';
 
 
@@ -33,6 +37,7 @@ function VisualizationPage() {
   const location = useLocation();
 
   useEffect(() => {
+
     if (NV){
       console.log("HAS NV");
       console.log(NV);
@@ -48,9 +53,14 @@ function VisualizationPage() {
         navigate('/');
         return;
       }
+
+      await csRenderInit();
+      await csToolsInit();
+
       const sessionKey = state.sessionKey;
       const fileInfo = state.fileInfo;
       setSessionKey(sessionKey);
+
       const masks = fileInfo.masks;
       const _checkBoxData = masks.map((filename, i) => {
         return {label: filenameToName(filename), id: i+1}
@@ -61,27 +71,27 @@ function VisualizationPage() {
 
       const formData = new FormData();
       formData.append('sessionKey', sessionKey);
-      formData.append('isSegmentation', true);
+      formData.append('isSegmentation', true); 
  
-      const segmentationBuffers = await Promise.all(masks.map(async (mask) => {
-        const response = await fetch(`${API_ORIGIN}/api/download/${mask}`, {
-          method: 'POST',
-          body: formData,
-        });
-        const buffer = await response.arrayBuffer();
-        return {
-          volumeId: mask,
-          buffer: buffer
-        }
-      }));
+      // const segmentationBuffers = await Promise.all(masks.map(async (mask) => {
+      //   const response = await fetch(`${API_ORIGIN}/api/download/${mask}`, {
+      //     method: 'POST',
+      //     body: formData,
+      //   });
+      //   const buffer = await response.arrayBuffer();
+      //   return {
+      //     volumeId: mask,
+      //     buffer: buffer
+      //   }
+      // }));
 
-      const mainNifti = fileInfo.MAIN_NIFTI;
-      const mainNiftiURL = URL.createObjectURL(mainNifti);
+      // const mainNifti = fileInfo.MAIN_NIFTI;
+      // const mainNiftiURL = URL.createObjectURL(mainNifti);
 
-      renderVisualization(axial_ref, sagittal_ref, coronal_ref, segmentationBuffers, mainNiftiURL)
+      await renderVisualization(axial_ref, sagittal_ref, coronal_ref, sessionKey)
       .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
-      const nv = await create3DVolume(render_ref, segmentationBuffers);
-      setNV(nv);
+      // const nv = await create3DVolume(render_ref, segmentationBuffers);
+      // setNV(nv);
     }
 
     fetchNiftiFilesForCornerstoneAndNV();

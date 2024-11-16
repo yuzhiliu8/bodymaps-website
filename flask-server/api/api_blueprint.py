@@ -1,4 +1,4 @@
-from flask import Blueprint, Flask, send_file, make_response, request, jsonify
+from flask import Blueprint, send_file, make_response, request, jsonify
 from services.nifti_processor import NiftiProcessor
 from services.session_manager import SessionManager
 from constants import Constants
@@ -43,20 +43,17 @@ def upload():
     return session_key
     
 
-@api_blueprint.route('/download/<file>', methods=['POST'])
-def download(file):
-    sessionKey = request.form['sessionKey']
-    if os.path.exists(os.path.join('sessions', sessionKey)):
-        isSegmentation = request.form['isSegmentation']
-        if isSegmentation:
-            path = os.path.join('sessions', sessionKey, 'segmentations', file)
-        else:
-            path = os.path.join('sessions', sessionKey, file)
-        
-        response = make_response(send_file(path, mimetype='application/gzip'))
+@api_blueprint.route('/get-main-nifti/<session_key>', methods=['GET'])
+def download(session_key):
+
+    if os.path.exists(os.path.join('sessions', session_key)): #validate session
+
+        path = os.path.join('sessions', session_key, Constants.MAIN_NIFTI_FILENAME)
+        response = make_response(send_file(path, mimetype='application/octet-stream'))
         response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
         response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
         response.headers['Content-Encoding'] = 'gzip'
+        response.headers['Content-Type'] = 'application/octet-stream'
 
         return response
 

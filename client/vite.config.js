@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import fs from 'fs'
 
 function customHeadersPlugin() {
   return {
@@ -31,9 +30,9 @@ export default defineConfig({
       // secure: false,
     }
   },
-  resolve: {
-    alias: {
-      "@cornerstonejs/tools": "@cornerstonejs/tools/dist/umd/index.js"
-    },
-  },
+  // resolve: {
+  //   alias: {
+  //     "@cornerstonejs/tools": "@cornerstonejs/tools/dist/umd/index.js"
+  //   },
+  // },
 });
