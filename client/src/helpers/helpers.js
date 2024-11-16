@@ -23,9 +23,8 @@ import {
 }from '@cornerstonejs/tools';
 
 import { cornerstoneNiftiImageVolumeLoader } from '@cornerstonejs/nifti-volume-loader';
-import { defaultColors, DEFAULT_SEGMENTATION_OPACITY  } from './constants';
+import { defaultColors, DEFAULT_SEGMENTATION_OPACITY, APP_CONSTANTS  } from './constants';
 import { createAndCacheVolumesFromArrayBuffers } from './createCSVolumes';
-
 
 const toolGroupId = "myToolGroup";
 const toolGroup3DId = "3DToolGroup";
@@ -34,10 +33,10 @@ const renderingEngineId = "myRenderingEngine";
 const DEFAULT_SEGMENTATION_CONFIG = {
   fillAlpha: DEFAULT_SEGMENTATION_OPACITY,
   fillAlphaInactive: DEFAULT_SEGMENTATION_OPACITY,
-  outlineOpacity: DEFAULT_SEGMENTATION_OPACITY,
-  outlineOpacityInactive: DEFAULT_SEGMENTATION_OPACITY,
-  outlineWidth: 3,
-  outlineWidthInactive: 3,
+  outlineOpacity: 1,
+  outlineWidth: 1,
+  renderOutline: false,
+  
 };
 
 const toolGroupSpecificRepresentationConfig = {
@@ -98,6 +97,26 @@ export async function renderVisualization(ref1, ref2, ref3, segmentationBuffers,
   
   const volume = await volumeLoader.createAndCacheVolume(volumeId);
 
+  const customColorLUT = {
+    0: [0, 0, 0, 0],       // transparent for background
+    1: APP_CONSTANTS.RED,
+    2: APP_CONSTANTS.BLUE,   
+    3: APP_CONSTANTS.MAROON,   
+    4: APP_CONSTANTS.BROWN,
+    5: APP_CONSTANTS.OLIVE,
+    6: APP_CONSTANTS.TEAL,
+    7: APP_CONSTANTS.PURPLE,
+    8: APP_CONSTANTS.MAGENTA,
+    9: APP_CONSTANTS.LIME,
+    // Add more mappings as needed
+  };
+
+  const colorLUT = [];
+  // Fill the colorLUT array with your custom colors
+  Object.keys(customColorLUT).forEach(value => {
+    colorLUT[value] = customColorLUT[value];
+  });
+
   const segmentationInputArray = []
   const segRepInputArray = []
   segmentationBuffers.forEach((segInfo, i) => {
@@ -117,10 +136,7 @@ export async function renderVisualization(ref1, ref2, ref3, segmentationBuffers,
         segmentationId: organId,
         type: csToolsEnums.SegmentationRepresentations.Labelmap,
         options: {
-          colorLUTOrIndex: [
-            defaultColors[i],
-            defaultColors[i], 
-          ],
+          colorLUTOrIndex: colorLUT,
         },
       });
   });

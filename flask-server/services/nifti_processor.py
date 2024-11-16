@@ -25,11 +25,11 @@ class NiftiProcessor:
     def calculate_mean_hu(self):
         pass
 
-    
-
-
-    @staticmethod
-    def combine_labels(nifti_files):
+    def combine_labels(self, nifti_files, filenames):
         pass
+
+
+    def __str__(self):
+        return f"NiftiProcessor Object for session {self._session_key}"
 
     

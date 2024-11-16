@@ -16,17 +16,21 @@ def home():
 @api_blueprint.route(f'/upload', methods= ['POST'])
 def upload():
     #if MAIN_NIFTI
+    #validate API KEY/Authentication
+
     session_manager = SessionManager.instance()
     session_key = session_manager.generate_session_key()
-    print(session_key)
+    nifti_processor = NiftiProcessor(session_key)
+    print(nifti_processor)
+
     files = request.files
     filenames = list(files)
     main_nifti = files[Constants.MAIN_NIFTI_FORM_NAME]
     filenames.remove(Constants.MAIN_NIFTI_FORM_NAME)
-    print(filenames)
     base_path = os.path.join(Constants.SESSIONS_DIR_NAME, session_key)
     os.makedirs(os.path.join(base_path, 'segmentations'), exist_ok=True)
     main_nifti.save(os.path.join(base_path, Constants.MAIN_NIFTI_FILENAME))
+    
     for filename in filenames:
         segmentation = files[filename]
         segmentation.save(os.path.join(base_path, 'segmentations', filename))

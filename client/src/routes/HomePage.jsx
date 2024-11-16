@@ -107,7 +107,7 @@ export default function HomePage() {
           </div>
           <input className="fileInput" type="file" onChange={handleUpload}/>
         </div>
-        <button onClick={() => {
+        {/* <button onClick={() => {
           if (nifti.name && masks){ 
             try {
               const formData = new FormData();    
@@ -135,7 +135,7 @@ export default function HomePage() {
               console.error(error.message);
             }
           }
-        }}> Debug </button>
+        }}> Debug </button> */}
         <div className="note">
           By using this online service ​<br/> you agree that the data can be used to improve the model.​
         </div>

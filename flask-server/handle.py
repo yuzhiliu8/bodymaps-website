@@ -24,7 +24,7 @@ import os
 
 def voxelThreshold(slice):
     num_voxels = len(slice[slice > 0])
-    return num_voxels < 100
+    return num_voxels < Constants.VOXEL_THRESHOLD
 
 def getCalcVolumeState(img_data, organ):
     if organ in Constants.organ_ids_volumeNA:
