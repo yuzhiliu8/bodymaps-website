@@ -11,6 +11,18 @@ const TEAL = [0, 128, 128, 255];
 const PURPLE = [145, 30, 180, 255];
 const MAGENTA = [240, 50, 230, 255];
 const LIME = [50, 205, 50, 255];
+
+export const APP_CONSTANTS = {};
+APP_CONSTANTS.RED = RED;
+APP_CONSTANTS.BLUE = BLUE;
+APP_CONSTANTS.MAROON = MAROON;
+APP_CONSTANTS.BROWN = BROWN;
+APP_CONSTANTS.OLIVE = OLIVE;
+APP_CONSTANTS.TEAL = TEAL;
+APP_CONSTANTS.PURPLE = PURPLE;
+APP_CONSTANTS.MAGENTA = MAGENTA;
+APP_CONSTANTS.LIME = LIME;
+
 export const defaultColors = [RED, BLUE, MAROON, BROWN, OLIVE, TEAL, PURPLE, MAGENTA, LIME];
 export const NVcolorMaps = [
     {
@@ -97,3 +109,4 @@ export const NVcolorMaps = [
 ]
 
 export const accepted_exts = ['.nii.gz', '.nii']
+

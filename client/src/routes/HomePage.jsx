@@ -79,14 +79,8 @@ export default function HomePage() {
       } catch (error) {
         console.error(error.message);
       }
-      
-    
     }
-
   }, [nifti, masks]);
-
-
-
 
   return (
     <div className="HomePage">
@@ -113,6 +107,35 @@ export default function HomePage() {
           </div>
           <input className="fileInput" type="file" onChange={handleUpload}/>
         </div>
+        {/* <button onClick={() => {
+          if (nifti.name && masks){ 
+            try {
+              const formData = new FormData();    
+              formData.append('MAIN_NIFTI', nifti)
+              masks.forEach((file) => { 
+                formData.append(file.name, file) 
+              }) 
+              fetch(`${API_ORIGIN}/api/upload`, { method: 'POST', body: formData})
+              .then((response) => {
+                if (!response.ok){
+                  throw new Error("Could not connect to server");
+                }
+                return response.text();
+              }) 
+              .then((sessionKey) => {
+                const fileNames = masks.map((mask) => {
+                  return mask.name;
+                });
+              const fileInfo = {};
+              fileInfo.MAIN_NIFTI = nifti;
+              fileInfo.masks = fileNames;
+              // navigate('/visualization', {state: {sessionKey: sessionKey, fileInfo: fileInfo}});   
+              });
+            } catch (error) {
+              console.error(error.message);
+            }
+          }
+        }}> Debug </button> */}
         <div className="note">
           By using this online service ​<br/> you agree that the data can be used to improve the model.​
         </div>
