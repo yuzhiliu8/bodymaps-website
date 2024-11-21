@@ -14,6 +14,7 @@ class Constants:
     BASE_PATH = os.environ['BASE_PATH']
     MAIN_NIFTI_FORM_NAME = 'MAIN_NIFTI'  #main nifti file in Form Data
     MAIN_NIFTI_FILENAME = 'ct.nii.gz'
+    SEGMENTATIONS_NIFTI_FILENAME = 'combined_labels.nii.gz'
     #db variables
     DB_CONNECTION_STRING = os.environ['DB_CONNECTION_STRING']
 

@@ -23,18 +23,20 @@ def upload():
     nifti_processor = NiftiProcessor(session_key)
     print(nifti_processor)
 
-    files = request.files
-    filenames = list(files)
-    main_nifti = files[Constants.MAIN_NIFTI_FORM_NAME]
+    nifti_files = request.files
+    filenames = list(nifti_files)
+    main_nifti = nifti_files[Constants.MAIN_NIFTI_FORM_NAME]
     filenames.remove(Constants.MAIN_NIFTI_FORM_NAME)
     base_path = os.path.join(Constants.SESSIONS_DIR_NAME, session_key)
     os.makedirs(os.path.join(base_path, 'segmentations'), exist_ok=True)
     main_nifti.save(os.path.join(base_path, Constants.MAIN_NIFTI_FILENAME))
+
+    combined_labels = nifti_processor.combine_labels(filenames, nifti_files)
     
-    for filename in filenames:
-        segmentation = files[filename]
-        segmentation.save(os.path.join(base_path, 'segmentations', filename))
-        print(filename)
+    # for filename in filenames:
+    #     # segmentation = files[filename]
+    #     # segmentation.save(os.path.join(base_path, 'segmentations', filename))
+    #     print(filename)
     
     # for filename in filenames:
     #     file = files[filename]
@@ -54,6 +56,32 @@ def download(file):
             path = os.path.join('sessions', sessionKey, file)
         
         response = make_response(send_file(path, mimetype='application/gzip'))
+        response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
+        response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
+        response.headers['Content-Encoding'] = 'gzip'
+
+        return response
+    
+@api_blueprint.route('/get-main-nifti/<session_key>', methods=['GET'])
+def get_main_nifti(session_key):
+    #validate session_key
+    if os.path.exists(os.path.join(Constants.SESSIONS_DIR_NAME, session_key)):
+        path = os.path.join(Constants.SESSIONS_DIR_NAME, session_key, Constants.MAIN_NIFTI_FILENAME) # /sessions/[session_key]/ct.nii.gz
+        response = make_response(send_file(path, mimetype='application/gzip'))
+
+        response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
+        response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
+        response.headers['Content-Encoding'] = 'gzip'
+
+        return response
+    
+@api_blueprint.route('/get-segmentations/<session_key>', methods=['GET'])
+def get_segmentations(session_key):
+    #validate session_key
+    if os.path.exists(os.path.join(Constants.SESSIONS_DIR_NAME, session_key)):
+        path = os.path.join(Constants.SESSIONS_DIR_NAME, session_key, Constants.MAIN_NIFTI_FILENAME)
+        response = make_response(send_file(path, mimetype='application/gzip'))
+
         response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
         response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
         response.headers['Content-Encoding'] = 'gzip'

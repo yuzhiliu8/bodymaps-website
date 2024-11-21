@@ -1,11 +1,11 @@
 import React from 'react'
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
-import { setVisibilities, renderVisualization, setToolGroupOpacity } from '../helpers/helpers';
+import { setVisibilities, renderVisualization, setToolGroupOpacity } from '../helpers/CornerstoneNifti';
 import ReportScreen from '../components/ReportScreen/ReportScreen';
 import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
 import OpacitySlider from '../components/OpacitySlider/OpacitySlider';
-import { create3DVolume, updateVisibilities, updateGeneralOpacity } from '../helpers/Volume3D';
+import { create3DVolume, updateVisibilities, updateGeneralOpacity } from '../helpers/NiiVueNifti';
 import {  API_ORIGIN, DEFAULT_SEGMENTATION_OPACITY } from '../helpers/constants';
 import { filenameToName } from '../helpers/util';
 import './VisualizationPage.css';
@@ -39,7 +39,7 @@ function VisualizationPage() {
     }
     else {  
       console.log("NO NV");
-      console.log(NV);
+      console.log(NV); 
     }
     const fetchNiftiFilesForCornerstoneAndNV = async () => {
       const state = location.state; 
@@ -50,6 +50,7 @@ function VisualizationPage() {
       }
       const sessionKey = state.sessionKey;
       const fileInfo = state.fileInfo;
+      console.log(state);
       setSessionKey(sessionKey);
       const masks = fileInfo.masks;
       const _checkBoxData = masks.map((filename, i) => {
@@ -78,9 +79,9 @@ function VisualizationPage() {
       const mainNifti = fileInfo.MAIN_NIFTI;
       const mainNiftiURL = URL.createObjectURL(mainNifti);
 
-      renderVisualization(axial_ref, sagittal_ref, coronal_ref, segmentationBuffers, mainNiftiURL)
+      renderVisualization(axial_ref, sagittal_ref, coronal_ref, sessionKey) //async
       .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
-      const nv = await create3DVolume(render_ref, segmentationBuffers);
+      const nv = create3DVolume(render_ref, segmentationBuffers); //async
       setNV(nv);
     }
 
@@ -96,7 +97,7 @@ function VisualizationPage() {
     }
   }, [segmentationRepresentationUIDs, checkState, NV])
 
-  const showTaskMenu = () => {
+  const showTaskMenu = () => { /// CAN USE USESTATE SHOW TRUE/FALSE INSTEAD OF THIS
     if (TaskMenu_ref.current.style.display === "none"){
       TaskMenu_ref.current.style.display = "block"; 
     }
@@ -105,7 +106,7 @@ function VisualizationPage() {
     }
   }
 
-  const showReportScreen = () => {
+  const showReportScreen = () => {          /// CAN USE USESTATE SHOW TRUE/FALSE INSTEAD OF THIS
     if (ReportScreen_ref.current.style.display === "none"){
       ReportScreen_ref.current.style.display = "block";
       VisualizationContainer_ref.current.style.opacity = "25%";

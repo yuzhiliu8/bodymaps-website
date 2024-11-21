@@ -8,7 +8,7 @@ import "./HomePage.css"
 
 
 export default function HomePage() {
-  const [nifti, setNifti] = useState({});
+  const [mainNifti, setMainNifti] = useState({});
   const [masks, setMasks] = useState();
   const navigate = useNavigate();
 
@@ -21,7 +21,7 @@ export default function HomePage() {
 
     const ext = file.name.substring(file.name.indexOf('.'))
     if (accepted_exts.includes(ext)){
-      setNifti(file);
+      setMainNifti(file);
     } else {
       window.alert(`file extension ${ext} not accepted!`);
     }
@@ -51,12 +51,11 @@ export default function HomePage() {
     }
   }
 
-   
-  useEffect(() => {
-    if (nifti.name && masks){ 
+  const setup = () => {
+    if (mainNifti.name && masks){ 
       try {
         const formData = new FormData();    
-        formData.append('MAIN_NIFTI', nifti)
+        formData.append('MAIN_NIFTI', mainNifti)
         masks.forEach((file) => { 
           formData.append(file.name, file) 
         }) 
@@ -72,15 +71,20 @@ export default function HomePage() {
             return mask.name;
           });
         const fileInfo = {};
-        fileInfo.MAIN_NIFTI = nifti;
+        fileInfo.MAIN_NIFTI = mainNifti;
         fileInfo.masks = fileNames;
-        navigate('/visualization', {state: {sessionKey: sessionKey, fileInfo: fileInfo}});   
+        // navigate('/visualization', {state: {sessionKey: sessionKey, fileInfo: fileInfo}});   
         });
       } catch (error) {
         console.error(error.message);
       }
     }
-  }, [nifti, masks]);
+  }
+
+   
+  useEffect(() => {
+    setup();
+  }, [mainNifti, masks]);
 
   return (
     <div className="HomePage">
@@ -98,49 +102,24 @@ export default function HomePage() {
               or Click to Upload
             </div>
             {
-              (typeof nifti.name === "undefined") ? (
+              (typeof mainNifti.name === "undefined") ? (
                 <></>
               ) : (
-                <div> {nifti.name} </div>
+                <div> {mainNifti.name} </div>
               )
             }
           </div>
           <input className="fileInput" type="file" onChange={handleUpload}/>
         </div>
-        {/* <button onClick={() => {
-          if (nifti.name && masks){ 
-            try {
-              const formData = new FormData();    
-              formData.append('MAIN_NIFTI', nifti)
-              masks.forEach((file) => { 
-                formData.append(file.name, file) 
-              }) 
-              fetch(`${API_ORIGIN}/api/upload`, { method: 'POST', body: formData})
-              .then((response) => {
-                if (!response.ok){
-                  throw new Error("Could not connect to server");
-                }
-                return response.text();
-              }) 
-              .then((sessionKey) => {
-                const fileNames = masks.map((mask) => {
-                  return mask.name;
-                });
-              const fileInfo = {};
-              fileInfo.MAIN_NIFTI = nifti;
-              fileInfo.masks = fileNames;
-              // navigate('/visualization', {state: {sessionKey: sessionKey, fileInfo: fileInfo}});   
-              });
-            } catch (error) {
-              console.error(error.message);
-            }
-          }
-        }}> Debug </button> */}
+        
         <div className="note">
           By using this online service ​<br/> you agree that the data can be used to improve the model.​
         </div>
         <br/>
         <div>Upload CT Masks Here: (Development Phase only)</div> <br/>
+        <button onClick={() => {
+          setup();
+        }}> Debug </button>
         <input type="file" multiple onChange={handleMaskUpload}/>
       </div>
     </div>    
