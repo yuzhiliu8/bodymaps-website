@@ -1,9 +1,11 @@
-from flask import Blueprint, Flask, send_file, make_response, request, jsonify
+from flask import Blueprint, send_file, make_response, request, jsonify
 from services.nifti_processor import NiftiProcessor
 from services.session_manager import SessionManager
 from constants import Constants
+
 import shutil
 import os
+import nibabel as nib
 
 
 api_blueprint = Blueprint('api', __name__)
@@ -28,19 +30,13 @@ def upload():
     main_nifti = nifti_files[Constants.MAIN_NIFTI_FORM_NAME]
     filenames.remove(Constants.MAIN_NIFTI_FORM_NAME)
     base_path = os.path.join(Constants.SESSIONS_DIR_NAME, session_key)
-    os.makedirs(os.path.join(base_path, 'segmentations'), exist_ok=True)
+    os.makedirs(base_path, exist_ok=True)
     main_nifti.save(os.path.join(base_path, Constants.MAIN_NIFTI_FILENAME))
 
     combined_labels = nifti_processor.combine_labels(filenames, nifti_files)
-    
-    # for filename in filenames:
-    #     # segmentation = files[filename]
-    #     # segmentation.save(os.path.join(base_path, 'segmentations', filename))
-    #     print(filename)
-    
-    # for filename in filenames:
-    #     file = files[filename]
-    #     file.save(os.path.join(base, 'segmentations', filename))
+    save_path = os.path.join(f'./{Constants.SESSIONS_DIR_NAME}/{session_key}/combined_labels.nii.gz')
+    # print(combined_labels)
+    nib.save(combined_labels, save_path)
 
     return session_key
     
