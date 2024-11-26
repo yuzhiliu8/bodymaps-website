@@ -1,17 +1,14 @@
 import React from 'react'
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
-import { setVisibilities, renderVisualization, setToolGroupOpacity } from '../helpers/helpers';
+import { setVisibilities, renderVisualization, setToolGroupOpacity } from '../helpers/CornerstoneNifti';
 import ReportScreen from '../components/ReportScreen/ReportScreen';
 import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
 import OpacitySlider from '../components/OpacitySlider/OpacitySlider';
-import { create3DVolume, updateVisibilities, updateGeneralOpacity } from '../helpers/Volume3D';
+import { create3DVolume, updateVisibilities, updateGeneralOpacity } from '../helpers/NiiVueNifti';
 import {  API_ORIGIN, DEFAULT_SEGMENTATION_OPACITY } from '../helpers/constants';
 import { filenameToName } from '../helpers/util';
 import './VisualizationPage.css';
-
-
-
 
 
 function VisualizationPage() {
@@ -39,9 +36,9 @@ function VisualizationPage() {
     }
     else {  
       console.log("NO NV");
-      console.log(NV);
+      console.log(NV); 
     }
-    const fetchNiftiFilesForCornerstoneAndNV = async () => {
+    const setup = async () => {
       const state = location.state; 
       if (!state){
         window.alert('No Nifti Files Uploaded!');
@@ -50,6 +47,7 @@ function VisualizationPage() {
       }
       const sessionKey = state.sessionKey;
       const fileInfo = state.fileInfo;
+      console.log(state);
       setSessionKey(sessionKey);
       const masks = fileInfo.masks;
       const _checkBoxData = masks.map((filename, i) => {
@@ -59,32 +57,13 @@ function VisualizationPage() {
       setCheckBoxData(_checkBoxData);
       setCheckState(Array(_checkBoxData.length).fill(true));
 
-      const formData = new FormData();
-      formData.append('sessionKey', sessionKey);
-      formData.append('isSegmentation', true);
- 
-      const segmentationBuffers = await Promise.all(masks.map(async (mask) => {
-        const response = await fetch(`${API_ORIGIN}/api/download/${mask}`, {
-          method: 'POST',
-          body: formData,
-        });
-        const buffer = await response.arrayBuffer();
-        return {
-          volumeId: mask,
-          buffer: buffer
-        }
-      }));
-
-      const mainNifti = fileInfo.MAIN_NIFTI;
-      const mainNiftiURL = URL.createObjectURL(mainNifti);
-
-      renderVisualization(axial_ref, sagittal_ref, coronal_ref, segmentationBuffers, mainNiftiURL)
+      renderVisualization(axial_ref, sagittal_ref, coronal_ref, sessionKey) //async
       .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
-      const nv = await create3DVolume(render_ref, segmentationBuffers);
+      const nv = create3DVolume(render_ref, sessionKey); //async
       setNV(nv);
     }
 
-    fetchNiftiFilesForCornerstoneAndNV();
+    setup();
   }, []);
 
 
@@ -96,7 +75,7 @@ function VisualizationPage() {
     }
   }, [segmentationRepresentationUIDs, checkState, NV])
 
-  const showTaskMenu = () => {
+  const showTaskMenu = () => { /// CAN USE USESTATE SHOW TRUE/FALSE INSTEAD OF THIS
     if (TaskMenu_ref.current.style.display === "none"){
       TaskMenu_ref.current.style.display = "block"; 
     }
@@ -105,7 +84,7 @@ function VisualizationPage() {
     }
   }
 
-  const showReportScreen = () => {
+  const showReportScreen = () => {          /// CAN USE USESTATE SHOW TRUE/FALSE INSTEAD OF THIS
     if (ReportScreen_ref.current.style.display === "none"){
       ReportScreen_ref.current.style.display = "block";
       VisualizationContainer_ref.current.style.opacity = "25%";

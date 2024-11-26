@@ -1,4 +1,5 @@
 import secrets
+from werkzeug.datastructures import FileStorage
 
 class SessionManager(object):
     _instance = None
@@ -16,4 +17,7 @@ class SessionManager(object):
     
     def generate_session_key(self, length=32):
         return secrets.token_hex(length)
+    
+    def validate_session(self, session_key):
+        pass
         

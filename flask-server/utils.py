@@ -1,2 +1,6 @@
-def removeFileExt(filename):
-    return filename[:filename.index('.')]
+
+
+class Utils:
+    @classmethod
+    def removeFileExt(cls, filename):
+        return filename[:filename.index('.')]

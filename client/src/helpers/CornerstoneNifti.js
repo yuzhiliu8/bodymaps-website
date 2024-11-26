@@ -24,11 +24,10 @@ import {
 
 import { cornerstoneNiftiImageVolumeLoader } from '@cornerstonejs/nifti-volume-loader';
 import { defaultColors, DEFAULT_SEGMENTATION_OPACITY, APP_CONSTANTS  } from './constants';
-import { createAndCacheVolumesFromArrayBuffers } from './createCSVolumes';
 
 const toolGroupId = "myToolGroup";
-const toolGroup3DId = "3DToolGroup";
 const renderingEngineId = "myRenderingEngine";
+const segmentationId = "combined_labels";
 
 const DEFAULT_SEGMENTATION_CONFIG = {
   fillAlpha: DEFAULT_SEGMENTATION_OPACITY,
@@ -49,53 +48,31 @@ const toolGroupSpecificRepresentationConfig = {
 
 
 
-export async function renderVisualization(ref1, ref2, ref3, segmentationBuffers, mainNiftiURL){
-  await createAndCacheVolumesFromArrayBuffers(segmentationBuffers);
+export async function renderVisualization(ref1, ref2, ref3, sessionKey){
+  cache.purgeCache();
   csTools3dInit();
   await csInit();
 
   ref1.current.oncontextmenu = (e) => e.preventDefault();
   ref2.current.oncontextmenu = (e) => e.preventDefault();
   ref3.current.oncontextmenu = (e) => e.preventDefault();
-
   
-  addToolsToCornerstone();  
   const toolGroup = createToolGroup();
-
-  toolGroup.addTool(StackScrollMouseWheelTool.toolName);
-  toolGroup.addTool(SegmentationDisplayTool.toolName);
-  toolGroup.addTool(ZoomTool.toolName);
-  toolGroup.addTool(PanTool.toolName);
-
-  toolGroup.setToolActive(StackScrollMouseWheelTool.toolName);
-  toolGroup.setToolEnabled(SegmentationDisplayTool.toolName);
-
-  toolGroup.setToolActive(PanTool.toolName, {
-    bindings: [{mouseButton: csToolsEnums.MouseBindings.Primary}],
-  });
-
-  toolGroup.setToolActive(ZoomTool.toolName, {
-    bindings: [{ mouseButton: csToolsEnums.MouseBindings.Secondary}],
-  });
-
   volumeLoader.registerVolumeLoader('nifti', cornerstoneNiftiImageVolumeLoader);
+  const renderingEngine = createRenderingEngine();
 
-
-  let renderingEngine = getRenderingEngine(renderingEngineId);
-  if (renderingEngine){
-    renderingEngine.destroy();  
-    renderingEngine = new RenderingEngine(renderingEngineId); 
-  } else {
-    renderingEngine = new RenderingEngine(renderingEngineId); 
-  }
-
+  const mainNiftiURL = `${APP_CONSTANTS.API_ORIGIN}/api/get-main-nifti/${sessionKey}`;
   const volumeId = 'nifti:' + mainNiftiURL;
+
   const viewportId1 = 'CT_NIFTI_AXIAL';
   const viewportId2 = 'CT_NIFTI_SAGITTAL';
-  const viewportId3 = 'CT_NIFTI_CORONAL'; 
-
+  const viewportId3 = 'CT_NIFTI_CORONAL';
   
   const volume = await volumeLoader.createAndCacheVolume(volumeId);
+  
+  const segmentationURL = `${APP_CONSTANTS.API_ORIGIN}/api/download/${'combined_labels.nii.gz'}/${sessionKey}`;
+  const combined_labels_Id = 'nifti:' + segmentationURL;
+  const combined_labels = await volumeLoader.createAndCacheVolume(combined_labels_Id);
 
   const customColorLUT = {
     0: [0, 0, 0, 0],       // transparent for background
@@ -116,31 +93,6 @@ export async function renderVisualization(ref1, ref2, ref3, segmentationBuffers,
   Object.keys(customColorLUT).forEach(value => {
     colorLUT[value] = customColorLUT[value];
   });
-
-  const segmentationInputArray = []
-  const segRepInputArray = []
-  segmentationBuffers.forEach((segInfo, i) => {
-    const organId = segInfo.volumeId;
-    segmentation.state.removeSegmentation(organId);
-    segmentationInputArray.push(
-      {
-        segmentationId: organId,
-        representation: {
-          type: csToolsEnums.SegmentationRepresentations.Labelmap,
-          data:{
-            volumeId: organId,
-          },
-        },
-      });
-      segRepInputArray.push({
-        segmentationId: organId,
-        type: csToolsEnums.SegmentationRepresentations.Labelmap,
-        options: {
-          colorLUTOrIndex: colorLUT,
-        },
-      });
-  });
-
 
   const viewportInputArray = [
       {
@@ -186,8 +138,25 @@ export async function renderVisualization(ref1, ref2, ref3, segmentationBuffers,
   renderingEngine.render();
   console.log("volume rendered");
 
-  segmentation.addSegmentations(segmentationInputArray);
-  const segRepUIDs = await segmentation.addSegmentationRepresentations(toolGroupId, segRepInputArray, toolGroupSpecificRepresentationConfig);
+  segmentation.state.removeSegmentation(segmentationId);
+  segmentation.addSegmentations([{
+    segmentationId: segmentationId, 
+    representation: {
+      type: csToolsEnums.SegmentationRepresentations.Labelmap,
+      data:{
+        volumeId: combined_labels_Id,
+      },
+    },
+  }]);
+  const segRepUIDs = await segmentation.addSegmentationRepresentations(
+    toolGroupId, 
+    [{
+      segmentationId: segmentationId, 
+      type: csToolsEnums.SegmentationRepresentations.Labelmap,
+      options: {
+        colorLUTOrIndex: colorLUT,
+      }, 
+    }],toolGroupSpecificRepresentationConfig );
   console.log("labelmaps rendered");
   return segRepUIDs;
 }
@@ -204,21 +173,44 @@ function addToolsToCornerstone(){
 }
 
 function createToolGroup(){
+  addToolsToCornerstone();
   ToolGroupManager.destroyToolGroup(toolGroupId);
   const toolGroup = ToolGroupManager.createToolGroup(toolGroupId);
+
+  toolGroup.addTool(StackScrollMouseWheelTool.toolName);
+  toolGroup.addTool(SegmentationDisplayTool.toolName);
+  toolGroup.addTool(ZoomTool.toolName);
+  toolGroup.addTool(PanTool.toolName);
+
+  toolGroup.setToolActive(StackScrollMouseWheelTool.toolName);
+  toolGroup.setToolEnabled(SegmentationDisplayTool.toolName);
+
+  toolGroup.setToolActive(PanTool.toolName, {
+    bindings: [{mouseButton: csToolsEnums.MouseBindings.Primary}],
+  });
+
+  toolGroup.setToolActive(ZoomTool.toolName, {
+    bindings: [{ mouseButton: csToolsEnums.MouseBindings.Secondary}],
+  });
   return toolGroup;
 } 
 
-let i = 0;
-export const debug = async () => {
-  
+function createRenderingEngine(){
+  let renderingEngine = getRenderingEngine(renderingEngineId);
+  if (renderingEngine){
+    renderingEngine.destroy();  
+    renderingEngine = new RenderingEngine(renderingEngineId); 
+  } else {
+    renderingEngine = new RenderingEngine(renderingEngineId); 
+  }
+  return renderingEngine;
 }
+
 export function setVisibilities(segRepUIDs, checkState){
-  let i = 1;  
-  segRepUIDs.forEach((segRepUID) => {
-    segmentation.config.visibility.setSegmentVisibility(toolGroupId, segRepUID, 1, checkState[i]);
-    i++;
-  });
+  const uid = segRepUIDs[0];
+  for (let i = 1; i < checkState.length; i++){
+    segmentation.config.visibility.setSegmentVisibility(toolGroupId, uid, i, checkState[i]);
+  }
 };
 
 
