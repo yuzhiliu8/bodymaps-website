@@ -1,4 +1,5 @@
 import secrets
+from werkzeug.datastructures import FileStorage
 
 class SessionManager(object):
     _instance = None

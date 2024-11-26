@@ -73,7 +73,7 @@ export default function HomePage() {
         const fileInfo = {};
         fileInfo.MAIN_NIFTI = mainNifti;
         fileInfo.masks = fileNames;
-        // navigate('/visualization', {state: {sessionKey: sessionKey, fileInfo: fileInfo}});   
+        navigate('/visualization', {state: {sessionKey: sessionKey, fileInfo: fileInfo}});   
         });
       } catch (error) {
         console.error(error.message);
@@ -117,9 +117,6 @@ export default function HomePage() {
         </div>
         <br/>
         <div>Upload CT Masks Here: (Development Phase only)</div> <br/>
-        <button onClick={() => {
-          setup();
-        }}> Debug </button>
         <input type="file" multiple onChange={handleMaskUpload}/>
       </div>
     </div>    

@@ -1,13 +1,24 @@
 import unittest
 import os
+import nibabel as nib
+import io
 
 from app import create_app
 from services.nifti_processor import NiftiProcessor
+from werkzeug.datastructures import MultiDict, FileStorage
+
 
 """
 Each test session has 
-    ct.nii.gz - Main nifti/CT Scan file
-    combined_labels.nii.gz - segmentation files combined into one
+
+    ct.nii.gz 
+        - Main nifti/CT Scan file
+
+    /combined_labels_ANS/combined_labels.nii.gz
+        - segmentation files combined into one (TESTING CREATED ONE AGAINST THIS ONE)
+
+    /combined_labels.nii.gz 
+        - segmentation file that NiftiProcessor will create and store here (FILE THAT NEEDS TO BE TESTED)
 
     /segmentations - Directory containing 9 nifti segmentation files, which are:
         - aorta.nii.gz
@@ -32,31 +43,76 @@ Each test session has
         ct.nii.gz ~ 16mb
         combined_labels ~ 204kb
 """
-
+def create_nifti_multi_dict(seg_filenames: list[str], segmentation_path: str):
+    
+    nifti_multi_dict = MultiDict()
+    for filename in seg_filenames:
+        path = os.path.join(segmentation_path, filename)
+        
+        with open(path, 'rb') as file_stream:
+            file_storage = FileStorage(stream=io.BytesIO(file_stream.read()), filename=filename, content_type='application/gzip')
+            nifti_multi_dict.add(key=filename, value=file_storage)
+    
+    return nifti_multi_dict
 
 
 class TestNiftiProcessorFunctions(unittest.TestCase):
 
     def setUp(self):
-        self.client = create_app().test_client()
-        self.nifti_processor = NiftiProcessor('test-tessions')
-        print(os.path.exists('test-sessions'))
-        # print('setup')
+        self.test_case: str = ''
+        self.combined_labels_ANS: nib.nifti1.Nifti1Image = None
 
     def tearDown(self):
-        pass
+        self.test_case = ''
+        self.combined_labels_ANS = None
 
-    def test_combined_labels(self):
-        response = self.client.get('/bodymaps/api/')
-        print(response.text)
-        # print(self.client)
-        self.assertEqual(4, 4)
+    def test_case_045(self):
+        self.test_case = 'test-045'
+        session_path = os.path.join('test-sessions', self.test_case)
+        self.combined_labels_ANS = nib.load(os.path.join(session_path, 'combined_labels_ANS', 'combined_labels.nii.gz'))
+        segmentation_path = os.path.join(session_path, 'segmentations')
+        seg_filenames = os.listdir(segmentation_path)
+
+        nifti_multi_dict = create_nifti_multi_dict(seg_filenames, segmentation_path)
+
+        nifti_processor = NiftiProcessor(session_path=session_path)
+        combined_labels = nifti_processor.combine_labels(seg_filenames, nifti_multi_dict, save=False)
+        # print(combined_labels)
+        
+        self.assertEqual(combined_labels.header, self.combined_labels_ANS.header)
+        self.assertEqual(combined_labels.get_fdata().all(), self.combined_labels_ANS.get_fdata().all())
 
     def test_case_050(self):
-        self.assertEqual(4, 4)
+        self.test_case = 'test-050'
+        session_path = os.path.join('test-sessions', self.test_case)
+        self.combined_labels_ANS = nib.load(os.path.join(session_path, 'combined_labels_ANS', 'combined_labels.nii.gz'))
+        segmentation_path = os.path.join(session_path, 'segmentations')
+        seg_filenames = os.listdir(segmentation_path)
+
+        nifti_multi_dict = create_nifti_multi_dict(seg_filenames, segmentation_path)
+
+        nifti_processor = NiftiProcessor(session_path=session_path)
+        combined_labels = nifti_processor.combine_labels(seg_filenames, nifti_multi_dict, save=False)
+        # print(combined_labels)
+        
+        self.assertEqual(combined_labels.header, self.combined_labels_ANS.header)
+        self.assertEqual(combined_labels.get_fdata().all(), self.combined_labels_ANS.get_fdata().all())
 
     def test_case_0338(self):
-        self.assertEqual(4, 4)
+        self.test_case = 'test-338'
+        session_path = os.path.join('test-sessions', self.test_case)
+        self.combined_labels_ANS = nib.load(os.path.join(session_path, 'combined_labels_ANS', 'combined_labels.nii.gz'))
+        segmentation_path = os.path.join(session_path, 'segmentations')
+        seg_filenames = os.listdir(segmentation_path)
+
+        nifti_multi_dict = create_nifti_multi_dict(seg_filenames, segmentation_path)
+
+        nifti_processor = NiftiProcessor(session_path=session_path)
+        combined_labels = nifti_processor.combine_labels(seg_filenames, nifti_multi_dict, save=False)
+        # print(combined_labels)
+        
+        self.assertEqual(combined_labels.header, self.combined_labels_ANS.header)
+        self.assertEqual(combined_labels.get_fdata().all(), self.combined_labels_ANS.get_fdata().all())
 
 if __name__ == "__main__":
     unittest.main()

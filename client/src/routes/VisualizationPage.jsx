@@ -11,9 +11,6 @@ import { filenameToName } from '../helpers/util';
 import './VisualizationPage.css';
 
 
-
-
-
 function VisualizationPage() {
   const [checkState, setCheckState] = useState([true]);
   const [segmentationRepresentationUIDs, setSegmentationRepresentationUIDs] = useState(null);
@@ -41,7 +38,7 @@ function VisualizationPage() {
       console.log("NO NV");
       console.log(NV); 
     }
-    const fetchNiftiFilesForCornerstoneAndNV = async () => {
+    const setup = async () => {
       const state = location.state; 
       if (!state){
         window.alert('No Nifti Files Uploaded!');
@@ -60,32 +57,13 @@ function VisualizationPage() {
       setCheckBoxData(_checkBoxData);
       setCheckState(Array(_checkBoxData.length).fill(true));
 
-      const formData = new FormData();
-      formData.append('sessionKey', sessionKey);
-      formData.append('isSegmentation', true);
- 
-      const segmentationBuffers = await Promise.all(masks.map(async (mask) => {
-        const response = await fetch(`${API_ORIGIN}/api/download/${mask}`, {
-          method: 'POST',
-          body: formData,
-        });
-        const buffer = await response.arrayBuffer();
-        return {
-          volumeId: mask,
-          buffer: buffer
-        }
-      }));
-
-      const mainNifti = fileInfo.MAIN_NIFTI;
-      const mainNiftiURL = URL.createObjectURL(mainNifti);
-
       renderVisualization(axial_ref, sagittal_ref, coronal_ref, sessionKey) //async
       .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
-      const nv = create3DVolume(render_ref, segmentationBuffers); //async
+      const nv = create3DVolume(render_ref, sessionKey); //async
       setNV(nv);
     }
 
-    fetchNiftiFilesForCornerstoneAndNV();
+    setup();
   }, []);
 
 

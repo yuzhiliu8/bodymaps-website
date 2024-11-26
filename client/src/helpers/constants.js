@@ -110,5 +110,16 @@ export const NVcolorMaps = [
     },
 ]
 
+export const NVColormap = {
+    name: 'CUSTOMCMAP',
+    cmap:{
+    R: [0, 230, 0],
+    B: [0, 25, 130],
+    G: [0, 75, 200]
+    },
+}
+
+APP_CONSTANTS.NVColormap = NVColormap;
+
 export const accepted_exts = ['.nii.gz', '.nii']
 

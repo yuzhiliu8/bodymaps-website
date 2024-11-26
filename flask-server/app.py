@@ -16,7 +16,12 @@ def create_app():
     app = Flask(__name__)
     app.register_blueprint(api_blueprint, url_prefix=f'{Constants.BASE_PATH}/api')
     app.config['SQLALCHEMY_DATABASE_URI'] = Constants.SQLALCHEMY_DATABASE_URI
-    db.init_app(app)
+
+    try:
+        db.init_app(app)
+        print('connected to db')
+    except: 
+        print('Could not connect to DB!')
     CORS(app)
     return app
 
