@@ -6,7 +6,7 @@ import ReportScreen from '../components/ReportScreen/ReportScreen';
 import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
 import OpacitySlider from '../components/OpacitySlider/OpacitySlider';
 import { create3DVolume, updateVisibilities, updateGeneralOpacity } from '../helpers/NiiVueNifti';
-import {  API_ORIGIN, DEFAULT_SEGMENTATION_OPACITY } from '../helpers/constants';
+import { APP_CONSTANTS } from '../helpers/constants';
 import { filenameToName } from '../helpers/util';
 import './VisualizationPage.css';
 
@@ -17,7 +17,7 @@ function VisualizationPage() {
   const [NV, setNV] = useState();
   const [sessionKey, setSessionKey] = useState(undefined);
   const [checkBoxData, setCheckBoxData] = useState([]);
-  const [opacityValue, setOpacityValue] = useState(DEFAULT_SEGMENTATION_OPACITY*100);
+  const [opacityValue, setOpacityValue] = useState(APP_CONSTANTS.DEFAULT_SEGMENTATION_OPACITY*100);
   const axial_ref = useRef();
   const sagittal_ref = useRef();
   const coronal_ref = useRef();
@@ -59,7 +59,7 @@ function VisualizationPage() {
 
       renderVisualization(axial_ref, sagittal_ref, coronal_ref, sessionKey) //async
       .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
-      const nv = create3DVolume(render_ref, sessionKey); //async
+      const nv = await create3DVolume(render_ref, sessionKey); //async
       setNV(nv);
     }
 
@@ -123,7 +123,7 @@ function VisualizationPage() {
 const navBack = () => {
   const formData = new FormData()
   formData.append('sessionKey', sessionKey)
-  fetch(`${API_ORIGIN}/api/terminate-session`, {
+  fetch(`${APP_CONSTANTS.API_ORIGIN}/api/terminate-session`, {
     method: 'POST', 
     body: formData,
   }).then((response) => response.json())

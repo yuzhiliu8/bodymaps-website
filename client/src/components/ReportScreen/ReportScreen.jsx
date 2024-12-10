@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import ReportScreenItem from './ReportScreenItem';
-import { API_ORIGIN } from '../../helpers/constants';
+import { APP_CONSTANTS } from '../../helpers/constants';
 import './ReportScreen.css';
 
 function ReportScreen({ sessionKey }) {
@@ -11,7 +11,7 @@ function ReportScreen({ sessionKey }) {
     if (typeof sessionKey !== 'undefined'){
       const formData = new FormData();
       formData.append('sessionKey', sessionKey)
-      fetch(`${API_ORIGIN}/api/mask-data`, {
+      fetch(`${APP_CONSTANTS.API_ORIGIN}/api/mask-data`, {
         method: 'POST',
         body: formData,
       })
