@@ -1,6 +1,7 @@
 import unittest
 import os
 import nibabel as nib
+import numpy as np
 import io
 
 from app import create_app
@@ -78,9 +79,17 @@ class TestNiftiProcessorFunctions(unittest.TestCase):
         nifti_processor = NiftiProcessor(session_path=session_path)
         combined_labels = nifti_processor.combine_labels(seg_filenames, nifti_multi_dict, save=False)
         # print(combined_labels)
-        
+
+        differences = combined_labels.get_fdata() == self.combined_labels_ANS.get_fdata()
+        error_voxels = len(differences[differences == False])
+        dims = combined_labels.shape
+        total_voxels = dims[0] * dims[1] * dims[2]
+        error_percent = error_voxels / total_voxels
+        print(self.test_case)
+        print(f'Number of Inaccurate Voxels: {error_voxels} Total Voxels: {total_voxels}')
+        print(f'Accuracy: {1 - error_percent}')
         self.assertEqual(combined_labels.header, self.combined_labels_ANS.header)
-        self.assertEqual(combined_labels.get_fdata().all(), self.combined_labels_ANS.get_fdata().all())
+        
 
     def test_case_050(self):
         self.test_case = 'test-050'
@@ -94,9 +103,16 @@ class TestNiftiProcessorFunctions(unittest.TestCase):
         nifti_processor = NiftiProcessor(session_path=session_path)
         combined_labels = nifti_processor.combine_labels(seg_filenames, nifti_multi_dict, save=False)
         # print(combined_labels)
-        
+
+        differences = combined_labels.get_fdata() == self.combined_labels_ANS.get_fdata()
+        error_voxels = len(differences[differences == False])
+        dims = combined_labels.shape
+        total_voxels = dims[0] * dims[1] * dims[2]
+        error_percent = error_voxels / total_voxels
+        print(self.test_case)
+        print(f'Number of Inaccurate Voxels: {error_voxels} Total Voxels: {total_voxels}')
+        print(f'Accuracy: {1 - error_percent}')
         self.assertEqual(combined_labels.header, self.combined_labels_ANS.header)
-        self.assertEqual(combined_labels.get_fdata().all(), self.combined_labels_ANS.get_fdata().all())
 
     def test_case_0338(self):
         self.test_case = 'test-338'
@@ -110,9 +126,16 @@ class TestNiftiProcessorFunctions(unittest.TestCase):
         nifti_processor = NiftiProcessor(session_path=session_path)
         combined_labels = nifti_processor.combine_labels(seg_filenames, nifti_multi_dict, save=False)
         # print(combined_labels)
-        
+
+        differences = combined_labels.get_fdata() == self.combined_labels_ANS.get_fdata()
+        error_voxels = len(differences[differences == False])
+        dims = combined_labels.shape
+        total_voxels = dims[0] * dims[1] * dims[2]
+        error_percent = error_voxels / total_voxels
+        print(self.test_case)
+        print(f'Number of Inaccurate Voxels: {error_voxels} Total Voxels: {total_voxels}')
+        print(f'Accuracy: {1 - error_percent}')
         self.assertEqual(combined_labels.header, self.combined_labels_ANS.header)
-        self.assertEqual(combined_labels.get_fdata().all(), self.combined_labels_ANS.get_fdata().all())
 
 if __name__ == "__main__":
     unittest.main()

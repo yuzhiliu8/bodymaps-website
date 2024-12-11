@@ -19,7 +19,7 @@ class TestApplicationSessionModel(unittest.TestCase):
         self.session_key = self.session_manager.generate_session_key()
         self.main_nifti_path='test-sessions/test-045'
         self.combined_labels_path='test-sessions/test-045/combined_labels.nii.gz'
-        self.combined_labels_metadata={"aorta.nii.gz": 1, "gall_bladder.nii.gz": 2}
+        self.organ_intensities={"aorta.nii.gz": 1, "gall_bladder.nii.gz": 2}
 
         db.create_all()
     
@@ -34,7 +34,7 @@ class TestApplicationSessionModel(unittest.TestCase):
             session_id=session_key,
             main_nifti_path=self.main_nifti_path,
             combined_labels_path=self.combined_labels_path,
-            combined_labels_metadata=self.combined_labels_metadata,
+            organ_intensities=self.organ_intensities,
             session_created=datetime.now()
         )
         db.session.add(new_session)
@@ -47,7 +47,7 @@ class TestApplicationSessionModel(unittest.TestCase):
         self.assertEqual(app_session.session_id, session_key)
         self.assertEqual(app_session.main_nifti_path, self.main_nifti_path)
         self.assertEqual(app_session.combined_labels_path, self.combined_labels_path)
-        self.assertEqual(app_session.combined_labels_metadata, self.combined_labels_metadata)
+        self.assertEqual(app_session.organ_intensities, self.organ_intensities)
 
         #cleanup from DB
         db.session.delete(app_session)
@@ -55,14 +55,13 @@ class TestApplicationSessionModel(unittest.TestCase):
     
     def test_duplicate_session_id(self):
         session_key = self.session_manager.generate_session_key()
-
         new_session = ApplicationSession(
             session_id=session_key,
             main_nifti_path=self.main_nifti_path,
             combined_labels_path=self.combined_labels_path,
-            combined_labels_metadata=self.combined_labels_metadata,
+            organ_intensities=self.organ_intensities,
             session_created=datetime.now()
-        )
+        ) 
 
         db.session.add(new_session)
         db.session.commit()
@@ -71,7 +70,7 @@ class TestApplicationSessionModel(unittest.TestCase):
             session_id=session_key,
             main_nifti_path="test/path",
             combined_labels_path="test/path/combined_labels.nii.gz",
-            combined_labels_metadata={"metadata": 1},
+            organ_intensities={"metadata": 1},
             session_created=datetime.now()
         ) 
         

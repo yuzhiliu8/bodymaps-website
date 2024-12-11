@@ -3,7 +3,7 @@ from flask_cors import CORS
 from constants import Constants
 from api.api_blueprint import api_blueprint
 from models.base import db
-# from models.application_session import ApplicationSession
+from models.application_session import ApplicationSession
 # from datetime import datetime
 import os
 

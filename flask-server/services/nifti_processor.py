@@ -34,6 +34,7 @@ class NiftiProcessor:
         combined_labels_affine = None
         for i in range(len(filenames)):
             filename = filenames[i]
+            #print(filename)
             segmentation = nifti_multi_dict[filename]
             # print(segmentation)
             data = segmentation.read()

@@ -1,6 +1,5 @@
 from models.base import db
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.sql import func
 from sqlalchemy import JSON, String, DateTime
 
 class ApplicationSession(db.Model):
@@ -9,7 +8,7 @@ class ApplicationSession(db.Model):
     session_id: Mapped[str] = mapped_column(primary_key=True, unique=True)
     main_nifti_path: Mapped[str] = mapped_column(type_=String,  nullable=False)
     combined_labels_path: Mapped[str] = mapped_column(type_=String)
-    combined_labels_metadata: Mapped[JSON] = mapped_column(type_=JSON)
+    organ_intensities: Mapped[JSON] = mapped_column(type_=JSON)
     session_created: Mapped[DateTime] = mapped_column(type_=DateTime) 
 
     def __str__(self):
@@ -18,7 +17,7 @@ class ApplicationSession(db.Model):
             session_id: {self.session_id} 
             main_nifti_path: {self.main_nifti_path} 
             combined_files_path: {self.combined_labels_path} 
-            combined_files_metadata: {self.combined_labels_metadata} 
+            organ_intensities: {self.combined_labels_metadata} 
             session_created: {self.session_created}'''
 
 
