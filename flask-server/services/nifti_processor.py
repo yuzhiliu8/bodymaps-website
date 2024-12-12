@@ -28,7 +28,6 @@ class NiftiProcessor:
         pass
 
     def combine_labels(self, filenames: list[str], nifti_multi_dict: MultiDict, save=True):
-
         combined_labels_img_data = None
         combined_labels_header = None
         combined_labels_affine = None
