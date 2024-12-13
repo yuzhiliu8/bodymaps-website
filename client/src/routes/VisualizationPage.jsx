@@ -29,6 +29,8 @@ function VisualizationPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [showReportScreen, setShowReportScreen] = useState(false);
+
   useEffect(() => {
     if (NV){
       console.log("HAS NV");
@@ -84,12 +86,14 @@ function VisualizationPage() {
     }
   }
 
-  const showReportScreen = () => {          /// CAN USE USESTATE SHOW TRUE/FALSE INSTEAD OF THIS
+  const onReportScreenClick = () => {          /// CAN USE USESTATE SHOW TRUE/FALSE INSTEAD OF THIS
     if (ReportScreen_ref.current.style.display === "none"){
+      setShowReportScreen(true);
       ReportScreen_ref.current.style.display = "block";
       VisualizationContainer_ref.current.style.opacity = "25%";
     }
     else{
+      setShowReportScreen(false);
       ReportScreen_ref.current.style.display = "none";
       VisualizationContainer_ref.current.style.opacity = "100%";
     }
@@ -147,7 +151,7 @@ const navBack = () => {
         </div>
         <div className="report-container">
           <div className="dropdown">
-            <div className="dropdown-header" onClick={showReportScreen}>Report</div>
+            <div className="dropdown-header" onClick={onReportScreenClick}>Report</div>
           </div>
         </div>
         <button onClick={navBack}>Back</button>
@@ -169,7 +173,9 @@ const navBack = () => {
       </div>
 
       <div className="report" ref={ReportScreen_ref} style={{display: "none"}}>
-        <ReportScreen sessionKey={sessionKey}/>
+        {(showReportScreen === false) ? (<></>) : (
+          <ReportScreen sessionKey={sessionKey} />
+        )}
       </div>
 
     </div>

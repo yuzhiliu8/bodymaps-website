@@ -1,12 +1,15 @@
 from flask import Blueprint, send_file, make_response, request, jsonify
 from services.nifti_processor import NiftiProcessor
 from services.session_manager import SessionManager
+from models.application_session import ApplicationSession
+from models.combined_labels import CombinedLabels
+from models.base import db
 from constants import Constants
 
 import shutil
 import os
 import nibabel as nib
-
+from datetime import datetime
 
 api_blueprint = Blueprint('api', __name__)
 
@@ -17,25 +20,52 @@ def home():
 
 @api_blueprint.route(f'/upload', methods= ['POST'])
 def upload():
+    resp = {}
     #if MAIN_NIFTI
     #validate API KEY/Authentication
 
     session_manager = SessionManager.instance()
-    session_key = session_manager.generate_session_key()
-    nifti_processor = NiftiProcessor(session_path=os.path.join(Constants.SESSIONS_DIR_NAME, session_key))
+    session_id = session_manager.generate_uuid()
+    base_path = os.path.join(Constants.SESSIONS_DIR_NAME, session_id)
+    nifti_processor = NiftiProcessor(session_path=base_path)
     print(nifti_processor)
 
     nifti_multi_dict = request.files
     filenames = list(nifti_multi_dict)
     main_nifti = nifti_multi_dict[Constants.MAIN_NIFTI_FORM_NAME]
-    filenames.remove(Constants.MAIN_NIFTI_FORM_NAME)
-    base_path = os.path.join(Constants.SESSIONS_DIR_NAME, session_key)
+
     os.makedirs(base_path, exist_ok=True)
-    main_nifti.save(os.path.join(base_path, Constants.MAIN_NIFTI_FILENAME))
 
-    combined_labels = nifti_processor.combine_labels(filenames, nifti_multi_dict, save=True)
+    main_nifti_path = os.path.join(base_path, Constants.MAIN_NIFTI_FILENAME)
+    main_nifti.save(main_nifti_path)
 
-    return session_key
+    combined_labels_path = os.path.join(nifti_processor._session_path, Constants.COMBINED_LABELS_FILENAME)
+
+
+    filenames.remove(Constants.MAIN_NIFTI_FORM_NAME)
+    combined_labels, organ_intensities = nifti_processor.combine_labels(filenames, nifti_multi_dict, save=True)
+    organ_metadata = {}
+
+    combined_labels_id = session_manager.generate_uuid()
+    new_session = ApplicationSession(
+        session_id=session_id,
+        main_nifti_path=main_nifti_path,
+        combined_labels_id=combined_labels_id,
+        session_created=datetime.now()
+    )
+    
+    new_clabel = CombinedLabels(
+        combined_labels_id=combined_labels_id,
+        combined_labels_path=combined_labels_path,
+        organ_intensities=organ_intensities,
+        organ_metadata=organ_metadata
+    )
+
+    db.session.add(new_session)
+    db.session.add(new_clabel)
+    db.session.commit()
+    
+    return session_id
     
 
 @api_blueprint.route('/download/<filename>/<session_key>', methods=['GET'])

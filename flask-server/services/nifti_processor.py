@@ -28,6 +28,7 @@ class NiftiProcessor:
         pass
 
     def combine_labels(self, filenames: list[str], nifti_multi_dict: MultiDict, save=True):
+        organ_intensities = {}
         combined_labels_img_data = None
         combined_labels_header = None
         combined_labels_affine = None
@@ -38,6 +39,7 @@ class NiftiProcessor:
             # print(segmentation)
             data = segmentation.read()
 
+            
             with tempfile.NamedTemporaryFile(suffix='.nii.gz', delete=True) as temp:
                 temp.write(data)
                 # print(temp.name)
@@ -55,15 +57,17 @@ class NiftiProcessor:
                 scaled = nifti_obj.get_fdata() * (i+1)
                 combined_labels_img_data = np.maximum(combined_labels_img_data, scaled)
 
+                organ_intensities[filename] = i+1
+
         combined_labels = nib.nifti1.Nifti1Image(dataobj=combined_labels_img_data,
                                                  affine=combined_labels_affine,
                                                  header=combined_labels_header)
 
         if save is True:
-            save_path = os.path.join(self._session_path, 'combined_labels.nii.gz')
-            nib.save(combined_labels, save_path)
+            combined_labels_path = os.path.join(self._session_path, Constants.COMBINED_LABELS_FILENAME)
+            nib.save(combined_labels, combined_labels_path)
         
-        return combined_labels
+        return combined_labels, organ_intensities
 
 
     def __str__(self):

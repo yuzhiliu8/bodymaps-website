@@ -62,6 +62,11 @@ class TestNiftiProcessorFunctions(unittest.TestCase):
     def setUp(self):
         self.test_case: str = ''
         self.combined_labels_ANS: nib.nifti1.Nifti1Image = None
+        self.organ_intensities_ANS: dict = {'aorta.nii.gz': 1, 'spleen.nii.gz': 2, 
+                                            'pancreas.nii.gz': 3, 'kidney_left.nii.gz': 4, 
+                                            'postcava.nii.gz': 5, 'gall_bladder.nii.gz': 6, 
+                                            'liver.nii.gz': 7, 'stomach.nii.gz': 8, 
+                                            'kidney_right.nii.gz': 9}
 
     def tearDown(self):
         self.test_case = ''
@@ -77,8 +82,7 @@ class TestNiftiProcessorFunctions(unittest.TestCase):
         nifti_multi_dict = create_nifti_multi_dict(seg_filenames, segmentation_path)
 
         nifti_processor = NiftiProcessor(session_path=session_path)
-        combined_labels = nifti_processor.combine_labels(seg_filenames, nifti_multi_dict, save=False)
-        # print(combined_labels)
+        combined_labels, organ_intensities = nifti_processor.combine_labels(seg_filenames, nifti_multi_dict, save=False)
 
         differences = combined_labels.get_fdata() == self.combined_labels_ANS.get_fdata()
         error_voxels = len(differences[differences == False])
@@ -89,6 +93,7 @@ class TestNiftiProcessorFunctions(unittest.TestCase):
         print(f'Number of Inaccurate Voxels: {error_voxels} Total Voxels: {total_voxels}')
         print(f'Accuracy: {1 - error_percent}')
         self.assertEqual(combined_labels.header, self.combined_labels_ANS.header)
+        self.assertEqual(organ_intensities, self.organ_intensities_ANS)
         
 
     def test_case_050(self):
@@ -101,7 +106,7 @@ class TestNiftiProcessorFunctions(unittest.TestCase):
         nifti_multi_dict = create_nifti_multi_dict(seg_filenames, segmentation_path)
 
         nifti_processor = NiftiProcessor(session_path=session_path)
-        combined_labels = nifti_processor.combine_labels(seg_filenames, nifti_multi_dict, save=False)
+        combined_labels, organ_intensities = nifti_processor.combine_labels(seg_filenames, nifti_multi_dict, save=False)
         # print(combined_labels)
 
         differences = combined_labels.get_fdata() == self.combined_labels_ANS.get_fdata()
@@ -113,6 +118,7 @@ class TestNiftiProcessorFunctions(unittest.TestCase):
         print(f'Number of Inaccurate Voxels: {error_voxels} Total Voxels: {total_voxels}')
         print(f'Accuracy: {1 - error_percent}')
         self.assertEqual(combined_labels.header, self.combined_labels_ANS.header)
+        self.assertEqual(organ_intensities, self.organ_intensities_ANS)
 
     def test_case_0338(self):
         self.test_case = 'test-338'
@@ -124,7 +130,7 @@ class TestNiftiProcessorFunctions(unittest.TestCase):
         nifti_multi_dict = create_nifti_multi_dict(seg_filenames, segmentation_path)
 
         nifti_processor = NiftiProcessor(session_path=session_path)
-        combined_labels = nifti_processor.combine_labels(seg_filenames, nifti_multi_dict, save=False)
+        combined_labels, organ_intensities = nifti_processor.combine_labels(seg_filenames, nifti_multi_dict, save=False)
         # print(combined_labels)
 
         differences = combined_labels.get_fdata() == self.combined_labels_ANS.get_fdata()
@@ -136,6 +142,8 @@ class TestNiftiProcessorFunctions(unittest.TestCase):
         print(f'Number of Inaccurate Voxels: {error_voxels} Total Voxels: {total_voxels}')
         print(f'Accuracy: {1 - error_percent}')
         self.assertEqual(combined_labels.header, self.combined_labels_ANS.header)
+        self.assertEqual(organ_intensities, self.organ_intensities_ANS)
+        
 
 if __name__ == "__main__":
     unittest.main()
