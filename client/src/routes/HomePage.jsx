@@ -64,16 +64,17 @@ export default function HomePage() {
           if (!response.ok){
             throw new Error("Could not connect to server");
           }
-          return response.text();
+          return response.json();
         }) 
-        .then((sessionKey) => {
+        .then((data) => {
           const fileNames = masks.map((mask) => {
             return mask.name;
           });
         const fileInfo = {};
         fileInfo.MAIN_NIFTI = mainNifti;
         fileInfo.masks = fileNames;
-        navigate('/visualization', {state: {sessionKey: sessionKey, fileInfo: fileInfo}});   
+        console.log(data);
+        navigate('/visualization', {state: {sessionKey: data.session_id, fileInfo: fileInfo}});   
         });
       } catch (error) {
         console.error(error.message);

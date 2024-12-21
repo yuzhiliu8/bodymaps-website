@@ -20,7 +20,7 @@ export async function create3DVolume(canvasRef, sessionKey){
     nv.attachToCanvas(canvasRef.current);
     const nvImage = await NVImage.loadFromUrl({
         name: "combined_labels.nii.gz", //Make not harded coded, plz
-        url: `${APP_CONSTANTS.API_ORIGIN}/api/download/${'combined_labels.nii.gz'}/${sessionKey}`
+        url: `${APP_CONSTANTS.API_ORIGIN}/api/get-segmentations/${sessionKey}`
     });
     nvImage.setColormapLabel(APP_CONSTANTS.NVColormap)
     nv.addVolume(nvImage);

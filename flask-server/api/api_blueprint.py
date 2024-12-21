@@ -64,40 +64,50 @@ def upload():
     db.session.add(new_session)
     db.session.add(new_clabel)
     db.session.commit()
+
+    resp = {}
+    resp['status'] = "200"
+    resp['session_id'] = session_id
+    resp['combined_labels_id'] = combined_labels_id
     
-    return session_id
+    return jsonify(resp)
     
 
-@api_blueprint.route('/download/<filename>/<session_key>', methods=['GET'])
-def download(filename, session_key):
-    if os.path.exists(os.path.join('sessions', session_key)):
-        path = os.path.join('sessions', session_key, filename)
-        response = make_response(send_file(path, mimetype='application/gzip'))
-        response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
-        response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
-        response.headers['Content-Encoding'] = 'gzip'
+   
+@api_blueprint.route('/get-main-nifti/<session_id>', methods=['GET'])
+def get_main_nifti(session_id):
 
-        return response
-    
-@api_blueprint.route('/get-main-nifti/<session_key>', methods=['GET'])
-def get_main_nifti(session_key):
     #validate session_key
-    if os.path.exists(os.path.join(Constants.SESSIONS_DIR_NAME, session_key)):
-        path = os.path.join(Constants.SESSIONS_DIR_NAME, session_key, Constants.MAIN_NIFTI_FILENAME) # /sessions/[session_key]/ct.nii.gz
-        response = make_response(send_file(path, mimetype='application/gzip'))
+    stmt = db.select(ApplicationSession).where(ApplicationSession.session_id == session_id)
+    resp = db.session.execute(stmt)
+    app_session = resp.scalar()
+    main_nifti_path = app_session.main_nifti_path
+
+    if os.path.exists(main_nifti_path):
+        response = make_response(send_file(main_nifti_path, mimetype='application/gzip'))
 
         response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
         response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
         response.headers['Content-Encoding'] = 'gzip'
 
-        return response
+    else:
+        pass
+    
+    return response
     
 @api_blueprint.route('/get-segmentations/<session_key>', methods=['GET'])
 def get_segmentations(session_key):
+
     #validate session_key
-    if os.path.exists(os.path.join(Constants.SESSIONS_DIR_NAME, session_key)):
-        path = os.path.join(Constants.SESSIONS_DIR_NAME, session_key, Constants.MAIN_NIFTI_FILENAME)
-        response = make_response(send_file(path, mimetype='application/gzip'))
+
+    stmt = db.select(ApplicationSession.combined_labels_id,
+                     CombinedLabels.combined_labels_path).join(CombinedLabels, ApplicationSession.combined_labels_id == CombinedLabels.combined_labels_id).where(ApplicationSession.session_id == session_key)
+    resp = db.session.execute(stmt)
+    joint = resp.fetchone()
+    combined_labels_path = joint.combined_labels_path
+
+    if os.path.exists(combined_labels_path):
+        response = make_response(send_file(combined_labels_path, mimetype='application/gzip'))
 
         response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
         response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'

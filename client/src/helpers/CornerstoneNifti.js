@@ -67,7 +67,7 @@ export async function renderVisualization(ref1, ref2, ref3, sessionKey){
   
   const volume = await volumeLoader.createAndCacheVolume(volumeId);
   
-  const segmentationURL = `${APP_CONSTANTS.API_ORIGIN}/api/download/${'combined_labels.nii.gz'}/${sessionKey}`;
+  const segmentationURL = `${APP_CONSTANTS.API_ORIGIN}/api/get-segmentations/${sessionKey}`;
   const combined_labels_Id = 'nifti:' + segmentationURL;
   const combined_labels = await volumeLoader.createAndCacheVolume(combined_labels_Id);
 
