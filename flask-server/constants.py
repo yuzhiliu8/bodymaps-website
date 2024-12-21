@@ -7,7 +7,7 @@ load_dotenv()
 class Constants:
 
     # app variables
-    SESSIONS_DIR_NAME = 'sessions'
+    SESSIONS_DIR_NAME = os.environ['SESSIONS_DIR_PATH']
     DB_USER = os.environ['DB_USER']
     DB_PASS= os.environ['DB_PASS']
     DB_HOST = os.environ['DB_HOST']

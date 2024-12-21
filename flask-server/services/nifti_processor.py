@@ -8,21 +8,37 @@ import tempfile
 
 
 class NiftiProcessor:
-    def __init__(self, session_path):
+    def __init__(self, session_path=None, clabel_path=None):
         # validate(session_key)
         self._session_path = session_path
+
+        if clabel_path is None:
+            self._clabel_path = os.path.join(session_path, Constants.COMBINED_LABELS_FILENAME)
+        else:
+            self._clabel_path = clabel_path
+
         self._ct_header = None
         self._ct_array = None
-
-        self.set_ct_data()
-
     
+    def set_organ_intensities(self, organ_intensities):
+        self._organ_intensities = organ_intensities
+    
+    @classmethod
+    def from_clabel_path(cls, clabel_path):
+        index = clabel_path.index(Constants.COMBINED_LABELS_FILENAME)
+        session_path = clabel_path[:index-1] 
+        return cls(session_path, clabel_path)
+
+
+
+
     def set_ct_data(self):
         pass
 
     
     def calculate_volumes(self):
-        pass
+        nifti_obj = nib.load(self._clabel_path)
+
 
     def calculate_mean_hu(self):
         pass
@@ -64,13 +80,12 @@ class NiftiProcessor:
                                                  header=combined_labels_header)
 
         if save is True:
-            combined_labels_path = os.path.join(self._session_path, Constants.COMBINED_LABELS_FILENAME)
-            nib.save(combined_labels, combined_labels_path)
+            nib.save(combined_labels, self._clabel_path)
         
         return combined_labels, organ_intensities
 
 
     def __str__(self):
-        return f"NiftiProcessor Object for session {self._session_path}"
+        return f"NiftiProcessor Object for session {self._session_path} \n clabel_path: {self._clabel_path}"
 
     

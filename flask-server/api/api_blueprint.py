@@ -41,7 +41,6 @@ def upload():
 
     combined_labels_path = os.path.join(nifti_processor._session_path, Constants.COMBINED_LABELS_FILENAME)
 
-
     filenames.remove(Constants.MAIN_NIFTI_FORM_NAME)
     combined_labels, organ_intensities = nifti_processor.combine_labels(filenames, nifti_multi_dict, save=True)
     organ_metadata = {}
@@ -100,8 +99,12 @@ def get_segmentations(session_key):
 
     #validate session_key
 
-    stmt = db.select(ApplicationSession.combined_labels_id,
-                     CombinedLabels.combined_labels_path).join(CombinedLabels, ApplicationSession.combined_labels_id == CombinedLabels.combined_labels_id).where(ApplicationSession.session_id == session_key)
+    stmt = (
+        db.select(ApplicationSession.combined_labels_id, 
+                  CombinedLabels.combined_labels_path)
+            .join(CombinedLabels, ApplicationSession.combined_labels_id == CombinedLabels.combined_labels_id)
+            .where(ApplicationSession.session_id == session_key)
+    )
     resp = db.session.execute(stmt)
     joint = resp.fetchone()
     combined_labels_path = joint.combined_labels_path
@@ -118,12 +121,48 @@ def get_segmentations(session_key):
 @api_blueprint.route(f'/mask-data', methods=['POST'])
 def get_mask_data():
     session_key = request.form['sessionKey']
+
+    j = db.join(CombinedLabels, ApplicationSession, ApplicationSession.combined_labels_id == CombinedLabels.combined_labels_id)
+
+    stmt = ( db.select(CombinedLabels)
+            .select_from(j)
+            .where(ApplicationSession.session_id == session_key))
+    
+
+    resp = db.session.execute(stmt)
+    combined_labels = resp.scalar()
+    #print(combined_labels)
+
+    if combined_labels.organ_metadata == {}: # run processing function --> write to database
+        nifti_processor = NiftiProcessor.from_clabel_path(combined_labels.combined_labels_path)
+        nifti_processor.set_organ_intensities(combined_labels.organ_intensities)
+
+        volumes = nifti_processor.calculate_volumes()
+        print(volumes)
+    else: # return database info
+        return jsonify(combined_labels.organ_metadata)
+
+
     return jsonify(session_key)
     # return jsonify(processMasks(session_key)) FIX WHEN REFACTORING
 
 @api_blueprint.route(f'/terminate-session', methods=['POST'])
 def terminate_session():
     session_key = request.form['sessionKey']
+
+    stmt = db.select(ApplicationSession).where(ApplicationSession.session_id == session_key)
+    resp = db.session.execute(stmt)
+    app_session = resp.scalar()
+    combined_labels_id = app_session.combined_labels_id
+
+    stmt = db.select(CombinedLabels).where(CombinedLabels.combined_labels_id == combined_labels_id)
+    resp = db.session.execute(stmt)
+    combined_labels = resp.scalar()
+
+    db.session.delete(app_session)
+    db.session.delete(combined_labels)
+    db.session.commit()
+
     try:
         print(f'removing session: {session_key}')
         shutil.rmtree(os.path.join('sessions', session_key))
