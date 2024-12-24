@@ -25,7 +25,7 @@ class Constants:
     # DB_CONNECTION_STRING = os.environ['DB_CONNECTION_STRING']
 
     # NiftiProcessor Variables
-    EROSION_PIXELS = 4
+    EROSION_PIXELS = 2
     CUBE_LEN = (2 * EROSION_PIXELS) + 1
     STRUCTURING_ELEMENT = np.ones([CUBE_LEN, CUBE_LEN, CUBE_LEN], dtype=bool)
 

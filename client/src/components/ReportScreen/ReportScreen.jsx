@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import ReportScreenItem from './ReportScreenItem';
 import { APP_CONSTANTS } from '../../helpers/constants';
 import './ReportScreen.css';
+import { filenameToName } from '../../helpers/util';
 
 function ReportScreen({ sessionKey }) {
   const [maskData, setMaskData] = useState({});
@@ -31,25 +32,24 @@ function ReportScreen({ sessionKey }) {
       <div className="header-line"></div>
       <div className="ReportScreenHeader">
         <div>Tissue</div>
-        <div>Cross-sectional Area</div>
+        <div>Volume</div>
         <div>Mean HU</div>
       </div>
       <div className="header-line"></div>
  
       <div className="items"> 
-        {(typeof maskData.data === 'undefined') ? (
+        {(typeof maskData.organ_metrics === 'undefined') ? (
           <div>Loading...</div>
         ) : (
-          maskData.data.map((organData, i) => {
-            const crossSectionArea = (typeof organData.volume_cm === 'number') ? <>{organData.volume_cm} cm<sup>3</sup></> : organData.volume_cm
+          console.log('render'),
+          maskData.organ_metrics.map((organData, i) => {
+            const crossSectionArea = (typeof organData.volume_cm3 === 'number') ? <>{organData.volume_cm3} cm<sup>3</sup></> : organData.volume_cm3
             return (<ReportScreenItem
               key={i}
-              tissue={organData.id}
+              tissue={filenameToName(organData.organ_name)}
               crossSectionArea={crossSectionArea}
               meanHU={organData.mean_hu}/>
           )})
-            
-          
         )} 
         <div className="header-line"></div>
       </div>

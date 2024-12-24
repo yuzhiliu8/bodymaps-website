@@ -6,6 +6,7 @@ from models.combined_labels import CombinedLabels
 from models.base import db
 from constants import Constants
 
+from sqlalchemy.orm import aliased
 import shutil
 import os
 import nibabel as nib
@@ -27,7 +28,7 @@ def upload():
     session_manager = SessionManager.instance()
     session_id = session_manager.generate_uuid()
     base_path = os.path.join(Constants.SESSIONS_DIR_NAME, session_id)
-    nifti_processor = NiftiProcessor(session_path=base_path)
+    nifti_processor = NiftiProcessor.from_clabel_path(os.path.join(base_path, Constants.COMBINED_LABELS_FILENAME))
     print(nifti_processor)
 
     nifti_multi_dict = request.files
@@ -39,7 +40,6 @@ def upload():
     main_nifti_path = os.path.join(base_path, Constants.MAIN_NIFTI_FILENAME)
     main_nifti.save(main_nifti_path)
 
-    combined_labels_path = os.path.join(nifti_processor._session_path, Constants.COMBINED_LABELS_FILENAME)
 
     filenames.remove(Constants.MAIN_NIFTI_FORM_NAME)
     combined_labels, organ_intensities = nifti_processor.combine_labels(filenames, nifti_multi_dict, save=True)
@@ -55,7 +55,7 @@ def upload():
     
     new_clabel = CombinedLabels(
         combined_labels_id=combined_labels_id,
-        combined_labels_path=combined_labels_path,
+        combined_labels_path=nifti_processor._clabel_path,
         organ_intensities=organ_intensities,
         organ_metadata=organ_metadata
     )
@@ -122,25 +122,37 @@ def get_segmentations(session_key):
 def get_mask_data():
     session_key = request.form['sessionKey']
 
-    j = db.join(CombinedLabels, ApplicationSession, ApplicationSession.combined_labels_id == CombinedLabels.combined_labels_id)
+    as1 = db.aliased(ApplicationSession)
+    cl2 = db.aliased(CombinedLabels)
 
-    stmt = ( db.select(CombinedLabels)
+    j = db.join(cl2, as1, as1.combined_labels_id == cl2.combined_labels_id)
+
+    stmt = (db.select(as1.session_id, as1.main_nifti_path, cl2.combined_labels_id, cl2.combined_labels_path, cl2.organ_intensities, cl2.organ_metadata)
             .select_from(j)
-            .where(ApplicationSession.session_id == session_key))
-    
+            .where(as1.session_id == session_key))
 
     resp = db.session.execute(stmt)
-    combined_labels = resp.scalar()
-    #print(combined_labels)
+    row = resp.fetchone()
 
-    if combined_labels.organ_metadata == {}: # run processing function --> write to database
-        nifti_processor = NiftiProcessor.from_clabel_path(combined_labels.combined_labels_path)
-        nifti_processor.set_organ_intensities(combined_labels.organ_intensities)
+    if row.organ_metadata == {}: # run processing function --> write to database
+        nifti_processor = NiftiProcessor(row.main_nifti_path, row.combined_labels_path)
+        nifti_processor.set_organ_intensities(row.organ_intensities)
 
-        volumes = nifti_processor.calculate_volumes()
-        print(volumes)
+        organ_metadata = nifti_processor.calculate_metrics()
+
+        stmt = db.select(CombinedLabels).where(CombinedLabels.combined_labels_id == row.combined_labels_id)
+        resp = db.session.execute(stmt)
+        clabel = resp.scalar() #clabel to update
+        clabel.organ_metadata = organ_metadata #update clabel
+
+        db.session.commit()
+
+        print("writing to database")
+        return organ_metadata
+
     else: # return database info
-        return jsonify(combined_labels.organ_metadata)
+        print("returning database info")
+        return jsonify(row.organ_metadata)
 
 
     return jsonify(session_key)

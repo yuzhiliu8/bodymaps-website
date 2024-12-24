@@ -21,7 +21,6 @@ class TestCombinedLabels(unittest.TestCase):
     
 
     def test_insert_combined_labels(self):
-        
         combined_labels  = CombinedLabels(
             combined_labels_id = self.combined_labels_id,
             combined_labels_path = self.combined_labels_path,
@@ -73,7 +72,6 @@ class TestCombinedLabels(unittest.TestCase):
         db.session.rollback()
         db.session.delete(combined_labels)
         db.session.commit() 
-        
 
 if __name__ == "__main__":
     unittest.main()
