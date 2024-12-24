@@ -23,7 +23,12 @@ services:
     volumes:
       - ./flask-server/sessions:/app/sessions
     environment:
-      - BASE_PATH=${SERVER_BASE_PATH}
+      - BASE_PATH=${BASE_PATH}
+      - SESSIONS_DIR_PATH=${SESSIONS_DIR_PATH}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
     restart: unless-stopped
     networks:
       - host-global
