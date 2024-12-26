@@ -23,15 +23,15 @@ import {
 }from '@cornerstonejs/tools';
 
 import { cornerstoneNiftiImageVolumeLoader } from '@cornerstonejs/nifti-volume-loader';
-import { defaultColors, DEFAULT_SEGMENTATION_OPACITY, APP_CONSTANTS  } from './constants';
+import { APP_CONSTANTS } from './constants';
 
 const toolGroupId = "myToolGroup";
 const renderingEngineId = "myRenderingEngine";
 const segmentationId = "combined_labels";
 
 const DEFAULT_SEGMENTATION_CONFIG = {
-  fillAlpha: DEFAULT_SEGMENTATION_OPACITY,
-  fillAlphaInactive: DEFAULT_SEGMENTATION_OPACITY,
+  fillAlpha: APP_CONSTANTS.DEFAULT_SEGMENTATION_OPACITY,
+  fillAlphaInactive: APP_CONSTANTS.DEFAULT_SEGMENTATION_OPACITY,
   outlineOpacity: 1,
   outlineWidth: 1,
   renderOutline: false,
@@ -44,9 +44,6 @@ const toolGroupSpecificRepresentationConfig = {
     [csToolsEnums.SegmentationRepresentations.Labelmap]: DEFAULT_SEGMENTATION_CONFIG
   },
 };
-
-
-
 
 export async function renderVisualization(ref1, ref2, ref3, sessionKey){
   cache.purgeCache();
@@ -70,28 +67,15 @@ export async function renderVisualization(ref1, ref2, ref3, sessionKey){
   
   const volume = await volumeLoader.createAndCacheVolume(volumeId);
   
-  const segmentationURL = `${APP_CONSTANTS.API_ORIGIN}/api/download/${'combined_labels.nii.gz'}/${sessionKey}`;
+  const segmentationURL = `${APP_CONSTANTS.API_ORIGIN}/api/get-segmentations/${sessionKey}`;
   const combined_labels_Id = 'nifti:' + segmentationURL;
   const combined_labels = await volumeLoader.createAndCacheVolume(combined_labels_Id);
 
-  const customColorLUT = {
-    0: [0, 0, 0, 0],       // transparent for background
-    1: APP_CONSTANTS.RED,
-    2: APP_CONSTANTS.BLUE,   
-    3: APP_CONSTANTS.MAROON,   
-    4: APP_CONSTANTS.BROWN,
-    5: APP_CONSTANTS.OLIVE,
-    6: APP_CONSTANTS.TEAL,
-    7: APP_CONSTANTS.PURPLE,
-    8: APP_CONSTANTS.MAGENTA,
-    9: APP_CONSTANTS.LIME,
-    // Add more mappings as needed
-  };
 
   const colorLUT = [];
   // Fill the colorLUT array with your custom colors
-  Object.keys(customColorLUT).forEach(value => {
-    colorLUT[value] = customColorLUT[value];
+  Object.keys(APP_CONSTANTS.cornerstoneCustomColorLUT).forEach(value => {
+    colorLUT[value] = APP_CONSTANTS.cornerstoneCustomColorLUT[value];
   });
 
   const viewportInputArray = [
@@ -132,8 +116,6 @@ export async function renderVisualization(ref1, ref2, ref3, sessionKey){
       [{ volumeId }],
       [viewportId1, viewportId2, viewportId3]
   );
-
-
 
   renderingEngine.render();
   console.log("volume rendered");

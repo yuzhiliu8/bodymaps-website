@@ -6,7 +6,7 @@ import ReportScreen from '../components/ReportScreen/ReportScreen';
 import NestedCheckBox from '../components/NestedCheckBox/NestedCheckBox';
 import OpacitySlider from '../components/OpacitySlider/OpacitySlider';
 import { create3DVolume, updateVisibilities, updateGeneralOpacity } from '../helpers/NiiVueNifti';
-import {  API_ORIGIN, DEFAULT_SEGMENTATION_OPACITY } from '../helpers/constants';
+import { APP_CONSTANTS } from '../helpers/constants';
 import { filenameToName } from '../helpers/util';
 import './VisualizationPage.css';
 
@@ -17,7 +17,7 @@ function VisualizationPage() {
   const [NV, setNV] = useState();
   const [sessionKey, setSessionKey] = useState(undefined);
   const [checkBoxData, setCheckBoxData] = useState([]);
-  const [opacityValue, setOpacityValue] = useState(DEFAULT_SEGMENTATION_OPACITY*100);
+  const [opacityValue, setOpacityValue] = useState(APP_CONSTANTS.DEFAULT_SEGMENTATION_OPACITY*100);
   const axial_ref = useRef();
   const sagittal_ref = useRef();
   const coronal_ref = useRef();
@@ -28,6 +28,8 @@ function VisualizationPage() {
   const VisualizationContainer_ref = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [showReportScreen, setShowReportScreen] = useState(false);
 
   useEffect(() => {
     if (NV){
@@ -59,7 +61,7 @@ function VisualizationPage() {
 
       renderVisualization(axial_ref, sagittal_ref, coronal_ref, sessionKey) //async
       .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
-      const nv = create3DVolume(render_ref, sessionKey); //async
+      const nv = await create3DVolume(render_ref, sessionKey); //async
       setNV(nv);
     }
 
@@ -84,12 +86,14 @@ function VisualizationPage() {
     }
   }
 
-  const showReportScreen = () => {          /// CAN USE USESTATE SHOW TRUE/FALSE INSTEAD OF THIS
+  const onReportScreenClick = () => {          /// CAN USE USESTATE SHOW TRUE/FALSE INSTEAD OF THIS
     if (ReportScreen_ref.current.style.display === "none"){
+      setShowReportScreen(true);
       ReportScreen_ref.current.style.display = "block";
       VisualizationContainer_ref.current.style.opacity = "25%";
     }
     else{
+      setShowReportScreen(false);
       ReportScreen_ref.current.style.display = "none";
       VisualizationContainer_ref.current.style.opacity = "100%";
     }
@@ -123,7 +127,7 @@ function VisualizationPage() {
 const navBack = () => {
   const formData = new FormData()
   formData.append('sessionKey', sessionKey)
-  fetch(`${API_ORIGIN}/api/terminate-session`, {
+  fetch(`${APP_CONSTANTS.API_ORIGIN}/api/terminate-session`, {
     method: 'POST', 
     body: formData,
   }).then((response) => response.json())
@@ -147,7 +151,7 @@ const navBack = () => {
         </div>
         <div className="report-container">
           <div className="dropdown">
-            <div className="dropdown-header" onClick={showReportScreen}>Report</div>
+            <div className="dropdown-header" onClick={onReportScreenClick}>Report</div>
           </div>
         </div>
         <button onClick={navBack}>Back</button>
@@ -169,7 +173,9 @@ const navBack = () => {
       </div>
 
       <div className="report" ref={ReportScreen_ref} style={{display: "none"}}>
-        <ReportScreen sessionKey={sessionKey}/>
+        {(showReportScreen === false) ? (<></>) : (
+          <ReportScreen sessionKey={sessionKey} />
+        )}
       </div>
 
     </div>

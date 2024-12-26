@@ -7,7 +7,7 @@ load_dotenv()
 class Constants:
 
     # app variables
-    SESSIONS_DIR_NAME = 'sessions'
+    SESSIONS_DIR_NAME = os.environ['SESSIONS_DIR_PATH']
     DB_USER = os.environ['DB_USER']
     DB_PASS= os.environ['DB_PASS']
     DB_HOST = os.environ['DB_HOST']
@@ -19,13 +19,13 @@ class Constants:
     BASE_PATH = os.environ['BASE_PATH']
     MAIN_NIFTI_FORM_NAME = 'MAIN_NIFTI'  #main nifti file in Form Data
     MAIN_NIFTI_FILENAME = 'ct.nii.gz'
-    SEGMENTATIONS_NIFTI_FILENAME = 'combined_labels.nii.gz'
+    COMBINED_LABELS_FILENAME = 'combined_labels.nii.gz'
 
     # #db variables
     # DB_CONNECTION_STRING = os.environ['DB_CONNECTION_STRING']
 
     # NiftiProcessor Variables
-    EROSION_PIXELS = 4
+    EROSION_PIXELS = 2
     CUBE_LEN = (2 * EROSION_PIXELS) + 1
     STRUCTURING_ELEMENT = np.ones([CUBE_LEN, CUBE_LEN, CUBE_LEN], dtype=bool)
 

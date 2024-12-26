@@ -3,10 +3,10 @@ from flask_cors import CORS
 from constants import Constants
 from api.api_blueprint import api_blueprint
 from models.base import db
-from models.applicationSession import ApplicationSession
+from models.application_session import ApplicationSession
+from models.combined_labels import CombinedLabels
 # from datetime import datetime
 import os
-
 
 def create_session_dir():
     if not os.path.isdir(Constants.SESSIONS_DIR_NAME):

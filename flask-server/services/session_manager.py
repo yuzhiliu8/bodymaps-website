@@ -1,4 +1,5 @@
 import secrets
+import uuid
 from werkzeug.datastructures import FileStorage
 
 class SessionManager(object):
@@ -15,8 +16,8 @@ class SessionManager(object):
             #Complete any other necessary initialization here
         return cls._instance
     
-    def generate_session_key(self, length=32):
-        return secrets.token_hex(length)
+    def generate_uuid(self):
+        return str(uuid.uuid4())
     
     def validate_session(self, session_key):
         pass

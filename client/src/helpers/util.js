@@ -1,5 +1,10 @@
 export function filenameToName(filename) {
-    return filename.substring(0, filename.indexOf('.'));
+    let index = filename.indexOf('.');
+    if (index === -1){
+        return filename;
+    }
+
+    return filename.substring(0, index);
 }
 
 export function arrayIsEqual(arr1, arr2) {
