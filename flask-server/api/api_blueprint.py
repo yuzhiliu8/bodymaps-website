@@ -68,10 +68,9 @@ def upload():
     resp['status'] = "200"
     resp['session_id'] = session_id
     resp['combined_labels_id'] = combined_labels_id
+    resp['organ_intensities'] = organ_intensities
     
     return jsonify(resp)
-    
-
    
 @api_blueprint.route('/get-main-nifti/<session_id>', methods=['GET'])
 def get_main_nifti(session_id):
@@ -94,23 +93,23 @@ def get_main_nifti(session_id):
     
     return response
     
-@api_blueprint.route('/get-segmentations/<session_key>', methods=['GET'])
-def get_segmentations(session_key):
+@api_blueprint.route('/get-segmentations/<combined_labels_id>', methods=['GET'])
+def get_segmentations(combined_labels_id):
 
     #validate session_key
 
-    stmt = (
-        db.select(ApplicationSession.combined_labels_id, 
-                  CombinedLabels.combined_labels_path)
-            .join(CombinedLabels, ApplicationSession.combined_labels_id == CombinedLabels.combined_labels_id)
-            .where(ApplicationSession.session_id == session_key)
-    )
+    # stmt = (
+    #     db.select(ApplicationSession.combined_labels_id, 
+    #               CombinedLabels.combined_labels_path)
+    #         .join(CombinedLabels, ApplicationSession.combined_labels_id == CombinedLabels.combined_labels_id)
+    #         .where(ApplicationSession.session_id == session_key)
+    # )
+    stmt = db.select(CombinedLabels).where(CombinedLabels.combined_labels_id == combined_labels_id)
     resp = db.session.execute(stmt)
-    joint = resp.fetchone()
-    combined_labels_path = joint.combined_labels_path
+    clabel = resp.scalar()
 
-    if os.path.exists(combined_labels_path):
-        response = make_response(send_file(combined_labels_path, mimetype='application/gzip'))
+    if os.path.exists(clabel.combined_labels_path):
+        response = make_response(send_file(clabel.combined_labels_path, mimetype='application/gzip'))
 
         response.headers['Cross-Origin-Opener-Policy'] = 'same-origin'
         response.headers['Cross-Origin-Embedder-Policy'] = 'require-corp'
@@ -154,30 +153,15 @@ def get_mask_data():
         print("returning database info")
         return jsonify(row.organ_metadata)
 
-
-    return jsonify(session_key)
-    # return jsonify(processMasks(session_key)) FIX WHEN REFACTORING
-
 @api_blueprint.route(f'/terminate-session', methods=['POST'])
 def terminate_session():
-    session_key = request.form['sessionKey']
-
-    stmt = db.select(ApplicationSession).where(ApplicationSession.session_id == session_key)
-    resp = db.session.execute(stmt)
-    app_session = resp.scalar()
-    combined_labels_id = app_session.combined_labels_id
-
-    stmt = db.select(CombinedLabels).where(CombinedLabels.combined_labels_id == combined_labels_id)
-    resp = db.session.execute(stmt)
-    combined_labels = resp.scalar()
-
-    db.session.delete(app_session)
-    db.session.delete(combined_labels)
-    db.session.commit()
-
+    session_id = request.form['sessionKey']
+    session_manager = SessionManager.instance()
+    
+    session_manager.terminate_session(session_id)
     try:
-        print(f'removing session: {session_key}')
-        shutil.rmtree(os.path.join('sessions', session_key))
+        print(f'removing session: {session_id}')
+        shutil.rmtree(os.path.join(Constants.SESSIONS_DIR_NAME, session_id))
         return jsonify({'message': 'removed session!'})
     except:
         return jsonify({'message': 'Session does not exist!'})

@@ -47,21 +47,23 @@ function VisualizationPage() {
         navigate('/');
         return;
       }
-      const sessionKey = state.sessionKey;
-      const fileInfo = state.fileInfo;
-      console.log(state);
-      setSessionKey(sessionKey);
-      const masks = fileInfo.masks;
-      const _checkBoxData = masks.map((filename, i) => {
-        return {label: filenameToName(filename), id: i+1}
-      })
-      _checkBoxData.unshift({label: "Default (All)", id: 0})
-      setCheckBoxData(_checkBoxData);
-      setCheckState(Array(_checkBoxData.length).fill(true));
 
-      renderVisualization(axial_ref, sagittal_ref, coronal_ref, sessionKey) //async
+      const sessionId = state.session_id
+      const clabelId = state.combined_labels_id
+      const organ_intensities = state.organ_intensities
+
+      setSessionKey(sessionId);
+
+      const checkBoxData = Object.keys(organ_intensities).map((filename, i) => {
+        return {label: filenameToName(filename), id: i+1}
+      });
+      checkBoxData.unshift({label: "Default (All)", id: 0});
+      setCheckBoxData(checkBoxData);
+      setCheckState(Array(checkBoxData.length).fill(true));
+
+      renderVisualization(axial_ref, sagittal_ref, coronal_ref, sessionId, clabelId) //async
       .then((UIDs) => setSegmentationRepresentationUIDs(UIDs));
-      const nv = await create3DVolume(render_ref, sessionKey); //async
+      const nv = await create3DVolume(render_ref, clabelId); //async
       setNV(nv);
     }
 

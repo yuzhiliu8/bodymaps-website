@@ -10,7 +10,7 @@ console.log('niivue created');
 
 
 
-export async function create3DVolume(canvasRef, sessionKey){
+export async function create3DVolume(canvasRef, clabelId){
     console.log(nv.volumes);
     if (nv.volumes.length > 0){  //remove existing volumes
         for (let i = 0; i < nv.volumes.length; i++){
@@ -20,7 +20,7 @@ export async function create3DVolume(canvasRef, sessionKey){
     nv.attachToCanvas(canvasRef.current);
     const nvImage = await NVImage.loadFromUrl({
         name: "combined_labels.nii.gz", //Make not harded coded, plz
-        url: `${APP_CONSTANTS.API_ORIGIN}/api/get-segmentations/${sessionKey}`
+        url: `${APP_CONSTANTS.API_ORIGIN}/api/get-segmentations/${clabelId}`
     });
     nvImage.setColormapLabel(APP_CONSTANTS.NVColormap)
     nv.addVolume(nvImage);

@@ -74,7 +74,7 @@ export default function HomePage() {
         fileInfo.MAIN_NIFTI = mainNifti;
         fileInfo.masks = fileNames;
         console.log(data);
-        navigate('/visualization', {state: {sessionKey: data.session_id, fileInfo: fileInfo}});   
+        navigate('/visualization', {state: data});   
         });
       } catch (error) {
         console.error(error.message);

@@ -45,7 +45,7 @@ const toolGroupSpecificRepresentationConfig = {
   },
 };
 
-export async function renderVisualization(ref1, ref2, ref3, sessionKey){
+export async function renderVisualization(ref1, ref2, ref3, sessionId, clabelId){
   cache.purgeCache();
   csTools3dInit();
   await csInit();
@@ -58,7 +58,7 @@ export async function renderVisualization(ref1, ref2, ref3, sessionKey){
   volumeLoader.registerVolumeLoader('nifti', cornerstoneNiftiImageVolumeLoader);
   const renderingEngine = createRenderingEngine();
 
-  const mainNiftiURL = `${APP_CONSTANTS.API_ORIGIN}/api/get-main-nifti/${sessionKey}`;
+  const mainNiftiURL = `${APP_CONSTANTS.API_ORIGIN}/api/get-main-nifti/${sessionId}`;
   const volumeId = 'nifti:' + mainNiftiURL;
 
   const viewportId1 = 'CT_NIFTI_AXIAL';
@@ -67,7 +67,7 @@ export async function renderVisualization(ref1, ref2, ref3, sessionKey){
   
   const volume = await volumeLoader.createAndCacheVolume(volumeId);
   
-  const segmentationURL = `${APP_CONSTANTS.API_ORIGIN}/api/get-segmentations/${sessionKey}`;
+  const segmentationURL = `${APP_CONSTANTS.API_ORIGIN}/api/get-segmentations/${clabelId}`;
   const combined_labels_Id = 'nifti:' + segmentationURL;
   const combined_labels = await volumeLoader.createAndCacheVolume(combined_labels_Id);
 
