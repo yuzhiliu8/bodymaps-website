@@ -10,16 +10,15 @@ from sqlalchemy.orm import aliased
 import shutil
 import os
 import nibabel as nib
-from datetime import datetime
+from datetime import datetime, timedelta
 
 api_blueprint = Blueprint('api', __name__)
 
-@api_blueprint.route(f'/', methods=['GET'])
+@api_blueprint.route('/', methods=['GET'])
 def home():
     return "api"
 
-
-@api_blueprint.route(f'/upload', methods= ['POST'])
+@api_blueprint.route('/upload', methods= ['POST'])
 def upload():
     resp = {}
     #if MAIN_NIFTI
@@ -29,7 +28,6 @@ def upload():
     session_id = session_manager.generate_uuid()
     base_path = os.path.join(Constants.SESSIONS_DIR_NAME, session_id)
     nifti_processor = NiftiProcessor.from_clabel_path(os.path.join(base_path, Constants.COMBINED_LABELS_FILENAME))
-    print(nifti_processor)
 
     nifti_multi_dict = request.files
     filenames = list(nifti_multi_dict)
@@ -117,7 +115,7 @@ def get_segmentations(combined_labels_id):
 
         return response
 
-@api_blueprint.route(f'/mask-data', methods=['POST'])
+@api_blueprint.route('/mask-data', methods=['POST'])
 def get_mask_data():
     session_key = request.form['sessionKey']
 
@@ -166,3 +164,11 @@ def terminate_session():
     except:
         return jsonify({'message': 'Session does not exist!'})
 
+@api_blueprint.route('/scheduled_check', methods = ['GET'])
+def scheduled_check():
+    session_manager = SessionManager.instance()
+    session_manager.scheduled_check()
+    stmt = db.select(ApplicationSession)
+    resp = db.session.execute(stmt)
+    print(resp.scalars().all())
+    return 'hi'

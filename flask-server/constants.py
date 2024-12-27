@@ -21,6 +21,8 @@ class Constants:
     MAIN_NIFTI_FILENAME = 'ct.nii.gz'
     COMBINED_LABELS_FILENAME = 'combined_labels.nii.gz'
 
+    SESSION_TIMEDELTA = 7 #in days
+
     # #db variables
     # DB_CONNECTION_STRING = os.environ['DB_CONNECTION_STRING']
 

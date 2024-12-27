@@ -1,8 +1,10 @@
 from models.base import db
 from models.application_session import ApplicationSession
 from models.combined_labels import CombinedLabels
+from datetime import datetime, timedelta
+from constants import Constants
 import uuid
-import asyncio
+
 
 class SessionManager(object):
     _instance = None
@@ -21,7 +23,6 @@ class SessionManager(object):
     def generate_uuid(self):
         return str(uuid.uuid4())
 
-    
     def validate_session(self, session_id):
         pass
         
@@ -29,6 +30,7 @@ class SessionManager(object):
         pass
         
     def terminate_session(self, session_id):
+        
         stmt = db.select(ApplicationSession).where(ApplicationSession.session_id == session_id)
         resp = db.session.execute(stmt)
         app_session = resp.scalar()
@@ -41,4 +43,9 @@ class SessionManager(object):
         db.session.delete(app_session)
         db.session.delete(combined_labels)
         db.session.commit()
+
+    def scheduled_check():
+        stmt = db.select(ApplicationSession).where
+        resp = db.session.execute(stmt)
+        print(resp.scalars().all())
 
