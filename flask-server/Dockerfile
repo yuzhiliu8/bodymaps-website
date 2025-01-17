@@ -17,4 +17,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 5000
 
-CMD ["gunicorn",  "--workers", "2", "--threads", "2", "app:app", "--bind", "0.0.0.0:5000"]
+CMD ["gunicorn",  "-w", "2", "-t", "2", "app:app", "--bind", "0.0.0.0:5000"]

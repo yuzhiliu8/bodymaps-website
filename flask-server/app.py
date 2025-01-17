@@ -8,7 +8,7 @@ from models.combined_labels import CombinedLabels
 from services.session_manager import SessionManager
 # from datetime import datetime
 import os
-from apscheduler.schedulers.background import BackgroundScheduler
+#from apscheduler.schedulers.background import BackgroundScheduler
 
 def create_session_dir():
     if not os.path.isdir(Constants.SESSIONS_DIR_NAME):
@@ -28,9 +28,9 @@ def create_app():
     CORS(app)
     with app.app_context():
         db.create_all()
-        scheduler = BackgroundScheduler()
-        scheduler.add_job(func=SessionManager.scheduled_check, trigger='interval', seconds=2)
-        scheduler.start()
+        #scheduler = BackgroundScheduler()
+        #scheduler.add_job(func=SessionManager.scheduled_check, trigger='interval', seconds=2)
+        #scheduler.start()
     return app
 
 app = create_app() 

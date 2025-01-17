@@ -2,7 +2,6 @@ from models.base import db
 from models.application_session import ApplicationSession
 from models.combined_labels import CombinedLabels
 from datetime import datetime, timedelta
-from constants import Constants
 import uuid
 
 
