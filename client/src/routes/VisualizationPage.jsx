@@ -32,14 +32,6 @@ function VisualizationPage() {
   const [showReportScreen, setShowReportScreen] = useState(false);
 
   useEffect(() => {
-    if (NV){
-      console.log("HAS NV");
-      console.log(NV);
-    }
-    else {  
-      console.log("NO NV");
-      console.log(NV); 
-    }
     const setup = async () => {
       const state = location.state; 
       if (!state){
@@ -158,9 +150,6 @@ const navBack = () => {
         </div>
         <button onClick={navBack}>Back</button>
         <br/>
-        {/* <button onClick={() => {
-          console.log(filenameToName('aorta.nii.gz'))
-        }}> Debug </button> */}
       </div>
       
       <div className="visualization-container" ref={VisualizationContainer_ref} >
@@ -183,5 +172,4 @@ const navBack = () => {
     </div>
   )
 }
-
 export default VisualizationPage

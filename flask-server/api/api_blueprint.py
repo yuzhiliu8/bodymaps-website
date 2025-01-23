@@ -7,12 +7,24 @@ from models.base import db
 from constants import Constants
 
 from sqlalchemy.orm import aliased
-import shutil
 import os
 import nibabel as nib
 from datetime import datetime, timedelta
 
 api_blueprint = Blueprint('api', __name__)
+last_session_check = datetime.now()
+
+@api_blueprint.before_request
+def before_request():
+    global last_session_check
+    current_time = datetime.now()
+    if current_time >= last_session_check + timedelta(minutes=Constants.SCHEDULED_CHECK_INTERVAL):
+        session_manager = SessionManager.instance()
+        expired = session_manager.get_expired()
+        for app_session in expired:
+            session_manager.terminate_session(app_session.session_id)
+        
+        last_session_check = current_time
 
 @api_blueprint.route('/', methods=['GET'])
 def home():
@@ -44,11 +56,16 @@ def upload():
     organ_metadata = {}
 
     combined_labels_id = session_manager.generate_uuid()
+
+    current_time = datetime.now()
+    expire_time = current_time + timedelta(days=3)
+
     new_session = ApplicationSession(
         session_id=session_id,
         main_nifti_path=main_nifti_path,
         combined_labels_id=combined_labels_id,
-        session_created=datetime.now()
+        session_created=current_time,
+        session_expire_date = expire_time,
     )
     
     new_clabel = CombinedLabels(
@@ -96,12 +113,6 @@ def get_segmentations(combined_labels_id):
 
     #validate session_key
 
-    # stmt = (
-    #     db.select(ApplicationSession.combined_labels_id, 
-    #               CombinedLabels.combined_labels_path)
-    #         .join(CombinedLabels, ApplicationSession.combined_labels_id == CombinedLabels.combined_labels_id)
-    #         .where(ApplicationSession.session_id == session_key)
-    # )
     stmt = db.select(CombinedLabels).where(CombinedLabels.combined_labels_id == combined_labels_id)
     resp = db.session.execute(stmt)
     clabel = resp.scalar()
@@ -156,19 +167,17 @@ def terminate_session():
     session_id = request.form['sessionKey']
     session_manager = SessionManager.instance()
     
-    session_manager.terminate_session(session_id)
-    try:
-        print(f'removing session: {session_id}')
-        shutil.rmtree(os.path.join(Constants.SESSIONS_DIR_NAME, session_id))
-        return jsonify({'message': 'removed session!'})
-    except:
-        return jsonify({'message': 'Session does not exist!'})
+    success = session_manager.terminate_session(session_id)
 
-@api_blueprint.route('/scheduled_check', methods = ['GET'])
-def scheduled_check():
-    session_manager = SessionManager.instance()
-    session_manager.scheduled_check()
-    stmt = db.select(ApplicationSession)
-    resp = db.session.execute(stmt)
-    print(resp.scalars().all())
-    return 'hi'
+    if success:
+        return jsonify({'message': 'removed session!'})
+    else:
+        return jsonify({'message': 'Session does not exist!'})
+# @api_blueprint.route('/scheduled_check', methods = ['GET'])
+# def scheduled_check():
+#     session_manager = SessionManager.instance()
+#     session_manager.scheduled_check()
+#     stmt = db.select(ApplicationSession)
+#     resp = db.session.execute(stmt)
+#     print(resp.scalars().all())
+#     return 'hi'

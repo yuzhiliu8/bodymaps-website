@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 import numpy as np
+from datetime import datetime
 
 load_dotenv()   
 
@@ -13,7 +14,8 @@ class Constants:
     DB_HOST = os.environ['DB_HOST']
     DB_NAME = os.environ['DB_NAME']
     SQLALCHEMY_DATABASE_URI = f'postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}'
-
+    
+    SCHEDULED_CHECK_INTERVAL = 5 #minutes  
 
     # api_blueprint variables
     BASE_PATH = os.environ['BASE_PATH']
@@ -21,7 +23,7 @@ class Constants:
     MAIN_NIFTI_FILENAME = 'ct.nii.gz'
     COMBINED_LABELS_FILENAME = 'combined_labels.nii.gz'
 
-    SESSION_TIMEDELTA = 7 #in days
+    SESSION_TIMEDELTA = 3 #in days
 
     # #db variables
     # DB_CONNECTION_STRING = os.environ['DB_CONNECTION_STRING']

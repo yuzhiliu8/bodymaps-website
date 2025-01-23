@@ -2,21 +2,15 @@ import { Niivue, NVImage, SLICE_TYPE } from '@niivue/niivue';
 import { APP_CONSTANTS } from './constants';
 
 
-const nv = new Niivue({
-    sliceType: SLICE_TYPE.RENDER,
-});
-console.log('niivue created');
-
 
 
 
 export async function create3DVolume(canvasRef, clabelId){
-    console.log(nv.volumes);
-    if (nv.volumes.length > 0){  //remove existing volumes
-        for (let i = 0; i < nv.volumes.length; i++){
-            nv.removeVolume[i]; 
-        }
-   }
+
+    const nv = new Niivue({
+        sliceType: SLICE_TYPE.RENDER,
+    });
+
     nv.attachToCanvas(canvasRef.current);
     const nvImage = await NVImage.loadFromUrl({
         name: "combined_labels.nii.gz", //Make not harded coded, plz
@@ -31,17 +25,7 @@ export async function create3DVolume(canvasRef, clabelId){
         A: [0, 128, 128, 128, 128, 0, 128, 128, 128, 128, 128],
         I: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 });
-    //nv.updateGLVolume();
-    
-    
-    // segmentationInfos.forEach(async (segInfo, i) => {
-    //     const name = `${segInfo.volumeId}.nii.gz`
-    //     const imageOptions = NVImageFromUrlOptions(name);
-    //     imageOptions.buffer = segInfo.buffer;
-    //     imageOptions.name = name;
-    //     imageOptions.colormap = colorMapNames[i];
-    //     await nv.addVolumeFromUrl(imageOptions);
-    // })
+    console.log('niivue created');
     return nv;
 }
 
