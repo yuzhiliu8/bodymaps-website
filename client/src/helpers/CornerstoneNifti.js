@@ -147,7 +147,6 @@ export async function renderVisualization(ref1, ref2, ref3, sessionId, clabelId)
 
 function addToolsToCornerstone(){
   const addedTools = csToolState.tools;
-  console.log(addedTools);
   if (!addedTools.StackScrollMouseWheel) addTool(StackScrollMouseWheelTool);
   if (!addedTools.SegmentationDisplay) addTool(SegmentationDisplayTool);
   if (!addedTools.Zoom) addTool(ZoomTool);

@@ -5,8 +5,6 @@ import './NestedCheckBox.css'
 
 function CheckBox({itemData, checkStateProp, update}) {
     const isChecked = checkStateProp[itemData.id];
-    console.log(itemData);
-
     let backgroundColor;
     if (itemData.id === 0){
         backgroundColor = `rgba(0, 0, 0, 0)`;
