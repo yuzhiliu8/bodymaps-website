@@ -183,5 +183,4 @@ const navBack = () => {
     </div>
   )
 }
-
 export default VisualizationPage
