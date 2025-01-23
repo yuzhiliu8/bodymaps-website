@@ -3,58 +3,75 @@
     text-align:center;
   }
   
-  .container{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height:100vh;
-    flex-direction:column;
-  }
+.container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height:100vh;
+  flex-direction:column;
+}
   
-  .header {
-    position:absolute;
-    top:10px;
-    left:10px;
-    font-size: 20px;
-    color: #a5a5a5;
-    font-family: AptosDisplay;
-  }
-  
-  
+.header {
+  position:absolute;
+  top:10px;
+  left:10px;
+  font-size: 20px;
+  color: #a5a5a5;
+  font-family: AptosDisplay;
+}
   
   
   
-  .input-container {
-    display:flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    margin:0 20vh;
-    background-color: #eaeef8;
-    box-sizing:border-box;
-    border: 2px solid #1d43b3;
-    border-radius: 15px;
-  }
   
-  .fileInput{
-    opacity:0%;
-    min-height:10vh;
-    padding: 2vh 25vh;
-  }
   
-  .label-container{
-    position:absolute;
-    flex-grow: inherit;
-  }
+.input-container {
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin:0 20vh;
+  background-color: #eaeef8;
+  box-sizing:border-box;
+  border: 2px solid #1d43b3;
+  border-radius: 15px;
+}
   
-  .input-label{
-    font-size: 20px;
-    font-family: AptosDisplay;
-    color: #2955bb;
-  }
+.fileInput{
+  opacity:0%;
+  min-height:10vh;
+  padding: 2vh 25vh;
+}
   
-  .note{
-    font-family: AptosDisplay;
-    font-size: 16px;
-    color: #a5a5a5;
-  }
+.label-container{
+  position:absolute;
+  flex-grow: inherit;
+}
+  
+.input-label{
+  font-size: 20px;
+  font-family: AptosDisplay;
+  color: #2955bb;
+}
+  
+.note{
+  font-family: AptosDisplay;
+  font-size: 16px;
+  color: #a5a5a5;
+}
+
+.segmentation-mode-selector-container{
+  background-color:lightblue;
+  width:40vw;
+  height:200px;
+}
+
+.seg-mode-select-header{
+  display:flex;
+  flex-direction:row;
+  gap:5px;
+}
+
+.seg-mode{
+  background-color:lightgrey;
+  flex: 1;
+}

@@ -10,6 +10,7 @@ import "./HomePage.css"
 export default function HomePage() {
   const [mainNifti, setMainNifti] = useState({});
   const [masks, setMasks] = useState();
+  
   const navigate = useNavigate();
 
 
@@ -117,8 +118,21 @@ export default function HomePage() {
           By using this online service ​<br/> you agree that the data can be used to improve the model.​
         </div>
         <br/>
-        <div>Upload CT Masks Here: (Development Phase only)</div> <br/>
+        {/* <div className="segmentation-mode-selector-container">
+            <div className="seg-mode-select-header">
+              <div className="seg-mode">
+                <p>Use AI Segmentation</p>
+              </div>
+              <div className="seg-mode">
+                <p>Use Own Segmentations</p>
+              </div>
+            </div>
+            
+
+        </div> */}
+        <div>Upload CT Masks Here:</div> <br/>
         <input type="file" multiple onChange={handleMaskUpload}/>
+        {/* <button>Go!</button> */}
       </div>
     </div>    
   )
